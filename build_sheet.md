@@ -812,19 +812,19 @@ Everything in Premium, plus:
 
 #### Step 4.1 — Tafsir Viewer
 
-- [ ] Tafsir synchronized with Quran panel
+- [x] Tafsir synchronized with Quran panel
   - Auto-scrolls tafsir to match current verse in Quran panel
   - Or: select any verse, tafsir panel updates
-- [ ] Tafsir selector: switch between installed tafsirs easily
-- [ ] Multiple tafsirs side by side
-- [ ] Volume/page reference always shown (for citation)
+- [x] Tafsir selector: switch between installed tafsirs easily
+- [x] Multiple tafsirs side by side
+- [x] Volume/page reference always shown (for citation)
 - [ ] Tafsir passage highlights: key rulings, ijaz markers, disputed points
 
 #### Step 4.2 — Tafsir Cross-References
 
-- [ ] Hadith citations within tafsir are live links → opens hadith in panel
-- [ ] Quranic verse cross-references within tafsir are live links
-- [ ] Author bio accessible from tafsir header
+- [x] Hadith citations within tafsir are live links → opens hadith in panel
+- [x] Quranic verse cross-references within tafsir are live links
+- [x] Author bio accessible from tafsir header
 
 ---
 

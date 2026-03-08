@@ -93,6 +93,9 @@ type CachedStatements = {
   getAyahsBySurah: Statement
   getTranslations: Statement
   getTafsir: Statement
+  getTafsirsForAyah: Statement
+  getTafsirsBySurah: Statement
+  getTafsirKeys: Statement
   getHadith: Statement
   getHadithGrades: Statement
   getMorphologyForAyah: Statement
@@ -154,6 +157,24 @@ export class LibraryService {
       getTafsir: this.db.prepare(`
         SELECT * FROM tafsir_entries WHERE ayah_id = ? AND tafsir_key = ?
         LIMIT 1
+      `),
+
+      getTafsirsForAyah: this.db.prepare(`
+        SELECT * FROM tafsir_entries WHERE ayah_id = ?
+        ORDER BY tafsir_key
+      `),
+
+      getTafsirsBySurah: this.db.prepare(`
+        SELECT te.*
+        FROM tafsir_entries te
+        JOIN ayahs a ON te.ayah_id = a.id
+        JOIN surahs s ON a.surah_id = s.id
+        WHERE s.number = ? AND te.tafsir_key = ?
+        ORDER BY a.ayah_number
+      `),
+
+      getTafsirKeys: this.db.prepare(`
+        SELECT DISTINCT tafsir_key FROM tafsir_entries ORDER BY tafsir_key
       `),
 
       getHadith: this.db.prepare(`
@@ -234,6 +255,19 @@ export class LibraryService {
 
   getTafsir(ayahId: number, tafsirKey: string): TafsirRow | undefined {
     return this.stmts.getTafsir.get(ayahId, tafsirKey) as TafsirRow | undefined
+  }
+
+  getTafsirsForAyah(ayahId: number): TafsirRow[] {
+    return this.stmts.getTafsirsForAyah.all(ayahId) as TafsirRow[]
+  }
+
+  getTafsirsBySurah(surahNumber: number, tafsirKey: string): TafsirRow[] {
+    return this.stmts.getTafsirsBySurah.all(surahNumber, tafsirKey) as TafsirRow[]
+  }
+
+  getTafsirKeys(): string[] {
+    const rows = this.stmts.getTafsirKeys.all() as Array<{ tafsir_key: string }>
+    return rows.map((r) => r.tafsir_key)
   }
 
   getHadith(collectionKey: string, hadithNumber: string): HadithRow | undefined {

@@ -350,6 +350,66 @@ This file tracks the implementation progress of the Maktabat Quran Study Softwar
 
 ---
 
+### Session 4 — Phase 4: Tafsir Module
+
+**Date**: 2026-03-08
+
+**Status**: ✅ Complete
+
+#### Changes Made
+
+**`packages/main/src/library-service.ts`** — Enhanced
+
+- Added `getTafsirsForAyah: Statement`, `getTafsirsBySurah: Statement`, `getTafsirKeys: Statement` to statement cache
+- Added `getTafsirsForAyah(ayahId)` — returns all tafsir entries for a single ayah (any key)
+- Added `getTafsirsBySurah(surahNumber, tafsirKey)` — returns tafsir for all ayahs in a surah
+- Added `getTafsirKeys()` — returns list of installed tafsir keys
+
+**`packages/main/src/ipc-handlers.ts`** — Enhanced
+
+- Added `library:get-tafsirs-for-ayah` handler
+- Added `library:get-tafsirs-by-surah` handler
+- Added `library:get-tafsir-keys` handler
+
+**`packages/main/src/preload.ts`** — Enhanced
+
+- Added `library:get-tafsirs-for-ayah`, `library:get-tafsirs-by-surah`, `library:get-tafsir-keys` to `validChannels` whitelist
+
+**`packages/shared/types/ipc.ts`** — Enhanced
+
+- Added `LIBRARY_GET_TAFSIRS_FOR_AYAH`, `LIBRARY_GET_TAFSIRS_BY_SURAH`, `LIBRARY_GET_TAFSIR_KEYS` IPC channel constants
+- Added `TafsirData`, `GetTafsirsForAyahRequest`, `GetTafsirsBySurahRequest` types
+
+**`packages/database/seeds/seed-tafsir-fatiha.sql`** — New file
+
+- Ibn Kathir tafsir commentary for all 7 verses of Al-Fatiha
+- Inserts `ibn-kathir` into the `resources` table (author, tradition, type, century metadata)
+- Volume and page references from standard print edition
+- Scholarly commentary with cross-references to Quranic verses
+
+**`packages/renderer/src/components/tafsir/TafsirViewer.tsx`** — New file
+
+- **Full tafsir viewer** for route `/tafsir/:surah/:ayah`
+- Surah/ayah taken from URL route params; synchronized from QuranReader's "View Tafsir" button
+- **Arabic verse banner**: displays the full tashkeel Arabic text at top of viewer
+- **Tafsir selector**: toggle between up to 2 installed tafsirs (TAFSIR_REGISTRY metadata lookup)
+- **Side-by-side panels**: when 2 tafsirs selected, rendered as split horizontal columns
+- **Volume/page citation badge**: shows "Vol. N, p. N" for every entry (gold-tinted)
+- **Cross-reference parser** (`parseCrossRefs`): regex-powered inline link parser:
+  - `Quran N:N` / `Q N:N` → navigates to `/tafsir/N/N`
+  - `(N:N)` parenthetical refs → same navigation
+  - `Bukhari N` / `Muslim N` / etc. → navigates to `/hadith/collection/N`
+- **Author bio modal** (`AuthorBioModal`): accessible from each panel's header "About ℹ" button — shows title, Arabic title, author name, dates, tradition, century, language, and biography
+- **Ayah navigator**: prev/verse buttons with "Verse N of M" counter
+- **TAFSIR_REGISTRY**: static metadata for Ibn Kathir, Al-Jalalayn, Al-Tabari (expandable as DB grows)
+- Graceful empty state when no tafsir data available for a verse
+
+**`packages/renderer/src/routes/index.tsx`** — Updated
+
+- `/tafsir/:surah/:ayah` now uses real `TafsirViewer` component (was `PlaceholderRoute`)
+
+---
+
 ## Phase Completion Status
 
 ### Phase 0: Project Foundation ✅ (pre-existing)
@@ -415,4 +475,15 @@ This file tracks the implementation progress of the Maktabat Quran Study Softwar
 - [x] Verse interaction menu (right-click context menu)
 - [x] Surah navigator (surah list, Meccan/Medinan filter, search, Juz' tab)
 
-### Phases 4–14 — _future sessions_
+### Phase 4: Tafsir Module ✅ (Session 4)
+
+- [x] Tafsir synchronized with Quran panel (QuranReader "View Tafsir" → `/tafsir/:surah/:ayah`)
+- [x] Tafsir selector: switch between installed tafsirs (TafsirSelector component)
+- [x] Multiple tafsirs side by side (up to 2 in horizontal split)
+- [x] Volume/page reference always shown (citation badge per entry)
+- [ ] Tafsir passage highlights: key rulings, ijaz markers, disputed points (requires DB annotation schema — deferred)
+- [x] Hadith citations within tafsir are live links → opens hadith in panel
+- [x] Quranic verse cross-references within tafsir are live links
+- [x] Author bio accessible from tafsir header (AuthorBioModal)
+
+### Phases 5–14 — _future sessions_
