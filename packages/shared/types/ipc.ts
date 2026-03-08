@@ -5,6 +5,9 @@ export const IpcChannel = {
   LIBRARY_GET_AYAHS_BY_SURAH: 'library:get-ayahs-by-surah',
   LIBRARY_GET_TRANSLATIONS: 'library:get-translations',
   LIBRARY_GET_TAFSIR: 'library:get-tafsir',
+  LIBRARY_GET_TAFSIRS_FOR_AYAH: 'library:get-tafsirs-for-ayah',
+  LIBRARY_GET_TAFSIRS_BY_SURAH: 'library:get-tafsirs-by-surah',
+  LIBRARY_GET_TAFSIR_KEYS: 'library:get-tafsir-keys',
   LIBRARY_GET_HADITH: 'library:get-hadith',
   LIBRARY_GET_MORPHOLOGY: 'library:get-morphology',
   USER_SAVE_NOTE: 'user:save-note',
@@ -163,4 +166,23 @@ export interface HighlightData {
   resourceKey: string
   contentRef: string
   color: HighlightColor
+}
+
+export interface TafsirData {
+  id: number
+  ayahId: number
+  tafsirKey: string
+  text: string
+  language: string
+  volume: number | null
+  page: number | null
+}
+
+export interface GetTafsirsForAyahRequest {
+  ayahId: number
+}
+
+export interface GetTafsirsBySurahRequest {
+  surahNumber: number
+  tafsirKey: string
 }

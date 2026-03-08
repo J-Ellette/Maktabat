@@ -4,6 +4,7 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 const Dashboard = lazy(() => import('../components/dashboard/Dashboard'))
 const SettingsPanel = lazy(() => import('../components/settings/SettingsPanel'))
 const QuranReader = lazy(() => import('../components/quran/QuranReader'))
+const TafsirViewer = lazy(() => import('../components/tafsir/TafsirViewer'))
 const PlaceholderRoute = lazy(() => import('./PlaceholderRoute'))
 
 function RouteSpinner() {
@@ -29,7 +30,8 @@ export default function AppRoutes(): React.ReactElement {
         <Route path="/hadith" element={<PlaceholderRoute title="Hadith" />} />
         <Route path="/hadith/:collection" element={<PlaceholderRoute title="Hadith" />} />
         <Route path="/hadith/:collection/:number" element={<PlaceholderRoute title="Hadith" />} />
-        <Route path="/tafsir/:surah/:ayah" element={<PlaceholderRoute title="Tafsir" />} />
+        {/* Tafsir module — Phase 4 */}
+        <Route path="/tafsir/:surah/:ayah" element={<TafsirViewer />} />
         <Route path="/search" element={<PlaceholderRoute title="Search" />} />
         <Route path="/library" element={<PlaceholderRoute title="Library Manager" />} />
         <Route path="/reading-plans" element={<PlaceholderRoute title="Reading Plans" />} />

@@ -82,6 +82,28 @@ export function registerIpcHandlers(
     return libraryService.getTafsir(id, key) ?? null
   })
 
+  // ── library:get-tafsirs-for-ayah ────────────────────────────────────────────
+  ipcMain.handle('library:get-tafsirs-for-ayah', (_event, ayahId: unknown) => {
+    const id = assertNumber(ayahId, 'ayahId')
+    return libraryService.getTafsirsForAyah(id)
+  })
+
+  // ── library:get-tafsirs-by-surah ────────────────────────────────────────────
+  ipcMain.handle(
+    'library:get-tafsirs-by-surah',
+    (_event, surahNumber: unknown, tafsirKey: unknown) => {
+      const sn = assertNumber(surahNumber, 'surahNumber')
+      const key = assertString(tafsirKey, 'tafsirKey')
+      if (sn < 1 || sn > 114) throw new Error('surahNumber must be between 1 and 114')
+      return libraryService.getTafsirsBySurah(sn, key)
+    }
+  )
+
+  // ── library:get-tafsir-keys ─────────────────────────────────────────────────
+  ipcMain.handle('library:get-tafsir-keys', () => {
+    return libraryService.getTafsirKeys()
+  })
+
   // ── library:get-hadith ──────────────────────────────────────────────────────
   ipcMain.handle('library:get-hadith', (_event, collectionKey: unknown, hadithNumber: unknown) => {
     const ck = assertString(collectionKey, 'collectionKey')
