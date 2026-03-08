@@ -1,0 +1,14 @@
+node_modules/
+dist/
+build/
+out/
+.cache/
+coverage/
+storybook-static/
+*.log
+.DS_Store
+*.db
+.env
+.env.*
+!.env.example
+wasm/*.wasm
