@@ -1,4 +1,4 @@
-import { app, Menu, MenuItem, shell, BrowserWindow } from 'electron'
+import { app, Menu, shell, BrowserWindow } from 'electron'
 
 export function buildMenu(getMainWindow: () => BrowserWindow | null): void {
   const isMac = process.platform === 'darwin'
@@ -101,10 +101,7 @@ export function buildMenu(getMainWindow: () => BrowserWindow | null): void {
               { type: 'separator' as const },
               {
                 label: 'Speech',
-                submenu: [
-                  { role: 'startSpeaking' as const },
-                  { role: 'stopSpeaking' as const },
-                ],
+                submenu: [{ role: 'startSpeaking' as const }, { role: 'stopSpeaking' as const }],
               },
             ]
           : []),
@@ -150,7 +147,8 @@ export function buildMenu(getMainWindow: () => BrowserWindow | null): void {
           accelerator: 'CmdOrCtrl+-',
           click: (): void => {
             const win = getMainWindow()
-            if (win) win.webContents.setZoomFactor(Math.max(0.5, win.webContents.getZoomFactor() - 0.1))
+            if (win)
+              win.webContents.setZoomFactor(Math.max(0.5, win.webContents.getZoomFactor() - 0.1))
           },
         },
         {
@@ -247,8 +245,8 @@ export function buildMenu(getMainWindow: () => BrowserWindow | null): void {
       submenu: [
         {
           label: 'Documentation',
-          click: async (): Promise<void> => {
-            await shell.openExternal('https://github.com/maktabat/maktabat/wiki')
+          click: (): void => {
+            void shell.openExternal('https://github.com/maktabat/maktabat/wiki')
           },
         },
         {
