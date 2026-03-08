@@ -1,12 +1,16 @@
 export const IpcChannel = {
   LIBRARY_SEARCH: 'library:search',
+  LIBRARY_GET_SURAHS: 'library:get-surahs',
   LIBRARY_GET_AYAH: 'library:get-ayah',
+  LIBRARY_GET_AYAHS_BY_SURAH: 'library:get-ayahs-by-surah',
+  LIBRARY_GET_TRANSLATIONS: 'library:get-translations',
   LIBRARY_GET_TAFSIR: 'library:get-tafsir',
   LIBRARY_GET_HADITH: 'library:get-hadith',
   LIBRARY_GET_MORPHOLOGY: 'library:get-morphology',
   USER_SAVE_NOTE: 'user:save-note',
   USER_GET_NOTES: 'user:get-notes',
   USER_SAVE_HIGHLIGHT: 'user:save-highlight',
+  USER_GET_HIGHLIGHTS: 'user:get-highlights',
   USER_GET_READING_PLAN: 'user:get-reading-plan',
   AUDIO_PLAY: 'audio:play',
   AUDIO_PAUSE: 'audio:pause',
@@ -96,4 +100,67 @@ export interface SettingsGetRequest {
 export interface SettingsSetRequest {
   key: string
   value: unknown
+}
+
+// Quran data types returned from IPC
+export interface SurahInfo {
+  id: number
+  number: number
+  arabicName: string
+  transliteratedName: string
+  englishName: string
+  revelationType: 'meccan' | 'medinan'
+  verseCount: number
+  juzStart: number
+}
+
+export interface AyahData {
+  id: number
+  surahNumber: number
+  ayahNumber: number
+  arabicText: string
+  arabicSimple: string
+  bismillahPre: boolean
+}
+
+export interface TranslationData {
+  id: number
+  ayahId: number
+  translationKey: string
+  text: string
+  translator: string
+  language: string
+}
+
+export interface MorphologyData {
+  id: number
+  wordPosition: number
+  surfaceForm: string
+  rootLetters: string | null
+  rootMeaningEnglish: string | null
+  pattern: string | null
+  pos: string
+  caseMarker: string | null
+}
+
+export interface AyahBundle {
+  ayah: AyahData
+  translations: TranslationData[]
+  morphology: MorphologyData[]
+}
+
+export type HighlightColor =
+  | 'gold'
+  | 'green'
+  | 'red'
+  | 'blue'
+  | 'yellow'
+  | 'orange'
+  | 'fuchsia'
+  | 'slate'
+
+export interface HighlightData {
+  resourceKey: string
+  contentRef: string
+  color: HighlightColor
 }
