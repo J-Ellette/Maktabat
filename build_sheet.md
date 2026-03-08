@@ -693,15 +693,15 @@ Everything in Premium, plus:
 
 #### Step 2.1 — Application Shell
 
-- [ ] Top-level layout component with theme provider
-- [ ] RTL/LTR direction context (switches per active panel language)
-- [ ] Panel system (core workspace engine)
+- [x] Top-level layout component with theme provider
+- [x] RTL/LTR direction context (switches per active panel language)
+- [x] Panel system (core workspace engine)
   - Resizable split panels (horizontal and vertical)
   - Drag-to-rearrange panels
   - Tab groups within panels
   - Panel presets: Research layout, Reading layout, Khutbah layout
   - Detach panel to separate window
-- [ ] Sidebar navigation
+- [x] Sidebar navigation
   - Library browser (tree: Collections → Resources → Chapters)
   - Bookmarks
   - Notes & Highlights
@@ -711,38 +711,38 @@ Everything in Premium, plus:
 
 #### Step 2.2 — Navigation & Routing
 
-- [ ] In-app router (React Router or TanStack Router)
-- [ ] History stack (back/forward like a browser)
-- [ ] Resource address bar: type `Quran 2:255` or `Bukhari 1` to navigate
-- [ ] Command palette (Cmd+K / Ctrl+K)
+- [x] In-app router (React Router or TanStack Router)
+- [x] History stack (back/forward like a browser)
+- [x] Resource address bar: type `Quran 2:255` or `Bukhari 1` to navigate
+- [x] Command palette (Cmd+K / Ctrl+K)
   - Search resources
   - Navigate to any verse, hadith, or resource
   - Run commands (open layouts, toggle panels, etc.)
 
 #### Step 2.3 — New Tab / Dashboard
 
-- [ ] Personalized command center (reimagined New Tab)
-- [ ] "Everything" view:
+- [x] Personalized command center (reimagined New Tab)
+- [x] "Everything" view:
   - Today's dhikr / Fortress of the Muslim entry
   - Verse of the Day (with tafsir snippet)
   - Hadith of the Day
   - Reading plan progress widget
   - Recent resources
   - Recent notes
-- [ ] "Reference" view:
+- [x] "Reference" view:
   - Quick-open any resource
   - Quick search
   - Quick navigate to surah/ayah
 
 #### Step 2.4 — Settings Panel
 
-- [ ] Appearance: Theme (Day/Night/Sepia/Custom), font sizes per panel type, color accents
-- [ ] Language: Interface language, default Arabic script (Hafs/Warsh), transliteration system
-- [ ] Library: Installed resources, available for download, storage usage
-- [ ] Account: Subscription tier, sign in/out, sync settings
-- [ ] Keyboard shortcuts (customizable)
-- [ ] Accessibility: High contrast, screen reader optimizations, reduced motion
-- [ ] Notifications: Reading plan reminders, new resource alerts
+- [x] Appearance: Theme (Day/Night/Sepia/Custom), font sizes per panel type, color accents
+- [x] Language: Interface language, default Arabic script (Hafs/Warsh), transliteration system
+- [x] Library: Installed resources, available for download, storage usage
+- [x] Account: Subscription tier, sign in/out, sync settings
+- [x] Keyboard shortcuts (customizable)
+- [x] Accessibility: High contrast, screen reader optimizations, reduced motion
+- [x] Notifications: Reading plan reminders, new resource alerts
 
 ---
 
