@@ -5,6 +5,11 @@ import CollectionTree from './CollectionTree'
 import HadithViewer from './HadithViewer'
 import HadithSearch from './HadithSearch'
 
+// ─── Constants ────────────────────────────────────────────────────────────────
+
+/** Maximum characters shown for Arabic text previews in the hadith list. */
+const PREVIEW_CHAR_LIMIT = 80
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface HadithRow {
@@ -225,7 +230,7 @@ export default function HadithBrowser(): React.ReactElement {
                         color: 'var(--text-primary)',
                       }}
                     >
-                      {h.arabic_text.substring(0, 80)}…
+                      {h.arabic_text.substring(0, PREVIEW_CHAR_LIMIT)}…
                     </p>
                   </button>
                 ))}

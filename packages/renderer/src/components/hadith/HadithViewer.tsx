@@ -116,7 +116,8 @@ export default function HadithViewer({
               6,
               0
             )) as CompanionHadith[]
-            setCompanions((comps ?? []).filter((c) => c.id !== result.hadith.id).slice(0, 5))
+            const currentId = result.hadith.id
+            setCompanions((comps ?? []).filter((c) => c.id !== currentId).slice(0, 5))
           } catch {
             // companion search is best-effort
           }

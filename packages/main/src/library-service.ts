@@ -308,6 +308,8 @@ export class LibraryService {
         FROM hadiths h
         JOIN hadith_collections c ON h.collection_id = c.id
         WHERE h.book_id = ?
+        -- Sort numerically first (for integer hadith numbers), then lexicographically
+        -- as a fallback for compound numbers like "1a", "1b" etc.
         ORDER BY CAST(h.hadith_number AS INTEGER), h.hadith_number
       `),
 
@@ -316,6 +318,8 @@ export class LibraryService {
         FROM hadiths h
         JOIN hadith_collections c ON h.collection_id = c.id
         WHERE h.chapter_id = ?
+        -- Sort numerically first (for integer hadith numbers), then lexicographically
+        -- as a fallback for compound numbers like "1a", "1b" etc.
         ORDER BY CAST(h.hadith_number AS INTEGER), h.hadith_number
       `),
 

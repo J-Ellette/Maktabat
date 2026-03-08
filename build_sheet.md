@@ -832,38 +832,38 @@ Everything in Premium, plus:
 
 #### Step 5.1 — Hadith Collection Browser
 
-- [ ] Collection hierarchy: Collection → Book → Chapter → Hadith
-- [ ] Tree navigator for all installed collections
-- [ ] Collection metadata: compiler bio, century, tradition (Sunni/Shia/Ibadi), tier
+- [x] Collection hierarchy: Collection → Book → Chapter → Hadith
+- [x] Tree navigator for all installed collections
+- [x] Collection metadata: compiler bio, century, tradition (Sunni/Shia/Ibadi), tier
 
 #### Step 5.2 — Hadith Viewer
 
-- [ ] Arabic text (large, prominent)
-- [ ] English translation
-- [ ] Hadith number (collection numbering system)
-- [ ] Grade badge with color coding:
+- [x] Arabic text (large, prominent)
+- [x] English translation
+- [x] Hadith number (collection numbering system)
+- [x] Grade badge with color coding:
   - AEGreen-600: Sahih (Authentic)
   - AEGreen-400: Hasan (Good)
   - AEGold-500: Hasan li-ghayrihi
   - AERed-400: Da'if (Weak)
   - AERed-700: Mawdu' (Fabricated)
-- [ ] Multiple grades from different scholars shown (with attribution)
-- [ ] "Companion hadiths" — other hadiths with same/similar meaning
+- [x] Multiple grades from different scholars shown (with attribution)
+- [x] "Companion hadiths" — other hadiths with same/similar meaning
 
 #### Step 5.3 — Isnad (Chain of Narration) Viewer
 
-- [ ] Visual chain: Narrator → Narrator → Narrator → Prophet ﷺ
-- [ ] Each narrator: name, reliability grade, birth/death dates, click for bio
-- [ ] Narrator reliability color-coded
-- [ ] Common weak points in isnad highlighted
+- [x] Visual chain: Narrator → Narrator → Narrator → Prophet ﷺ
+- [x] Each narrator: name, reliability grade, birth/death dates, click for bio
+- [x] Narrator reliability color-coded
+- [x] Common weak points in isnad highlighted
 
 #### Step 5.4 — Hadith Search
 
-- [ ] Search by text (Arabic or English)
-- [ ] Search by narrator name
-- [ ] Search by topic/chapter
-- [ ] Filter by collection, grade, century
-- [ ] Concordance view: same hadith across multiple collections
+- [x] Search by text (Arabic or English)
+- [x] Search by narrator name
+- [x] Search by topic/chapter
+- [x] Filter by collection, grade, century
+- [x] Concordance view: same hadith across multiple collections
 
 ---
 
