@@ -9,6 +9,14 @@ export const IpcChannel = {
   LIBRARY_GET_TAFSIRS_BY_SURAH: 'library:get-tafsirs-by-surah',
   LIBRARY_GET_TAFSIR_KEYS: 'library:get-tafsir-keys',
   LIBRARY_GET_HADITH: 'library:get-hadith',
+  LIBRARY_GET_HADITH_COLLECTIONS: 'library:get-hadith-collections',
+  LIBRARY_GET_HADITH_BOOKS: 'library:get-hadith-books',
+  LIBRARY_GET_HADITH_CHAPTERS: 'library:get-hadith-chapters',
+  LIBRARY_GET_HADITHS_BY_BOOK: 'library:get-hadiths-by-book',
+  LIBRARY_GET_HADITHS_BY_CHAPTER: 'library:get-hadiths-by-chapter',
+  LIBRARY_GET_HADITH_BY_ID: 'library:get-hadith-by-id',
+  LIBRARY_GET_ISNAD: 'library:get-isnad',
+  LIBRARY_SEARCH_HADITHS: 'library:search-hadiths',
   LIBRARY_GET_MORPHOLOGY: 'library:get-morphology',
   USER_SAVE_NOTE: 'user:save-note',
   USER_GET_NOTES: 'user:get-notes',
@@ -185,4 +193,114 @@ export interface GetTafsirsForAyahRequest {
 export interface GetTafsirsBySurahRequest {
   surahNumber: number
   tafsirKey: string
+}
+
+// ─── Hadith Module Types ───────────────────────────────────────────────────────
+
+export interface HadithCollection {
+  id: number
+  key: string
+  nameArabic: string
+  nameEnglish: string
+  tradition: string
+  tier: string
+  compiler: string
+  century: number
+}
+
+export interface HadithBook {
+  id: number
+  collectionId: number
+  bookNumber: number
+  nameArabic: string
+  nameEnglish: string
+}
+
+export interface HadithChapter {
+  id: number
+  bookId: number
+  chapterNumber: number
+  nameArabic: string
+  nameEnglish: string
+}
+
+export interface HadithItem {
+  id: number
+  collectionId: number
+  bookId: number
+  chapterId: number | null
+  hadithNumber: string
+  arabicText: string
+  englishText: string
+  collectionKey: string
+  collectionNameEnglish: string
+}
+
+export interface HadithGrade {
+  id: number
+  hadithId: number
+  grade: string
+  grader: string
+  source: string | null
+}
+
+export interface IsnadNarrator {
+  id: number
+  position: number
+  nameArabic: string
+  nameEnglish: string
+  birthYear: number | null
+  deathYear: number | null
+  reliability: string
+}
+
+export interface HadithWithGrades {
+  hadith: HadithItem
+  grades: HadithGrade[]
+  isnad: IsnadNarrator[]
+}
+
+export interface HadithSearchResult {
+  id: number
+  hadithNumber: string
+  collectionKey: string
+  collectionNameEnglish: string
+  excerpt: string
+}
+
+export interface GetHadithCollectionsRequest {
+  tradition?: string
+  tier?: string
+}
+
+export interface GetHadithBooksRequest {
+  collectionKey: string
+}
+
+export interface GetHadithChaptersRequest {
+  bookId: number
+}
+
+export interface GetHadithsByBookRequest {
+  bookId: number
+}
+
+export interface GetHadithsByChapterRequest {
+  chapterId: number
+}
+
+export interface GetHadithByIdRequest {
+  hadithId: number
+}
+
+export interface GetIsnadRequest {
+  hadithId: number
+}
+
+export interface SearchHadithsRequest {
+  query: string
+  collectionKey?: string
+  grade?: string
+  limit?: number
+  offset?: number
 }

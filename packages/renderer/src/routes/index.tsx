@@ -5,6 +5,7 @@ const Dashboard = lazy(() => import('../components/dashboard/Dashboard'))
 const SettingsPanel = lazy(() => import('../components/settings/SettingsPanel'))
 const QuranReader = lazy(() => import('../components/quran/QuranReader'))
 const TafsirViewer = lazy(() => import('../components/tafsir/TafsirViewer'))
+const HadithBrowser = lazy(() => import('../components/hadith/HadithBrowser'))
 const PlaceholderRoute = lazy(() => import('./PlaceholderRoute'))
 
 function RouteSpinner() {
@@ -27,9 +28,10 @@ export default function AppRoutes(): React.ReactElement {
         <Route path="/quran/:surah" element={<QuranReader />} />
         <Route path="/quran/:surah/:ayah" element={<QuranReader />} />
         {/* Placeholder routes for future phases */}
-        <Route path="/hadith" element={<PlaceholderRoute title="Hadith" />} />
-        <Route path="/hadith/:collection" element={<PlaceholderRoute title="Hadith" />} />
-        <Route path="/hadith/:collection/:number" element={<PlaceholderRoute title="Hadith" />} />
+        {/* Hadith module — Phase 5 */}
+        <Route path="/hadith" element={<HadithBrowser />} />
+        <Route path="/hadith/:collection" element={<HadithBrowser />} />
+        <Route path="/hadith/:collection/:number" element={<HadithBrowser />} />
         {/* Tafsir module — Phase 4 */}
         <Route path="/tafsir/:surah/:ayah" element={<TafsirViewer />} />
         <Route path="/search" element={<PlaceholderRoute title="Search" />} />

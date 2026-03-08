@@ -116,6 +116,79 @@ export function registerIpcHandlers(
     return { hadith, grades }
   })
 
+  // ── library:get-hadith-collections ─────────────────────────────────────────
+  ipcMain.handle('library:get-hadith-collections', () => {
+    return libraryService.getHadithCollections()
+  })
+
+  // ── library:get-hadith-books ────────────────────────────────────────────────
+  ipcMain.handle('library:get-hadith-books', (_event, collectionKey: unknown) => {
+    const ck = assertString(collectionKey, 'collectionKey')
+    return libraryService.getHadithBooks(ck)
+  })
+
+  // ── library:get-hadith-chapters ─────────────────────────────────────────────
+  ipcMain.handle('library:get-hadith-chapters', (_event, bookId: unknown) => {
+    const id = assertNumber(bookId, 'bookId')
+    return libraryService.getHadithChapters(id)
+  })
+
+  // ── library:get-hadiths-by-book ──────────────────────────────────────────────
+  ipcMain.handle('library:get-hadiths-by-book', (_event, bookId: unknown) => {
+    const id = assertNumber(bookId, 'bookId')
+    return libraryService.getHadithsByBook(id)
+  })
+
+  // ── library:get-hadiths-by-chapter ──────────────────────────────────────────
+  ipcMain.handle('library:get-hadiths-by-chapter', (_event, chapterId: unknown) => {
+    const id = assertNumber(chapterId, 'chapterId')
+    return libraryService.getHadithsByChapter(id)
+  })
+
+  // ── library:get-hadith-by-id ─────────────────────────────────────────────────
+  ipcMain.handle('library:get-hadith-by-id', (_event, hadithId: unknown) => {
+    const id = assertNumber(hadithId, 'hadithId')
+
+    const hadith = libraryService.getHadithById(id)
+    if (!hadith) return null
+
+    const grades = libraryService.getHadithGrades(hadith.id)
+    const isnad = libraryService.getIsnad(hadith.id)
+    return { hadith, grades, isnad }
+  })
+
+  // ── library:get-isnad ────────────────────────────────────────────────────────
+  ipcMain.handle('library:get-isnad', (_event, hadithId: unknown) => {
+    const id = assertNumber(hadithId, 'hadithId')
+    return libraryService.getIsnad(id)
+  })
+
+  // ── library:search-hadiths ───────────────────────────────────────────────────
+  ipcMain.handle(
+    'library:search-hadiths',
+    (
+      _event,
+      query: unknown,
+      collectionKey: unknown,
+      grade: unknown,
+      limit: unknown,
+      offset: unknown
+    ) => {
+      const q = assertString(query, 'query')
+      if (q.length > 500) throw new Error('Query too long (max 500 characters)')
+
+      const ck =
+        collectionKey !== undefined && collectionKey !== null
+          ? assertString(collectionKey, 'collectionKey')
+          : undefined
+      const gr = grade !== undefined && grade !== null ? assertString(grade, 'grade') : undefined
+      const lim = limit !== undefined ? Math.min(assertNumber(limit, 'limit'), 100) : 20
+      const off = offset !== undefined ? assertNumber(offset, 'offset') : 0
+
+      return libraryService.searchHadiths(q, ck, gr, lim, off)
+    }
+  )
+
   // ── library:get-morphology ──────────────────────────────────────────────────
   ipcMain.handle('library:get-morphology', (_event, ayahId: unknown) => {
     const id = assertNumber(ayahId, 'ayahId')
