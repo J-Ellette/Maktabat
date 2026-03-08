@@ -1,5 +1,7 @@
 # Maktabat — مكتبة
+
 ## Quran Study Software: Full Expanded Specification & Multi-Step Build Sheet
+
 ### Electron Desktop Application
 
 ---
@@ -9,6 +11,7 @@
 **Maktabat** (Arabic: مكتبة — "Library") is a professional-grade Islamic digital library and Quran study platform modeled on the architecture of Logos Bible Software, purpose-built for Quranic and Islamic scholarly study. It serves students of knowledge, scholars, imams preparing khutbahs, and serious Muslim readers who need deep cross-referenced study tools in a beautifully crafted, RTL-aware desktop environment.
 
 ### What Makes It Different From a Simple eReader
+
 - Every word in the Quran links to morphological analysis, tafsir commentary, related hadith, and classical grammar resources
 - Resources are cross-linked: reading a verse surfaces relevant Hadith, Tafsir, Fiqh rulings, and Sirah events automatically
 - Linguistic analysis engine for Classical Arabic — root extraction, verb conjugation tables, balagha (rhetoric) markers
@@ -22,11 +25,13 @@
 ## 1. DESIGN SYSTEM
 
 ### Foundation
+
 - **Base**: UAE Design System v3.0 (https://designsystem.gov.ae)
 - **RTL-Native**: Arabic is primary script; all layouts support bidirectional text
 - **Accessibility**: WCAG 2.1 AA minimum
 
 ### Color Token System
+
 ```
 AEGold         50–950   Primary brand, decorative motifs, surah headers
 AERed          50–950   Alerts, Da'if hadith markers, warnings
@@ -41,6 +46,7 @@ Slate          50–950   Backgrounds, sidebar chrome, muted UI
 ```
 
 ### Typography
+
 - **Arabic Display**: Noto Naskh Arabic, Amiri — for Quranic text and headers
 - **Arabic Body**: IBM Plex Arabic — for commentary and prose
 - **Latin Display**: Cormorant Garamond — for English headers
@@ -49,6 +55,7 @@ Slate          50–950   Backgrounds, sidebar chrome, muted UI
 - **Quranic Text**: KFGQPC Uthmanic Hafs (dedicated Quran font, OpenType)
 
 ### Spacing & Layout
+
 - 8px base grid
 - Fluid panels with resizable splitters
 - Min panel width: 240px
@@ -61,6 +68,7 @@ Slate          50–950   Backgrounds, sidebar chrome, muted UI
 ## 2. ELECTRON ARCHITECTURE
 
 ### Tech Stack
+
 ```
 Runtime:        Electron 31+ (Chromium + Node.js)
 Frontend:       React 18 + TypeScript
@@ -76,6 +84,7 @@ Sync:           Optional: PouchDB ↔ CouchDB (cloud notes/highlights)
 ```
 
 ### Process Architecture
+
 ```
 Main Process (Node.js)
 ├── Window manager
@@ -96,6 +105,7 @@ Preload Script
 ```
 
 ### Data Storage Locations
+
 ```
 ~/Library/Application Support/Maktabat/   (macOS)
 %APPDATA%\Maktabat\                        (Windows)
@@ -113,6 +123,7 @@ Contents:
 ## 3. CONTENT LIBRARY STRUCTURE
 
 ### 3.1 The Quran
+
 - **Arabic text**: Multiple riwayat (Hafs an Asim primary, Warsh, Qalun optional)
 - **English translations** (all 6 listed in spec):
   - Noble Qur'an (Khan/Hilali)
@@ -126,9 +137,11 @@ Contents:
 - **Audio recitation**: Multiple reciters (Mishary, Al-Husary, etc.) synced to verse
 
 ### 3.2 Tafsir Collections
+
 Organized in three tiers:
 
 **Tier 1 — Classical Authenticated**
+
 - Tafsir al-Tabari
 - Tafsir Ibn Kathir
 - Tafsir al-Jalalayn
@@ -140,12 +153,14 @@ Organized in three tiers:
 - Dur al-Manthur (Al-Suyuti)
 
 **Tier 2 — Modern Classical**
+
 - Tafsir Ibn Ashur
 - Ruh al-Ma'ani (Al-Alusi)
 - Risale-i Nur (Said Nursi)
 - Safwat al-Tafasir (Al-Sabuni)
 
 **Tier 3 — Modern Urdu/English**
+
 - Maariful Quran (Muhammad Shafi)
 - Tafhim-ul-Quran (Maududi)
 - Bayan al-Quran (Thanwi)
@@ -154,6 +169,7 @@ Organized in three tiers:
 ### 3.3 Hadith Collections
 
 **Sunni — Kutub al-Sittah (The Six Books)**
+
 - Sahih al-Bukhari
 - Sahih Muslim
 - Sunan Abu Dawood
@@ -162,6 +178,7 @@ Organized in three tiers:
 - Sunan Ibn Majah
 
 **Sunni — Extended Primary Collections**
+
 - Al-Muwatta (Imam Malik)
 - Musnad Ahmad ibn Hanbal
 - Sunan al-Darimi
@@ -174,6 +191,7 @@ Organized in three tiers:
 - Musnad Abu Ya'la
 
 **Sunni — Secondary Collections**
+
 - Riyadh al-Salihin (Al-Nawawi)
 - Mishkat al-Masabih
 - Bulugh al-Maram (Ibn Hajar)
@@ -186,6 +204,7 @@ Organized in three tiers:
 - Al-Jami al-Kamil (Ziya-ur-Rahman Azmi)
 
 **Hadith Commentaries (Sharh)**
+
 - Fath al-Bari (Ibn Hajar — commentary on Bukhari)
 - Umdat al-Qari (Al-Ayni — commentary on Bukhari)
 - Al-Minhaj (Al-Nawawi — commentary on Muslim)
@@ -194,12 +213,14 @@ Organized in three tiers:
 - Fayd al-Qadir (Al-Munawi)
 
 **Shia — Al-Kutub Al-Arba'ah (The Four Books)**
+
 - Kitab al-Kafi (Kulayni)
 - Man La Yahduruhu al-Faqih (Shaikh Saduq)
 - Tahdhib al-Ahkam (Shaikh Tusi)
 - Al-Istibsar (Shaikh Tusi)
 
 **Shia — Extended Collections**
+
 - Nahj al-Balaghah
 - Al-Sahifa al-Sajjadiyya
 - Bihar al-Anwar (Allama Majlesi)
@@ -207,12 +228,14 @@ Organized in three tiers:
 - Tuhaf al-Uqul
 
 **Ibadi Collections**
+
 - Jami Sahih
 - Tartib al-Musnad
 
 ### 3.4 Fiqh (Jurisprudence) — By School
 
 **Hanafi**
+
 - Al-Hidayah (Al-Marghinani)
 - Al-Mabsut (Al-Sarakhsi)
 - Mukhtasar al-Quduri
@@ -221,26 +244,31 @@ Organized in three tiers:
 - Fatawa-i Razawiyya
 
 **Maliki**
+
 - Al Mudawanna (Sahnun)
 - Bidayat al-Mujtahid (Ibn Rushd)
 - Mukhtasar Khalil
 - Al-Dhakhirah (Al-Qarafi)
 
 **Shafi'i**
+
 - Kitab al-Umm (Al-Shafi'i)
 - Al-Majmu' (Al-Nawawi)
 - Minhaj al-Talibin (Al-Nawawi)
 - Rawdat al-Talibin (Al-Nawawi)
 
 **Hanbali**
+
 - Al-Mughni (Ibn Qudamah)
 - Zad al-Mustaqni'
 - Kashshaf al-Qina'
 
 **Zahiri**
+
 - Al-Muhalla (Ibn Hazm)
 
 ### 3.5 Aqidah (Theology/Creed)
+
 - Al-Aqidah al-Tahawiyyah + commentaries
 - Al-Aqidah al-Wasitiyyah (Ibn Taymiyyah)
 - Al-Fiqh al-Akbar (Abu Hanifa)
@@ -250,6 +278,7 @@ Organized in three tiers:
 - Maqalat al-Islamiyyin (Al-Ash'ari)
 
 ### 3.6 Sirah (Prophetic Biography)
+
 - Sirat Ibn Hisham
 - Zad al-Ma'ad (Ibn Qayyim)
 - Al-Sirah al-Nabawiyyah (Ibn Kathir)
@@ -258,7 +287,9 @@ Organized in three tiers:
 - Al-Shama'il al-Muhammadiyya (Al-Tirmidhi)
 
 ### 3.7 Arabic Language Sciences
+
 **Grammar (Nahw & Sarf)**
+
 - Kitab Sibawayh
 - Al-Ajurrumiyya
 - Alfiyya of Ibn Malik + Sharh Ibn Aqil
@@ -266,6 +297,7 @@ Organized in three tiers:
 - Mughni al-Labib (Ibn Hisham)
 
 **Dictionaries (Mu'jam)**
+
 - Lisan al-Arab (Ibn Manzur) — primary
 - Al-Qamus al-Muhit (Firuzabadi)
 - Al-Mufradat fi Gharib al-Quran (Al-Isfahani) — Quran-specific vocabulary
@@ -273,11 +305,13 @@ Organized in three tiers:
 - Al-Sihah fi al-Lugha (Al-Jawhari)
 
 **Rhetoric (Balagha)**
+
 - Dala'il al-I'jaz (Al-Jurjani)
 - Asrar al-Balagha (Al-Jurjani)
 - Al-Mutawwal (Al-Taftazani)
 
 ### 3.8 Quranic Sciences (Ulum al-Quran)
+
 - Al-Itqan (Al-Suyuti)
 - Al-Burhan fi Ulum al-Quran (Al-Zarkashi)
 - Asbab al-Nuzul (Al-Wahidi)
@@ -286,6 +320,7 @@ Organized in three tiers:
 - Al-Fawz al-Kabir (Shah Waliullah)
 
 ### 3.9 History & Biography
+
 - Tarikh at-Tabari
 - Al-Bidayah wan-Nihayah (Ibn Kathir)
 - Siyar A'lam al-Nubala' (Al-Dhahabi)
@@ -293,6 +328,7 @@ Organized in three tiers:
 - Muqaddimah (Ibn Khaldun)
 
 ### 3.10 Tazkiyyah & Spirituality
+
 - Ihya' Ulum al-Din (Al-Ghazali)
 - Kitab al-Adhkar (Al-Nawawi)
 - Al-Risala al-Qushayriyya
@@ -300,6 +336,7 @@ Organized in three tiers:
 - Fortress of the Muslim (daily adhkar)
 
 ### 3.11 Islamic Atlas
+
 - Historical maps of the Islamic world (7th–21st century)
 - Trade routes of the Sahaba era
 - Conquest and expansion maps
@@ -311,6 +348,7 @@ Organized in three tiers:
 ## 4. FEATURE SPECIFICATION
 
 ### 4.1 Core Reading Engine
+
 - **Multi-panel workspace**: Tile, tab, or float any resource
 - **Linked scrolling**: Quran text + translation + tafsir scroll in sync
 - **Word hover**: Hover any Arabic word → instant morphology popup
@@ -323,6 +361,7 @@ Organized in three tiers:
 ### 4.2 Search System
 
 **Basic Search**
+
 - Full-text across entire library
 - Search in Arabic, English, or transliteration
 - Filter by: collection type, madhab, century, language
@@ -330,17 +369,20 @@ Organized in three tiers:
 - Results ranked by relevance + resource authority
 
 **Smart Search (Premium)**
-- Natural language questions: "What does the Quran say about fasting?" 
+
+- Natural language questions: "What does the Quran say about fasting?"
 - Questions answered with cited results from your library
 - Synopsis of top results with footnotes
 - AI Study Assistant mode: conversational, library-anchored, cited
 
 **Morphological Search**
+
 - Search by Arabic root (3 or 4 letter)
 - Find all derivatives across Quran and Hadith
 - Verb pattern (wazan) search
 
 ### 4.3 Factbook
+
 - Encyclopedia of Quranic topics, figures, places, events
 - Entry for every Prophet mentioned in Quran
 - Entry for every Companion (Sahabi) of significance
@@ -351,6 +393,7 @@ Organized in three tiers:
 ### 4.4 Linguistic Analysis Tools
 
 **Word Study**
+
 - Select any Arabic word → full morphological analysis
 - Root identification
 - All occurrences in Quran
@@ -359,16 +402,19 @@ Organized in three tiers:
 - Lane's Lexicon cross-reference
 
 **Grammar Parsing**
+
 - Full i'rab (grammatical analysis) for every Quranic verse
 - Verb conjugation tables
 - Noun declension patterns
 - Sentence structure diagrams
 
 **Tajweed Markers**
+
 - Optional tajweed color-coding overlay on Arabic text
 - Rules explained on hover
 
 ### 4.5 Hadith Grading System
+
 - Every hadith displayed with its grading: Sahih, Hasan, Da'if, Mawdu'
 - Grade source attributed (Al-Albani, Al-Arnaut, Ibn Hajar, etc.)
 - Multiple gradings shown when scholars disagree
@@ -376,6 +422,7 @@ Organized in three tiers:
 - Isnad (chain of narration) viewer
 
 ### 4.6 Notes & Annotations
+
 - Highlight text in any color (mapped to AE color palette)
 - Inline notes anchored to verse/hadith
 - Note types: Study note, Question, Reflection, Khutbah material
@@ -384,6 +431,7 @@ Organized in three tiers:
 - Notes searchable across entire library
 
 ### 4.7 Khutbah Workflow
+
 - Mark any passage as "Khutbah material"
 - Khutbah builder: collect marked passages, organize outline
 - Templates: Jumu'ah Khutbah, Eid Khutbah, Special occasion
@@ -391,6 +439,7 @@ Organized in three tiers:
 - Khutbah history: tag which verses were used in which khutbah
 
 ### 4.8 Quran Study Templates
+
 - Verse-by-verse study template (Arabic → Translation → Tafsir → Hadith → Application)
 - Topical study template
 - Word study template
@@ -398,18 +447,21 @@ Organized in three tiers:
 - Character study (Prophets and figures)
 
 ### 4.9 Reading Plans
+
 - Quran completion plans (30 days, 60 days, 1 year, custom)
 - Hadith study plans (40 Hadith, Riyadh al-Salihin, etc.)
 - Progress tracking with streaks
 - Daily reminder notifications (desktop)
 
 ### 4.10 Islamic Atlas
+
 - Interactive historical maps
 - Timeline slider: see the Islamic world at any century
 - Click location → surfaced related Hadith, Sirah events, historical texts
 - Hajj route planner with historical context
 
 ### 4.11 Audio Integration
+
 - Quran recitation by multiple reciters
 - Verse-by-verse playback synced to highlighted text
 - Playback speed control
@@ -421,6 +473,7 @@ Organized in three tiers:
 ## 5. SUBSCRIPTION / ACCESS TIERS
 
 ### Free Tier
+
 - Quran text (Arabic) + 2 translations
 - Sahih al-Bukhari + Sahih Muslim
 - Tafsir al-Jalalayn
@@ -429,6 +482,7 @@ Organized in three tiers:
 - Fortress of the Muslim (adhkar)
 
 ### Standard ($9.99/month or $79.99/year)
+
 - Full Kutub al-Sittah
 - 6 Quran translations
 - 5 classical Tafsirs
@@ -438,7 +492,9 @@ Organized in three tiers:
 - Unlimited notes
 
 ### Premium ($19.99/month or $159.99/year)
+
 Everything in Standard, plus:
+
 - Full hadith library (all collections)
 - Full Tafsir library (all tiers)
 - Smart Search / Study Assistant (AI-powered)
@@ -453,7 +509,9 @@ Everything in Standard, plus:
 - Search results synopsis
 
 ### Scholar ($34.99/month or $279.99/year)
+
 Everything in Premium, plus:
+
 - Complete Arabic language library (grammar, dictionaries, rhetoric)
 - Shia & Ibadi collections
 - Full Fiqh library (all four madhabs + Zahiri)
@@ -465,6 +523,7 @@ Everything in Premium, plus:
 - Early access to new features
 
 ### Institution (Contact for pricing)
+
 - Multi-seat licensing
 - Custom branding options
 - LMS integration
@@ -480,6 +539,7 @@ Everything in Premium, plus:
 ### PHASE 0: Project Foundation
 
 #### Step 0.1 — Repository & Tooling Setup
+
 - [x] Initialize monorepo (pnpm workspaces)
   ```
   packages/
@@ -498,6 +558,7 @@ Everything in Premium, plus:
   - Auto-publish releases to GitHub Releases
 
 #### Step 0.2 — Design Token System
+
 - [x] Implement full UAE Design System v3 color tokens as CSS custom properties
   ```css
   --ae-gold-50 through --ae-gold-950
@@ -513,41 +574,44 @@ Everything in Premium, plus:
 - [ ] Build Storybook component library for design QA
 
 #### Step 0.3 — Database Schema Design
+
 - [x] Design SQLite schema for `library.db`:
+
   ```sql
   -- Core content tables
   surahs (id, number, arabic_name, transliterated_name, english_name, revelation_type, verse_count)
   ayahs (id, surah_id, ayah_number, arabic_text, arabic_simple, bismillah_pre)
   translations (id, ayah_id, translation_key, text, translator, language)
   tafsir_entries (id, ayah_id, tafsir_key, text, language, volume, page)
-  
+
   -- Hadith tables
   hadith_collections (id, key, name_arabic, name_english, tradition, tier, compiler, century)
   hadiths (id, collection_id, book_id, chapter_id, hadith_number, arabic_text, english_text)
   hadith_grades (id, hadith_id, grade, grader, source)
   hadith_narrators (id, name_arabic, name_english, birth_year, death_year, reliability)
   isnad_entries (id, hadith_id, position, narrator_id)
-  
+
   -- Cross-reference tables
   hadith_ayah_refs (id, hadith_id, ayah_id, relation_type)
   tafsir_hadith_refs (id, tafsir_entry_id, hadith_id)
   topic_ayah_refs (id, topic_id, ayah_id)
   topic_hadith_refs (id, topic_id, hadith_id)
-  
+
   -- Arabic language tables
   arabic_roots (id, root_letters, meaning_arabic, meaning_english)
   word_morphology (id, ayah_id, word_position, surface_form, root_id, pattern, pos, case_marker)
   dictionary_entries (id, root_id, source_key, definition_arabic, definition_english)
-  
+
   -- Resource metadata
   resources (id, key, title_arabic, title_english, author, tradition, type, century, tier)
-  
+
   -- Factbook
   factbook_entries (id, slug, title_arabic, title_english, type, summary, body)
   factbook_ayah_refs (id, entry_id, ayah_id)
   ```
 
 - [x] Design `user.db` schema:
+
   ```sql
   highlights (id, resource_key, content_ref, color, created_at)
   notes (id, resource_key, content_ref, type, body, tags, created_at, updated_at)
@@ -567,25 +631,27 @@ Everything in Premium, plus:
 ### PHASE 1: Main Process & IPC Layer
 
 #### Step 1.1 — Electron Main Process
-- [ ] Window manager
+
+- [x] Window manager
   - Create main BrowserWindow with correct security settings
   - `contextIsolation: true`, `nodeIntegration: false`, `sandbox: true`
   - Persist window size/position between sessions
   - Handle multiple windows (detached panels feature)
-- [ ] Application menu (native OS menus)
+- [x] Application menu (native OS menus)
   - File: New Window, Open Library, Import Resource, Export Notes, Preferences, Quit
   - Edit: Undo, Redo, Find, Find in Library
   - View: Panel layouts, Zoom, Theme, Full Screen
   - Library: Library Manager, Download Resources, Sync
   - Study: Reading Plans, Khutbah Builder, Study Templates
   - Help: Documentation, Keyboard Shortcuts, About
-- [ ] Tray icon with quick access to daily dhikr / verse of the day
-- [ ] System notifications (reading plan reminders, download complete)
-- [ ] Protocol handler: `maktabat://` deep links (e.g., `maktabat://quran/2:255` for Ayat al-Kursi)
-- [ ] File associations: `.mkt` format for exported libraries/note bundles
+- [x] Tray icon with quick access to daily dhikr / verse of the day
+- [x] System notifications (reading plan reminders, download complete)
+- [x] Protocol handler: `maktabat://` deep links (e.g., `maktabat://quran/2:255` for Ayat al-Kursi)
+- [x] File associations: `.mkt` format for exported libraries/note bundles
 
 #### Step 1.2 — IPC Contract Layer
-- [ ] Define all IPC channels in `shared/ipc-contracts.ts` (TypeScript enums)
+
+- [x] Define all IPC channels in `shared/ipc-contracts.ts` (TypeScript enums)
   ```typescript
   // Example channels
   LIBRARY_SEARCH = 'library:search'
@@ -602,18 +668,19 @@ Everything in Premium, plus:
   SETTINGS_GET = 'settings:get'
   SETTINGS_SET = 'settings:set'
   ```
-- [ ] Implement preload script exposing typed `window.maktabat` API
-- [ ] Implement all IPC handlers in main process
-- [ ] Input validation on all IPC calls (prevent injection)
+- [x] Implement preload script exposing typed `window.maktabat` API
+- [x] Implement all IPC handlers in main process
+- [x] Input validation on all IPC calls (prevent injection)
 
 #### Step 1.3 — Library Database Service
-- [ ] `LibraryService` class: wraps better-sqlite3, exposes typed queries
-- [ ] Prepared statement cache (performance)
-- [ ] Full-text search using SQLite FTS5 extension
+
+- [x] `LibraryService` class: wraps better-sqlite3, exposes typed queries
+- [x] Prepared statement cache (performance)
+- [x] Full-text search using SQLite FTS5 extension
   - Index Arabic text (normalized, diacritics-stripped version for search)
   - Index English text
   - Support transliteration search
-- [ ] Query builder for complex cross-resource queries
+- [x] Query builder for complex cross-resource queries
 - [ ] Resource download manager
   - Check which resources are licensed
   - Download encrypted resource packages from CDN
@@ -625,6 +692,7 @@ Everything in Premium, plus:
 ### PHASE 2: Core UI Shell
 
 #### Step 2.1 — Application Shell
+
 - [ ] Top-level layout component with theme provider
 - [ ] RTL/LTR direction context (switches per active panel language)
 - [ ] Panel system (core workspace engine)
@@ -642,6 +710,7 @@ Everything in Premium, plus:
   - Islamic Atlas
 
 #### Step 2.2 — Navigation & Routing
+
 - [ ] In-app router (React Router or TanStack Router)
 - [ ] History stack (back/forward like a browser)
 - [ ] Resource address bar: type `Quran 2:255` or `Bukhari 1` to navigate
@@ -651,6 +720,7 @@ Everything in Premium, plus:
   - Run commands (open layouts, toggle panels, etc.)
 
 #### Step 2.3 — New Tab / Dashboard
+
 - [ ] Personalized command center (reimagined New Tab)
 - [ ] "Everything" view:
   - Today's dhikr / Fortress of the Muslim entry
@@ -665,6 +735,7 @@ Everything in Premium, plus:
   - Quick navigate to surah/ayah
 
 #### Step 2.4 — Settings Panel
+
 - [ ] Appearance: Theme (Day/Night/Sepia/Custom), font sizes per panel type, color accents
 - [ ] Language: Interface language, default Arabic script (Hafs/Warsh), transliteration system
 - [ ] Library: Installed resources, available for download, storage usage
@@ -678,6 +749,7 @@ Everything in Premium, plus:
 ### PHASE 3: Quran Reading Module
 
 #### Step 3.1 — Quran Text Renderer
+
 - [ ] Arabic text display with proper OpenType features
   - Correct ligatures and contextual forms
   - Kashida (tatweel) handling
@@ -694,12 +766,14 @@ Everything in Premium, plus:
 - [ ] Page view mode (faithful to printed Mushaf)
 
 #### Step 3.2 — Translation Renderer
+
 - [ ] Single translation view
 - [ ] Parallel translation view (up to 4 translations + Arabic)
 - [ ] Translation comparison tool: highlight where translators differ
 - [ ] Interlinear mode: Arabic word + English gloss beneath each word
 
 #### Step 3.3 — Word-by-Word Interaction
+
 - [ ] Every Arabic word is an interactive element
 - [ ] Hover popover shows:
   - Arabic word (large)
@@ -711,6 +785,7 @@ Everything in Premium, plus:
 - [ ] Click word → opens Word Study panel (see 4.5)
 
 #### Step 3.4 — Verse Interaction Menu
+
 - [ ] Right-click or long-press any verse → context menu:
   - Copy (Arabic, Translation, or both)
   - Highlight (color picker using AE palette)
@@ -724,6 +799,7 @@ Everything in Premium, plus:
   - Play recitation from here
 
 #### Step 3.5 — Surah Navigator
+
 - [ ] Surah list with: number, Arabic name, English name, Meccan/Medinan, verse count
 - [ ] Filter by: Meccan/Medinan, theme, length
 - [ ] Juz' navigator
@@ -735,6 +811,7 @@ Everything in Premium, plus:
 ### PHASE 4: Tafsir Module
 
 #### Step 4.1 — Tafsir Viewer
+
 - [ ] Tafsir synchronized with Quran panel
   - Auto-scrolls tafsir to match current verse in Quran panel
   - Or: select any verse, tafsir panel updates
@@ -744,6 +821,7 @@ Everything in Premium, plus:
 - [ ] Tafsir passage highlights: key rulings, ijaz markers, disputed points
 
 #### Step 4.2 — Tafsir Cross-References
+
 - [ ] Hadith citations within tafsir are live links → opens hadith in panel
 - [ ] Quranic verse cross-references within tafsir are live links
 - [ ] Author bio accessible from tafsir header
@@ -753,11 +831,13 @@ Everything in Premium, plus:
 ### PHASE 5: Hadith Module
 
 #### Step 5.1 — Hadith Collection Browser
+
 - [ ] Collection hierarchy: Collection → Book → Chapter → Hadith
 - [ ] Tree navigator for all installed collections
 - [ ] Collection metadata: compiler bio, century, tradition (Sunni/Shia/Ibadi), tier
 
 #### Step 5.2 — Hadith Viewer
+
 - [ ] Arabic text (large, prominent)
 - [ ] English translation
 - [ ] Hadith number (collection numbering system)
@@ -771,12 +851,14 @@ Everything in Premium, plus:
 - [ ] "Companion hadiths" — other hadiths with same/similar meaning
 
 #### Step 5.3 — Isnad (Chain of Narration) Viewer
+
 - [ ] Visual chain: Narrator → Narrator → Narrator → Prophet ﷺ
 - [ ] Each narrator: name, reliability grade, birth/death dates, click for bio
 - [ ] Narrator reliability color-coded
 - [ ] Common weak points in isnad highlighted
 
 #### Step 5.4 — Hadith Search
+
 - [ ] Search by text (Arabic or English)
 - [ ] Search by narrator name
 - [ ] Search by topic/chapter
@@ -788,6 +870,7 @@ Everything in Premium, plus:
 ### PHASE 6: Search & AI Study Assistant
 
 #### Step 6.1 — Full-Text Search
+
 - [ ] Search bar (always accessible, Cmd+F)
 - [ ] Query parser: handles Arabic, English, transliteration
 - [ ] Results grouped by resource type (Quran, Tafsir, Hadith, Fiqh, etc.)
@@ -797,6 +880,7 @@ Everything in Premium, plus:
 - [ ] Morphological expansion: search "pray" also finds "prayer", "prayed", "salah", "salat"
 
 #### Step 6.2 — Smart Search (Premium)
+
 - [ ] Natural language question input
 - [ ] Query classified and decomposed into sub-searches
 - [ ] Results synthesized with:
@@ -809,6 +893,7 @@ Everything in Premium, plus:
 - [ ] Summarize button: get 2-3 sentence summary of any resource
 
 #### Step 6.3 — AI Study Assistant (Premium)
+
 - [ ] Chat interface panel
 - [ ] Conversational multi-turn: ask follow-up questions
 - [ ] Every answer anchored in installed library (no hallucination)
@@ -823,12 +908,14 @@ Everything in Premium, plus:
 ### PHASE 7: Linguistic Analysis Module
 
 #### Step 7.1 — Arabic Morphology Engine (WASM)
+
 - [ ] Compile Qalsadi or equivalent to WebAssembly
 - [ ] Expose API: `analyze(word: string) → MorphologyResult`
 - [ ] Pre-computed morphology for every Quranic word (stored in DB)
 - [ ] Real-time analysis for user-entered Arabic text
 
 #### Step 7.2 — Word Study Panel
+
 - [ ] Triggered by clicking any Arabic word in any panel
 - [ ] Displays:
   - Word in large Arabic type
@@ -849,6 +936,7 @@ Everything in Premium, plus:
 - [ ] Semantic field: related words, antonyms
 
 #### Step 7.3 — I'rab (Grammar Parsing) Viewer
+
 - [ ] Parse tree diagram for any Quranic verse
 - [ ] Color-coded by grammatical function:
   - Subject (mubtada / fa'il) — Tech Blue
@@ -860,6 +948,7 @@ Everything in Premium, plus:
 - [ ] Reference to grammar rules in installed grammar books
 
 #### Step 7.4 — Verb Conjugation Table
+
 - [ ] Input any Arabic root → full conjugation table
 - [ ] Past, present, imperative, active participle, passive participle, verbal noun
 - [ ] All persons, genders, numbers
@@ -871,6 +960,7 @@ Everything in Premium, plus:
 ### PHASE 8: Notes, Annotations & Khutbah Workflow
 
 #### Step 8.1 — Highlights System
+
 - [ ] Select text in any panel → highlight toolbar appears
 - [ ] 8 highlight colors mapped to AE palette
 - [ ] Highlights persist across sessions (stored in user.db)
@@ -878,6 +968,7 @@ Everything in Premium, plus:
 - [ ] Export highlights for any resource
 
 #### Step 8.2 — Notes System
+
 - [ ] Margin notes: anchored to specific verse/hadith/passage
 - [ ] Free-form notes: not anchored, just tagged
 - [ ] Rich text editor (Markdown-based with Arabic support)
@@ -887,6 +978,7 @@ Everything in Premium, plus:
 - [ ] Note export: PDF, DOCX, Markdown, plain text
 
 #### Step 8.3 — Khutbah Builder (Premium)
+
 - [ ] Mark any passage as "Khutbah material" from context menu
 - [ ] Khutbah Builder panel:
   - Title and date
@@ -900,6 +992,7 @@ Everything in Premium, plus:
 - [ ] Khutbah marker: reading a verse shows past khutbahs that used it
 
 #### Step 8.4 — Study Templates (Premium)
+
 - [ ] Template library:
   - Verse Deep-Dive (Arabic → Translation → Tafsir → Hadith → Fiqh → Application)
   - Topical Study
@@ -916,6 +1009,7 @@ Everything in Premium, plus:
 ### PHASE 9: Factbook & Islamic Atlas
 
 #### Step 9.1 — Factbook
+
 - [ ] Encyclopedia interface with search
 - [ ] Entry types: Person, Place, Event, Concept, Surah, Hadith Collection
 - [ ] Auto-triggers (Insights): reading a verse about a Prophet → Factbook entry floats in
@@ -929,6 +1023,7 @@ Everything in Premium, plus:
 - [ ] Commentaries section added progressively (Premium)
 
 #### Step 9.2 — Islamic Atlas
+
 - [ ] Map viewer with historical layers
 - [ ] Timeline slider (622 CE → present)
 - [ ] Map layers:
@@ -946,6 +1041,7 @@ Everything in Premium, plus:
 ### PHASE 10: Audio & Recitation
 
 #### Step 10.1 — Audio Engine
+
 - [ ] Recitation player (HTML5 Audio via Electron)
 - [ ] Verse-by-verse playback with text highlight sync
 - [ ] Reciters available: Mishary Rashid Al-Afasy, Mahmoud Khalil Al-Husary, Abdul Basit Abdul Samad, and more
@@ -956,6 +1052,7 @@ Everything in Premium, plus:
 - [ ] Offline audio download manager
 
 #### Step 10.2 — Audio Settings
+
 - [ ] Download reciters for offline use
 - [ ] Auto-advance to next verse / pause between verses
 - [ ] Translation audio (English) paired with Arabic
@@ -965,12 +1062,14 @@ Everything in Premium, plus:
 ### PHASE 11: Sync & Account System
 
 #### Step 11.1 — Account System
+
 - [ ] Sign up / Sign in (email + password, Google SSO)
 - [ ] Subscription management (Stripe integration)
 - [ ] License validation (offline grace period: 7 days)
 - [ ] Multi-device licensing (up to 3 devices per account)
 
 #### Step 11.2 — Cloud Sync (Optional)
+
 - [ ] Sync: Notes, highlights, bookmarks, reading progress, khutbahs
 - [ ] Conflict resolution: last-write-wins with merge prompts for conflicts
 - [ ] Sync status indicator
@@ -983,6 +1082,7 @@ Everything in Premium, plus:
 ### PHASE 12: Library Manager & Resource Store
 
 #### Step 12.1 — Library Manager
+
 - [ ] Installed resources list with storage size
 - [ ] Available resources browser (by category, tier, language)
 - [ ] Download individual resources or bundles
@@ -990,6 +1090,7 @@ Everything in Premium, plus:
 - [ ] Uninstall to free space
 
 #### Step 12.2 — Resource Import
+
 - [ ] Import third-party resources in MKT format
 - [ ] Import from EPUB (with Quran/Hadith detection)
 - [ ] Import personal PDFs (for annotation, not cross-linking)
@@ -1016,6 +1117,7 @@ Everything in Premium, plus:
 ### PHASE 14: Polish, Performance & Release
 
 #### Step 14.1 — Performance
+
 - [ ] Virtualized lists for long resources (react-virtual)
 - [ ] Lazy load panels (code splitting)
 - [ ] SQLite query profiling and index optimization
@@ -1025,6 +1127,7 @@ Everything in Premium, plus:
 - [ ] Memory monitoring (Electron can leak — add health checks)
 
 #### Step 14.2 — Accessibility
+
 - [ ] Full keyboard navigation (no mouse required)
 - [ ] Screen reader support (ARIA labels, live regions for search)
 - [ ] High contrast mode (uses AEBlack + AEGold for high contrast)
@@ -1033,6 +1136,7 @@ Everything in Premium, plus:
 - [ ] Minimum touch target sizes (for Surface/tablet use)
 
 #### Step 14.3 — Internationalization
+
 - [ ] Interface languages: Arabic, English, Urdu, Turkish, French, Indonesian (Phase 1)
 - [ ] RTL layout switching when Arabic interface selected
 - [ ] Number formatting (Arabic-Indic numerals option)
@@ -1040,6 +1144,7 @@ Everything in Premium, plus:
 - [ ] i18next for string management
 
 #### Step 14.4 — Security Hardening
+
 - [ ] Content Security Policy headers
 - [ ] Disable remote module
 - [ ] Validate all IPC inputs
@@ -1048,6 +1153,7 @@ Everything in Premium, plus:
 - [ ] Certificate pinning for API calls
 
 #### Step 14.5 — Testing
+
 - [ ] Unit tests: all database queries, morphology engine, search
 - [ ] Integration tests: IPC handlers
 - [ ] E2E tests (Playwright): core user flows
@@ -1058,6 +1164,7 @@ Everything in Premium, plus:
 - [ ] Performance benchmarks: cold start < 3s, search response < 200ms
 
 #### Step 14.6 — Build & Distribution
+
 - [ ] Mac: Universal binary (Intel + Apple Silicon), signed + notarized
 - [ ] Windows: NSIS installer + MSIX package, code-signed
 - [ ] Linux: AppImage + .deb + .rpm
@@ -1209,21 +1316,21 @@ maktabat/
 ## 9. PHASE SUMMARY
 
 ```
-Phase 0  — Foundation & Tooling          
-Phase 1  — Main Process & IPC            
-Phase 2  — UI Shell                      
-Phase 3  — Quran Reading Module          
-Phase 4  — Tafsir Module                 
-Phase 5  — Hadith Module                 
-Phase 6  — Search & AI Assistant         
-Phase 7  — Linguistic Analysis           
-Phase 8  — Notes, Annotations, Khutbah  
-Phase 9  — Factbook & Atlas              
-Phase 10 — Audio & Recitation            
-Phase 11 — Sync & Account System         
-Phase 12 — Library Manager              
-Phase 13 — Reading Plans                 
-Phase 14 — Polish, Testing & Release     
+Phase 0  — Foundation & Tooling
+Phase 1  — Main Process & IPC
+Phase 2  — UI Shell
+Phase 3  — Quran Reading Module
+Phase 4  — Tafsir Module
+Phase 5  — Hadith Module
+Phase 6  — Search & AI Assistant
+Phase 7  — Linguistic Analysis
+Phase 8  — Notes, Annotations, Khutbah
+Phase 9  — Factbook & Atlas
+Phase 10 — Audio & Recitation
+Phase 11 — Sync & Account System
+Phase 12 — Library Manager
+Phase 13 — Reading Plans
+Phase 14 — Polish, Testing & Release
 ──────────────────────────────────────────────────
 
 ```
@@ -1235,6 +1342,7 @@ Phase 14 — Polish, Testing & Release
 For an MVP that can go to beta users, scope to:
 
 ### MVP Includes
+
 - Full Quran Arabic text + 2 translations (Pickthall, Abdel Haleem)
 - Tafsir Ibn Kathir (most requested, available in English)
 - Kutub al-Sittah (the six books of Hadith)
@@ -1248,6 +1356,7 @@ For an MVP that can go to beta users, scope to:
 - Mac + Windows builds
 
 ### MVP Defers to v1.1
+
 - AI Study Assistant
 - Khutbah Builder
 - I'rab parser / Grammar diagrams
@@ -1260,12 +1369,13 @@ For an MVP that can go to beta users, scope to:
 - Linux builds
 
 ### MVP Stack (Simplified)
+
 - Skip WASM morphology engine for MVP — use pre-computed DB values only
 - Skip PouchDB sync — local-only notes for MVP
 - Use simpler search (SQLite FTS5 only, no MiniSearch overlay)
 
 ---
 
-*Document version: 1.0 — Maktabat Build Sheet*
-*Design Reference: UAE Design System v3.0*
-*Architecture Pattern: Logos Bible Software (analogous)*
+_Document version: 1.0 — Maktabat Build Sheet_
+_Design Reference: UAE Design System v3.0_
+_Architecture Pattern: Logos Bible Software (analogous)_
