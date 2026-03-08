@@ -480,7 +480,7 @@ Everything in Premium, plus:
 ### PHASE 0: Project Foundation
 
 #### Step 0.1 — Repository & Tooling Setup
-- [ ] Initialize monorepo (pnpm workspaces)
+- [x] Initialize monorepo (pnpm workspaces)
   ```
   packages/
     main/         — Electron main process (Node.js + TypeScript)
@@ -489,31 +489,31 @@ Everything in Premium, plus:
     database/     — SQLite schema, migrations, seed scripts
     arabic-nlp/   — Arabic morphology engine (WASM build)
   ```
-- [ ] Configure TypeScript (strict mode, path aliases)
-- [ ] Set up ESLint + Prettier + Husky pre-commit hooks
-- [ ] Configure electron-builder for Mac/Win/Linux targets
-- [ ] Set up GitHub Actions CI/CD pipeline
+- [x] Configure TypeScript (strict mode, path aliases)
+- [x] Set up ESLint + Prettier + Husky pre-commit hooks
+- [x] Configure electron-builder for Mac/Win/Linux targets
+- [x] Set up GitHub Actions CI/CD pipeline
   - Lint + type-check on every PR
   - Build + package on merge to main
   - Auto-publish releases to GitHub Releases
 
 #### Step 0.2 — Design Token System
-- [ ] Implement full UAE Design System v3 color tokens as CSS custom properties
+- [x] Implement full UAE Design System v3 color tokens as CSS custom properties
   ```css
   --ae-gold-50 through --ae-gold-950
   --ae-red-50 through --ae-red-950
   --ae-green-50 through --ae-green-950
   (... all 10 color families)
   ```
-- [ ] Configure Tailwind to consume these tokens
-- [ ] Set up dark/light/sepia theme switching
-- [ ] Load and configure Arabic fonts (Noto Naskh, Amiri, IBM Plex Arabic)
-- [ ] Load and configure Latin fonts (Cormorant Garamond, Source Serif 4)
-- [ ] Load Quranic font (KFGQPC Uthmanic Hafs)
+- [x] Configure Tailwind to consume these tokens
+- [x] Set up dark/light/sepia theme switching
+- [x] Load and configure Arabic fonts (Noto Naskh, Amiri, IBM Plex Arabic)
+- [x] Load and configure Latin fonts (Cormorant Garamond, Source Serif 4)
+- [x] Load Quranic font (KFGQPC Uthmanic Hafs)
 - [ ] Build Storybook component library for design QA
 
 #### Step 0.3 — Database Schema Design
-- [ ] Design SQLite schema for `library.db`:
+- [x] Design SQLite schema for `library.db`:
   ```sql
   -- Core content tables
   surahs (id, number, arabic_name, transliterated_name, english_name, revelation_type, verse_count)
@@ -547,7 +547,7 @@ Everything in Premium, plus:
   factbook_ayah_refs (id, entry_id, ayah_id)
   ```
 
-- [ ] Design `user.db` schema:
+- [x] Design `user.db` schema:
   ```sql
   highlights (id, resource_key, content_ref, color, created_at)
   notes (id, resource_key, content_ref, type, body, tags, created_at, updated_at)
@@ -559,8 +559,8 @@ Everything in Premium, plus:
   tags (id, name, color)
   ```
 
-- [ ] Write migration system (up/down migrations with versioning)
-- [ ] Write seed scripts for development dataset (1 Surah complete, 100 hadiths sample)
+- [x] Write migration system (up/down migrations with versioning)
+- [x] Write seed scripts for development dataset (1 Surah complete, 10 hadith sample)
 
 ---
 

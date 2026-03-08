@@ -1,0 +1,59 @@
+@import './tokens.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Arabic font imports (Google Fonts) */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Amiri:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Arabic:wght@300;400;500;600&display=swap');
+
+/* Latin font imports (Google Fonts) */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* KFGQPC Uthmanic Hafs font (bundled) */
+@font-face {
+  font-family: 'KFGQPC Uthmanic Hafs';
+  src: url('/fonts/KFGQPCUthmanicScriptHAFS.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Base styles */
+html {
+  font-family: 'Source Serif 4', serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+[dir='rtl'] {
+  font-family: 'IBM Plex Arabic', 'Noto Naskh Arabic', sans-serif;
+}
+
+.quran-text {
+  font-family: 'KFGQPC Uthmanic Hafs', 'Noto Naskh Arabic', serif;
+  font-size: 1.5rem;
+  line-height: 2.5;
+  direction: rtl;
+}
+
+/* 8px base grid */
+* {
+  box-sizing: border-box;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--ae-black-300);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--ae-black-400);
+}

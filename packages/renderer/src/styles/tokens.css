@@ -1,0 +1,181 @@
+:root {
+  /* ========================
+     AEGold - Primary brand, decorative motifs
+     ======================== */
+  --ae-gold-50: #fffbeb;
+  --ae-gold-100: #fef3c7;
+  --ae-gold-200: #fde68a;
+  --ae-gold-300: #fcd34d;
+  --ae-gold-400: #fbbf24;
+  --ae-gold-500: #f59e0b;
+  --ae-gold-600: #d97706;
+  --ae-gold-700: #b45309;
+  --ae-gold-800: #92400e;
+  --ae-gold-900: #78350f;
+  --ae-gold-950: #451a03;
+
+  /* ========================
+     AERed - Alerts, Da'if hadith markers
+     ======================== */
+  --ae-red-50: #fff1f2;
+  --ae-red-100: #ffe4e6;
+  --ae-red-200: #fecdd3;
+  --ae-red-300: #fda4af;
+  --ae-red-400: #fb7185;
+  --ae-red-500: #f43f5e;
+  --ae-red-600: #e11d48;
+  --ae-red-700: #be123c;
+  --ae-red-800: #9f1239;
+  --ae-red-900: #881337;
+  --ae-red-950: #4c0519;
+
+  /* ========================
+     AEGreen - Sahih markers, confirmed cross-references
+     ======================== */
+  --ae-green-50: #f0fdf4;
+  --ae-green-100: #dcfce7;
+  --ae-green-200: #bbf7d0;
+  --ae-green-300: #86efac;
+  --ae-green-400: #4ade80;
+  --ae-green-500: #22c55e;
+  --ae-green-600: #16a34a;
+  --ae-green-700: #15803d;
+  --ae-green-800: #166534;
+  --ae-green-900: #14532d;
+  --ae-green-950: #052e16;
+
+  /* ========================
+     AEBlack - Primary text, UI chrome
+     ======================== */
+  --ae-black-50: #f8fafc;
+  --ae-black-100: #f1f5f9;
+  --ae-black-200: #e2e8f0;
+  --ae-black-300: #cbd5e1;
+  --ae-black-400: #94a3b8;
+  --ae-black-500: #64748b;
+  --ae-black-600: #475569;
+  --ae-black-700: #334155;
+  --ae-black-800: #1e293b;
+  --ae-black-900: #0f172a;
+  --ae-black-950: #020617;
+
+  /* ========================
+     Tech Blue - Interactive elements, links
+     ======================== */
+  --tech-blue-50: #eff6ff;
+  --tech-blue-100: #dbeafe;
+  --tech-blue-200: #bfdbfe;
+  --tech-blue-300: #93c5fd;
+  --tech-blue-400: #60a5fa;
+  --tech-blue-500: #3b82f6;
+  --tech-blue-600: #2563eb;
+  --tech-blue-700: #1d4ed8;
+  --tech-blue-800: #1e40af;
+  --tech-blue-900: #1e3a8a;
+  --tech-blue-950: #172554;
+
+  /* ========================
+     Sea Blue - Secondary panels, Shia collection markers
+     ======================== */
+  --sea-blue-50: #ecfeff;
+  --sea-blue-100: #cffafe;
+  --sea-blue-200: #a5f3fc;
+  --sea-blue-300: #67e8f9;
+  --sea-blue-400: #22d3ee;
+  --sea-blue-500: #06b6d4;
+  --sea-blue-600: #0891b2;
+  --sea-blue-700: #0e7490;
+  --sea-blue-800: #155e75;
+  --sea-blue-900: #164e63;
+  --sea-blue-950: #083344;
+
+  /* ========================
+     Camel Yellow - Annotations, bookmarks, study highlights
+     ======================== */
+  --camel-yellow-50: #fefce8;
+  --camel-yellow-100: #fef9c3;
+  --camel-yellow-200: #fef08a;
+  --camel-yellow-300: #fde047;
+  --camel-yellow-400: #facc15;
+  --camel-yellow-500: #eab308;
+  --camel-yellow-600: #ca8a04;
+  --camel-yellow-700: #a16207;
+  --camel-yellow-800: #854d0e;
+  --camel-yellow-900: #713f12;
+  --camel-yellow-950: #422006;
+
+  /* ========================
+     Desert Orange - Ibadi collection markers
+     ======================== */
+  --desert-orange-50: #fff7ed;
+  --desert-orange-100: #ffedd5;
+  --desert-orange-200: #fed7aa;
+  --desert-orange-300: #fdba74;
+  --desert-orange-400: #fb923c;
+  --desert-orange-500: #f97316;
+  --desert-orange-600: #ea580c;
+  --desert-orange-700: #c2410c;
+  --desert-orange-800: #9a3412;
+  --desert-orange-900: #7c2d12;
+  --desert-orange-950: #431407;
+
+  /* ========================
+     Fuchsia - Tags, topic labels
+     ======================== */
+  --fuchsia-50: #fdf4ff;
+  --fuchsia-100: #fae8ff;
+  --fuchsia-200: #f5d0fe;
+  --fuchsia-300: #f0abfc;
+  --fuchsia-400: #e879f9;
+  --fuchsia-500: #d946ef;
+  --fuchsia-600: #c026d3;
+  --fuchsia-700: #a21caf;
+  --fuchsia-800: #86198f;
+  --fuchsia-900: #701a75;
+  --fuchsia-950: #4a044e;
+
+  /* ========================
+     Slate - Backgrounds, sidebar chrome
+     ======================== */
+  --slate-50: #f8fafc;
+  --slate-100: #f1f5f9;
+  --slate-200: #e2e8f0;
+  --slate-300: #cbd5e1;
+  --slate-400: #94a3b8;
+  --slate-500: #64748b;
+  --slate-600: #475569;
+  --slate-700: #334155;
+  --slate-800: #1e293b;
+  --slate-900: #0f172a;
+  --slate-950: #020617;
+
+  /* ========================
+     Theme variables - light mode defaults
+     ======================== */
+  --bg-primary: var(--slate-50);
+  --bg-secondary: var(--slate-100);
+  --text-primary: var(--ae-black-900);
+  --text-secondary: var(--ae-black-600);
+  --border-color: var(--ae-black-200);
+  --accent-primary: var(--ae-gold-500);
+  --accent-secondary: var(--ae-green-500);
+  --surface: #ffffff;
+}
+
+.dark {
+  --bg-primary: var(--ae-black-950);
+  --bg-secondary: var(--ae-black-900);
+  --text-primary: var(--ae-black-50);
+  --text-secondary: var(--ae-black-300);
+  --border-color: var(--ae-black-700);
+  --surface: var(--ae-black-900);
+}
+
+.sepia {
+  --bg-primary: #f4edd8;
+  --bg-secondary: #ede4c8;
+  --text-primary: #3d2b1f;
+  --text-secondary: #6b4c35;
+  --border-color: #c4a882;
+  --surface: #f9f3e6;
+}
