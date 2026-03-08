@@ -222,6 +222,4 @@ CREATE INDEX IF NOT EXISTS idx_hadith_grades_hadith ON hadith_grades(hadith_id);
 CREATE INDEX IF NOT EXISTS idx_word_morphology_ayah ON word_morphology(ayah_id);
 CREATE INDEX IF NOT EXISTS idx_word_morphology_root ON word_morphology(root_id);
 
-INSERT OR IGNORE INTO schema_migrations (version) VALUES ('001_initial_library');
-
 COMMIT;

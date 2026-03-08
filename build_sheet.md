@@ -560,7 +560,7 @@ Everything in Premium, plus:
   ```
 
 - [x] Write migration system (up/down migrations with versioning)
-- [x] Write seed scripts for development dataset (1 Surah complete, 10 hadiths sample)
+- [x] Write seed scripts for development dataset (1 Surah complete, 10 hadith sample)
 
 ---
 

@@ -76,6 +76,4 @@ CREATE INDEX IF NOT EXISTS idx_notes_resource ON notes(resource_key);
 CREATE INDEX IF NOT EXISTS idx_highlights_resource ON highlights(resource_key);
 CREATE INDEX IF NOT EXISTS idx_bookmarks_resource ON bookmarks(resource_key);
 
-INSERT OR IGNORE INTO schema_migrations (version) VALUES ('002_initial_user');
-
 COMMIT;
