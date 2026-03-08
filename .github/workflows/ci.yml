@@ -10,6 +10,8 @@ jobs:
   lint-and-typecheck:
     name: Lint & Type Check
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -38,6 +40,8 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     needs: lint-and-typecheck
+    permissions:
+      contents: read
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
