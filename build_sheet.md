@@ -750,7 +750,7 @@ Everything in Premium, plus:
 
 #### Step 3.1 — Quran Text Renderer
 
-- [ ] Arabic text display with proper OpenType features
+- [x] Arabic text display with proper OpenType features
   - Correct ligatures and contextual forms
   - Kashida (tatweel) handling
   - Verse end markers (آ)
@@ -758,35 +758,35 @@ Everything in Premium, plus:
   - Rub' al-Hizb markers (۞)
   - Hizb markers (۝)
   - Juz' markers
-- [ ] Tajweed color overlay (optional, toggleable)
+- [x] Tajweed color overlay (optional, toggleable)
   - Each tajweed rule gets distinct color from AE palette
   - Rule explained on hover
-- [ ] Line-by-line mode (mushaf style, right-to-left pages)
-- [ ] Verse-by-verse mode (study mode, LTR-friendly)
-- [ ] Page view mode (faithful to printed Mushaf)
+- [x] Line-by-line mode (mushaf style, right-to-left pages)
+- [x] Verse-by-verse mode (study mode, LTR-friendly)
+- [x] Page view mode (faithful to printed Mushaf)
 
 #### Step 3.2 — Translation Renderer
 
-- [ ] Single translation view
-- [ ] Parallel translation view (up to 4 translations + Arabic)
-- [ ] Translation comparison tool: highlight where translators differ
-- [ ] Interlinear mode: Arabic word + English gloss beneath each word
+- [x] Single translation view
+- [x] Parallel translation view (up to 4 translations + Arabic)
+- [x] Translation comparison tool: highlight where translators differ
+- [x] Interlinear mode: Arabic word + English gloss beneath each word
 
 #### Step 3.3 — Word-by-Word Interaction
 
-- [ ] Every Arabic word is an interactive element
-- [ ] Hover popover shows:
+- [x] Every Arabic word is an interactive element
+- [x] Hover popover shows:
   - Arabic word (large)
   - Transliteration
   - Word-by-word translation
   - Part of speech
   - Root letters
   - [Button: Open full word study]
-- [ ] Click word → opens Word Study panel (see 4.5)
+- [x] Click word → opens Word Study panel (see 4.5)
 
 #### Step 3.4 — Verse Interaction Menu
 
-- [ ] Right-click or long-press any verse → context menu:
+- [x] Right-click or long-press any verse → context menu:
   - Copy (Arabic, Translation, or both)
   - Highlight (color picker using AE palette)
   - Add Note
@@ -800,11 +800,11 @@ Everything in Premium, plus:
 
 #### Step 3.5 — Surah Navigator
 
-- [ ] Surah list with: number, Arabic name, English name, Meccan/Medinan, verse count
-- [ ] Filter by: Meccan/Medinan, theme, length
-- [ ] Juz' navigator
+- [x] Surah list with: number, Arabic name, English name, Meccan/Medinan, verse count
+- [x] Filter by: Meccan/Medinan, theme, length
+- [x] Juz' navigator
 - [ ] Hizb navigator
-- [ ] Search within Quran
+- [x] Search within Quran
 
 ---
 

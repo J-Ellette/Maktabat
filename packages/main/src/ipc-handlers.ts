@@ -36,6 +36,31 @@ export function registerIpcHandlers(
   libraryService: LibraryService,
   userService: UserService
 ): void {
+  // ── library:get-surahs ──────────────────────────────────────────────────────
+  ipcMain.handle('library:get-surahs', () => {
+    return libraryService.getSurahs()
+  })
+
+  // ── library:get-ayahs-by-surah ──────────────────────────────────────────────
+  ipcMain.handle('library:get-ayahs-by-surah', (_event, surahNumber: unknown) => {
+    const sn = assertNumber(surahNumber, 'surahNumber')
+    if (sn < 1 || sn > 114) throw new Error('surahNumber must be between 1 and 114')
+
+    const ayahs = libraryService.getAyahsBySurah(sn)
+    // For each ayah also get translations
+    return ayahs.map((ayah) => ({
+      ayah,
+      translations: libraryService.getTranslations(ayah.id),
+      morphology: libraryService.getMorphologyForAyah(ayah.id),
+    }))
+  })
+
+  // ── library:get-translations ────────────────────────────────────────────────
+  ipcMain.handle('library:get-translations', (_event, ayahId: unknown) => {
+    const id = assertNumber(ayahId, 'ayahId')
+    return libraryService.getTranslations(id)
+  })
+
   // ── library:get-ayah ────────────────────────────────────────────────────────
   ipcMain.handle('library:get-ayah', (_event, surahNumber: unknown, ayahNumber: unknown) => {
     const sn = assertNumber(surahNumber, 'surahNumber')
@@ -144,6 +169,12 @@ export function registerIpcHandlers(
       return userService.saveHighlight(rk, cr, c)
     }
   )
+
+  // ── user:get-highlights ─────────────────────────────────────────────────────
+  ipcMain.handle('user:get-highlights', (_event, resourceKey: unknown) => {
+    const rk = assertString(resourceKey, 'resourceKey')
+    return userService.getHighlightsByResource(rk)
+  })
 
   // ── user:get-reading-plan ───────────────────────────────────────────────────
   ipcMain.handle('user:get-reading-plan', (_event, planKey: unknown) => {

@@ -2,13 +2,17 @@ import { contextBridge, ipcRenderer } from 'electron'
 
 const validChannels = [
   'library:search',
+  'library:get-surahs',
   'library:get-ayah',
+  'library:get-ayahs-by-surah',
+  'library:get-translations',
   'library:get-tafsir',
   'library:get-hadith',
   'library:get-morphology',
   'user:save-note',
   'user:get-notes',
   'user:save-highlight',
+  'user:get-highlights',
   'user:get-reading-plan',
   'audio:play',
   'audio:pause',

@@ -75,9 +75,20 @@ export interface MorphologyRow {
   root_meaning_english?: string | null
 }
 
+export interface SurahRow {
+  id: number
+  number: number
+  arabic_name: string
+  transliterated_name: string
+  english_name: string
+  revelation_type: 'meccan' | 'medinan'
+  verse_count: number
+}
+
 // ─── Statement cache ──────────────────────────────────────────────────────────
 
 type CachedStatements = {
+  getSurahs: Statement
   getAyah: Statement
   getAyahsBySurah: Statement
   getTranslations: Statement
@@ -110,6 +121,13 @@ export class LibraryService {
 
   private prepareStatements(): void {
     this.stmts = {
+      getSurahs: this.db.prepare(`
+        SELECT id, number, arabic_name, transliterated_name, english_name,
+               revelation_type, verse_count
+        FROM surahs
+        ORDER BY number
+      `),
+
       getAyah: this.db.prepare(`
         SELECT a.*, s.number AS surah_number, s.arabic_name AS surah_arabic_name,
                s.english_name AS surah_english_name
@@ -197,6 +215,10 @@ export class LibraryService {
   }
 
   // ─── Public query API ──────────────────────────────────────────────────────
+
+  getSurahs(): SurahRow[] {
+    return this.stmts.getSurahs.all() as SurahRow[]
+  }
 
   getAyah(surahNumber: number, ayahNumber: number): AyahRow | undefined {
     return this.stmts.getAyah.get(surahNumber, ayahNumber) as AyahRow | undefined

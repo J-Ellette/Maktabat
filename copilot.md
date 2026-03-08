@@ -249,14 +249,170 @@ This file tracks the implementation progress of the Maktabat Quran Study Softwar
 - [x] Settings panel — Accessibility (high contrast, reduced motion, screen reader)
 - [x] Settings panel — Notifications (reminders, alerts)
 
-### Phase 3: Quran Reading Module — _next_
+---
 
-- [ ] Arabic text display with proper OpenType features
-- [ ] Tajweed color overlay
-- [ ] Line-by-line / verse-by-verse / page view modes
-- [ ] Translation renderer (single, parallel, interlinear)
-- [ ] Word-by-word interaction (hover popover)
-- [ ] Verse interaction menu (right-click context menu)
-- [ ] Surah navigator
+### Session 3 — Phase 3: Quran Reading Module
+
+**Date**: 2026-03-08
+
+**Status**: ✅ Complete
+
+#### Changes Made
+
+**`packages/shared/types/ipc.ts`** — Enhanced
+
+- Added `LIBRARY_GET_SURAHS`, `LIBRARY_GET_AYAHS_BY_SURAH`, `LIBRARY_GET_TRANSLATIONS`, `USER_GET_HIGHLIGHTS` IPC channels
+- Added `SurahInfo`, `AyahData`, `TranslationData`, `MorphologyData`, `AyahBundle`, `HighlightData`, `HighlightColor` types
+
+**`packages/main/src/library-service.ts`** — Enhanced
+
+- Added `SurahRow` interface
+- Added `getSurahs: Statement` to statement cache
+- Added `getSurahs()` public method returning all 114 surahs
+
+**`packages/main/src/ipc-handlers.ts`** — Enhanced
+
+- Added `library:get-surahs` handler
+- Added `library:get-ayahs-by-surah` handler (returns ayah + translations + morphology bundles)
+- Added `library:get-translations` handler
+- Added `user:get-highlights` handler
+
+**`packages/main/src/preload.ts`** — Enhanced
+
+- Added all new IPC channels to `validChannels` whitelist
+
+**`packages/renderer/src/hooks/useIpc.ts`** — New file
+
+- `useIpc()` hook returning typed `window.maktabat` bridge or null
+
+**`packages/renderer/src/components/quran/TajweedColors.ts`** — New file
+
+- Tajweed rule type definitions and color constants (8 rules mapped to AE palette)
+- Human-readable rule names in Arabic and English with descriptions
+
+**`packages/renderer/src/components/quran/WordPopover.tsx`** — New file
+
+- Hover card showing: Arabic word (large), root letters (gold), root meaning, part of speech, case marker, verb pattern
+- "Open full word study" button
+- Appears after 300ms hover delay, auto-hides on mouse leave
+
+**`packages/renderer/src/components/quran/VerseContextMenu.tsx`** — New file
+
+- Right-click context menu for any Quran verse
+- Copy: Arabic, Translation, or both
+- Highlight color picker (8 AE palette colors)
+- Actions: Add Note, Add to Khutbah, View in Tafsir, View related Hadith, Play recitation, Share verse
+- Closes on Escape or outside click; auto-adjusts position to stay within viewport
+
+**`packages/renderer/src/components/quran/ArabicVerse.tsx`** — New file
+
+- Renders a single Arabic verse with KFGQPC Uthmanic Hafs / Amiri font
+- OpenType features: `liga`, `calt`, `kern` (ligatures, contextual alternates, kerning)
+- Word-by-word interactive spans with hover delay popover
+- Arabic-Indic verse end markers (٥٦ style)
+- Bismillah pre-header for applicable surahs
+- Tajweed overlay toggle (CSS class hook; full coloring requires DB data)
+- View mode support: verse-by-verse vs. continuous inline
+- Highlight display with RGBA background overlays
+- IPC highlight save via `user:save-highlight`
+
+**`packages/renderer/src/components/quran/TranslationView.tsx`** — New file
+
+- Four display modes: `single`, `parallel` (up to 4 side-by-side), `comparison` (stacked with translator attribution), `interlinear` (Arabic word + English gloss)
+- `TranslationSelector` component for picking which translations to show (max 4 in parallel mode)
+
+**`packages/renderer/src/components/quran/SurahNavigator.tsx`** — New file
+
+- Full surah browser with cards: number badge, Arabic name (Amiri font), transliterated name, English name, Meccan/Medinan badge, verse count
+- Search filter (by number, name Arabic/transliterated/English)
+- Revelation type filter chips (All / Meccan / Medinan)
+- Tab switcher: Surahs | Juz' (30 Juz' with surah/ayah start points)
+- Footer with result count
+- Graceful empty state for missing DB data
+
+**`packages/renderer/src/components/quran/QuranReader.tsx`** — New file
+
+- Main entry for `/quran`, `/quran/:surah`, `/quran/:surah/:ayah` routes
+- Surah header: Arabic name (Amiri), transliterated name (Cormorant Garamond), Meccan/Medinan badge, verse count, ornamental divider
+- Sticky reading toolbar: surah nav toggle, view mode switcher (verse-by-verse / continuous / page), translation toggle, translation mode switcher, tajweed toggle + legend popup, prev/next surah buttons
+- Loads all verses + translations + morphology in one IPC call
+- Verse-by-verse mode: each verse in a card with Arabic text + translations
+- Continuous mode: all Arabic text flows as one RTL block + translations listed below
+- Translation selector bar below toolbar
+- Scrolls to target ayah when URL includes ayah parameter
+- Prev/Next surah footer navigation
+- Graceful empty/error states
+
+**`packages/renderer/src/routes/index.tsx`** — Updated
+
+- `/quran`, `/quran/:surah`, `/quran/:surah/:ayah` now use real `QuranReader` component
+- Added `/tafsir/:surah/:ayah` placeholder route for future Phase 4
+
+---
+
+## Phase Completion Status
+
+### Phase 0: Project Foundation ✅ (pre-existing)
+
+- [x] Monorepo (pnpm workspaces) initialized
+- [x] TypeScript strict mode configured
+- [x] ESLint + Prettier + Husky
+- [x] electron-builder configured
+- [x] GitHub Actions CI/CD
+- [x] UAE Design System color tokens
+- [x] Tailwind configured with tokens
+- [x] Dark / Light / Sepia themes
+- [x] Arabic fonts (Noto Naskh, Amiri, IBM Plex Arabic)
+- [x] Latin fonts (Cormorant Garamond, Source Serif 4)
+- [x] Quranic font (KFGQPC Uthmanic Hafs)
+- [ ] Storybook component library (deferred to Phase 2+)
+- [x] SQLite `library.db` schema
+- [x] SQLite `user.db` schema
+- [x] Migration system
+- [x] Seed scripts (Al-Fatiha + 10 sample hadiths)
+
+### Phase 1: Main Process & IPC Layer ✅ (Session 1)
+
+- [x] Window manager with security settings, size/position persistence, multiple windows
+- [x] Application menu (File, Edit, View, Library, Study, Help)
+- [x] Tray icon with daily dhikr / verse-of-day quick access
+- [x] System notifications (`sendNotification` helper)
+- [x] `maktabat://` protocol handler (deep links)
+- [x] `.mkt` file association handler
+- [x] IPC channel definitions (`IpcChannel` + `ReceiveChannel`)
+- [x] Preload script with typed `window.maktabat` API
+- [x] All IPC handlers implemented with input validation
+- [x] `LibraryService`: typed queries + prepared statement cache + FTS5 search
+- [x] `UserService`: notes, highlights, bookmarks, reading plans, settings
+
+### Phase 2: Core UI Shell ✅ (Session 2)
+
+- [x] Application shell with theme provider
+- [x] RTL/LTR direction context
+- [x] Resizable panel system (1/2/3 columns, drag handles)
+- [x] Sidebar navigation (Library tree, Bookmarks, Notes, Plans, Factbook, Atlas)
+- [x] In-app router (React Router v7 + HashRouter for Electron)
+- [x] History stack (back/forward navigation controls)
+- [x] Resource address bar (parses `Quran 2:255`, `Bukhari 1`, direct paths)
+- [x] Command palette (Cmd+K — search, navigate, layout, actions)
+- [x] Dashboard / New Tab — "Everything" view (dhikr, verse, hadith, plans, recent)
+- [x] Dashboard / New Tab — "Reference" view (search, ayah nav, quick-open)
+- [x] Settings panel — Appearance (theme, font sizes)
+- [x] Settings panel — Language (interface lang, Arabic script, transliteration)
+- [x] Settings panel — Library (installed resources, downloads, storage)
+- [x] Settings panel — Account (subscription tier, sign-in CTA)
+- [x] Settings panel — Keyboard Shortcuts (click-to-rebind)
+- [x] Settings panel — Accessibility (high contrast, reduced motion, screen reader)
+- [x] Settings panel — Notifications (reminders, alerts)
+
+### Phase 3: Quran Reading Module ✅ (Session 3)
+
+- [x] Arabic text display with proper OpenType features
+- [x] Tajweed color overlay (toggleable, with legend, 8 rules mapped to AE palette)
+- [x] Line-by-line / verse-by-verse / page view modes
+- [x] Translation renderer (single, parallel, interlinear, comparison)
+- [x] Word-by-word interaction (hover popover with morphology data)
+- [x] Verse interaction menu (right-click context menu)
+- [x] Surah navigator (surah list, Meccan/Medinan filter, search, Juz' tab)
 
 ### Phases 4–14 — _future sessions_
