@@ -213,7 +213,14 @@ export function registerIpcHandlers(
   // ── library:search ──────────────────────────────────────────────────────────
   ipcMain.handle(
     'library:search',
-    (_event, query: unknown, limit: unknown, offset: unknown, resourceTypes: unknown) => {
+    (
+      _event,
+      query: unknown,
+      limit: unknown,
+      offset: unknown,
+      resourceTypes: unknown,
+      expandMorphology: unknown
+    ) => {
       const q = assertString(query, 'query')
       if (q.length > 500) throw new Error('Query too long (max 500 characters)')
 
@@ -223,8 +230,9 @@ export function registerIpcHandlers(
         resourceTypes !== undefined && isStringArray(resourceTypes)
           ? assertStringArray(resourceTypes, 'resourceTypes')
           : undefined
+      const expand = typeof expandMorphology === 'boolean' ? expandMorphology : false
 
-      return libraryService.search(q, lim, off, types)
+      return libraryService.search(q, lim, off, types, expand)
     }
   )
 
@@ -613,12 +621,9 @@ export function registerIpcHandlers(
   })
 
   // ── library:get-tafsir-annotations ──────────────────────────────────────────
-  ipcMain.handle(
-    'library:get-tafsir-annotations',
-    (_e, ayahId: unknown, tafsirKey: unknown) => {
-      const id = assertNumber(ayahId, 'ayahId')
-      const tk = assertString(tafsirKey, 'tafsirKey')
-      return libraryService.getTafsirAnnotations(id, tk)
-    }
-  )
+  ipcMain.handle('library:get-tafsir-annotations', (_e, ayahId: unknown, tafsirKey: unknown) => {
+    const id = assertNumber(ayahId, 'ayahId')
+    const tk = assertString(tafsirKey, 'tafsirKey')
+    return libraryService.getTafsirAnnotations(id, tk)
+  })
 }

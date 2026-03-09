@@ -15,6 +15,7 @@ interface SearchResult {
   excerpt: string
   relevance: number
   metadata: Record<string, unknown>
+  expanded?: boolean
 }
 
 // ─── Resource type labels & colors ───────────────────────────────────────────
@@ -192,9 +193,13 @@ const ALL_TYPES: ResultType[] = ['ayah', 'translation', 'hadith']
 function FiltersSidebar({
   enabledTypes,
   onToggleType,
+  expandMorphology,
+  onToggleExpand,
 }: {
   enabledTypes: Set<ResultType>
   onToggleType: (type: ResultType) => void
+  expandMorphology: boolean
+  onToggleExpand: () => void
 }): React.ReactElement {
   return (
     <aside
@@ -227,6 +232,27 @@ function FiltersSidebar({
           )
         })}
       </div>
+
+      <div className="mt-4 pt-4" style={{ borderTop: '1px solid var(--border-subtle)' }}>
+        <p
+          className="text-xs font-bold uppercase tracking-wider mb-2"
+          style={{ color: 'var(--text-muted)' }}
+        >
+          Search Options
+        </p>
+        <label className="flex items-start gap-2 cursor-pointer select-none">
+          <input
+            type="checkbox"
+            className="rounded mt-0.5"
+            checked={expandMorphology}
+            onChange={onToggleExpand}
+            aria-label="Toggle morphological expansion"
+          />
+          <span className="text-sm leading-snug" style={{ color: 'var(--text-primary)' }}>
+            Morphological expansion
+          </span>
+        </label>
+      </div>
     </aside>
   )
 }
@@ -241,17 +267,25 @@ function FullTextSearch({ initialQuery }: { initialQuery: string }): React.React
   const [loading, setLoading] = useState(false)
   const [searched, setSearched] = useState(false)
   const [enabledTypes, setEnabledTypes] = useState<Set<ResultType>>(new Set(ALL_TYPES))
+  const [expandMorphology, setExpandMorphology] = useState(true)
   const inputRef = useRef<HTMLInputElement>(null)
 
   // Run search whenever query or enabled types change
   const runSearch = useCallback(
-    async (q: string, types: Set<ResultType>) => {
+    async (q: string, types: Set<ResultType>, expand: boolean) => {
       if (!ipc || !q.trim()) return
       setLoading(true)
       setSearched(true)
       try {
         const typeArray = [...types]
-        const rows = (await ipc.invoke('library:search', q, 60, 0, typeArray)) as SearchResult[]
+        const rows = (await ipc.invoke(
+          'library:search',
+          q,
+          60,
+          0,
+          typeArray,
+          expand
+        )) as SearchResult[]
         setResults(rows ?? [])
       } catch {
         setResults([])
@@ -262,12 +296,12 @@ function FullTextSearch({ initialQuery }: { initialQuery: string }): React.React
     [ipc]
   )
 
-  // Trigger search when query or types change
+  // Trigger search when query, types, or expansion setting changes
   useEffect(() => {
     if (query.trim()) {
-      void runSearch(query, enabledTypes)
+      void runSearch(query, enabledTypes, expandMorphology)
     }
-  }, [query, enabledTypes, runSearch])
+  }, [query, enabledTypes, expandMorphology, runSearch])
 
   // Auto-focus input on mount
   useEffect(() => {
@@ -308,7 +342,12 @@ function FullTextSearch({ initialQuery }: { initialQuery: string }): React.React
   return (
     <div className="flex gap-6">
       {/* Filters */}
-      <FiltersSidebar enabledTypes={enabledTypes} onToggleType={toggleType} />
+      <FiltersSidebar
+        enabledTypes={enabledTypes}
+        onToggleType={toggleType}
+        expandMorphology={expandMorphology}
+        onToggleExpand={() => setExpandMorphology((e) => !e)}
+      />
 
       {/* Main content */}
       <div className="flex-1 min-w-0">
@@ -424,10 +463,16 @@ function FullTextSearch({ initialQuery }: { initialQuery: string }): React.React
         {/* Results */}
         {!loading && hasResults && (
           <>
-            <p className="text-xs mb-4" style={{ color: 'var(--text-muted)' }}>
+            <p className="text-xs mb-1" style={{ color: 'var(--text-muted)' }}>
               {results.length} result{results.length !== 1 ? 's' : ''} for{' '}
               <strong style={{ color: 'var(--text-primary)' }}>&ldquo;{query}&rdquo;</strong>
             </p>
+            {expandMorphology && results.some((r) => r.expanded) && (
+              <p className="text-[10px] mb-4 italic" style={{ color: 'var(--text-muted)' }}>
+                (morphological expansion active)
+              </p>
+            )}
+            {(!expandMorphology || !results.some((r) => r.expanded)) && <div className="mb-4" />}
             <div className="flex flex-col gap-6">
               {groupsWithResults.map((type) => (
                 <ResultGroup key={type} type={type} results={grouped[type]} />
