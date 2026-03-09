@@ -1,6 +1,7 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAppStore } from '../../store/app-store'
+import { useIpc } from '../../hooks/useIpc'
 
 // ────────────────────────────────────────────────────────────────
 // Static sample data (will come from IPC in Phase 3+)
@@ -253,19 +254,46 @@ function RecentResourcesCard() {
 }
 
 function RecentNotesCard() {
+  const ipc = useIpc()
+  const navigate = useNavigate()
+  const [notes, setNotes] = useState<{ id: number; resource_key: string; content_ref: string; type: string; body: string }[]>([])
+
+  useEffect(() => {
+    if (!ipc) return
+    void (async () => {
+      try {
+        const data = await ipc.invoke('user:get-notes')
+        const all = data as { id: number; resource_key: string; content_ref: string; type: string; body: string }[]
+        setNotes(all.slice(0, 3))
+      } catch {
+        setNotes([])
+      }
+    })()
+  }, [ipc])
+
+  const displayNotes = notes.length > 0
+    ? notes
+    : RECENT_NOTES.map((n, i) => ({ id: i, resource_key: n.ref, content_ref: n.ref, type: n.type, body: n.body }))
+
   return (
     <Card title="📝 Recent Notes">
       <ul className="flex flex-col gap-2">
-        {RECENT_NOTES.map((n) => (
+        {displayNotes.map((n) => (
           <li
             key={n.id}
             className="p-2 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-color)]"
           >
-            <p className="text-xs text-[var(--text-secondary)] mb-0.5">{n.ref}</p>
+            <p className="text-xs text-[var(--text-secondary)] mb-0.5">{n.content_ref}</p>
             <p className="text-sm text-[var(--text-primary)] line-clamp-2">{n.body}</p>
           </li>
         ))}
       </ul>
+      <button
+        onClick={() => void navigate('/notes')}
+        className="mt-2 text-xs text-[var(--accent-primary)] hover:underline"
+      >
+        View all notes →
+      </button>
     </Card>
   )
 }

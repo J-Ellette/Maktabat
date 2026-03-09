@@ -21,9 +21,22 @@ export const IpcChannel = {
   LIBRARY_GET_WORD_OCCURRENCES: 'library:get-word-occurrences',
   USER_SAVE_NOTE: 'user:save-note',
   USER_GET_NOTES: 'user:get-notes',
+  USER_UPDATE_NOTE: 'user:update-note',
+  USER_DELETE_NOTE: 'user:delete-note',
+  USER_SEARCH_NOTES: 'user:search-notes',
   USER_SAVE_HIGHLIGHT: 'user:save-highlight',
   USER_GET_HIGHLIGHTS: 'user:get-highlights',
+  USER_GET_ALL_HIGHLIGHTS: 'user:get-all-highlights',
+  USER_DELETE_HIGHLIGHT: 'user:delete-highlight',
   USER_GET_READING_PLAN: 'user:get-reading-plan',
+  USER_SAVE_KHUTBAH: 'user:save-khutbah',
+  USER_GET_KHUTBAHS: 'user:get-khutbahs',
+  USER_GET_KHUTBAH: 'user:get-khutbah',
+  USER_UPDATE_KHUTBAH: 'user:update-khutbah',
+  USER_DELETE_KHUTBAH: 'user:delete-khutbah',
+  USER_ADD_KHUTBAH_MATERIAL: 'user:add-khutbah-material',
+  USER_GET_KHUTBAH_MATERIALS: 'user:get-khutbah-materials',
+  USER_REMOVE_KHUTBAH_MATERIAL: 'user:remove-khutbah-material',
   AUDIO_PLAY: 'audio:play',
   AUDIO_PAUSE: 'audio:pause',
   SETTINGS_GET: 'settings:get',
@@ -311,4 +324,54 @@ export interface WordOccurrenceRow {
   ayah_number: number
   surface_form: string
   pos: string
+}
+
+// ─── Khutbah Builder Types ─────────────────────────────────────────────────────
+
+export type KhutbahTemplateKey =
+  | 'jumuah'
+  | 'eid-al-fitr'
+  | 'eid-al-adha'
+  | 'janazah'
+  | 'nikah'
+  | 'custom'
+
+export type KhutbahStatus = 'draft' | 'final'
+
+export interface KhutbahRow {
+  id: number
+  title: string
+  date: string | null
+  template_key: KhutbahTemplateKey
+  status: KhutbahStatus
+  body: string
+}
+
+export interface KhutbahMaterialRow {
+  id: number
+  khutbah_id: number
+  content_ref: string
+  order_index: number
+}
+
+export interface SaveKhutbahRequest {
+  title: string
+  date?: string
+  templateKey: KhutbahTemplateKey
+  body?: string
+}
+
+export interface UpdateKhutbahRequest {
+  id: number
+  title?: string
+  date?: string
+  body?: string
+  status?: KhutbahStatus
+}
+
+// ─── Notes Search ─────────────────────────────────────────────────────────────
+
+export interface SearchNotesRequest {
+  query: string
+  limit?: number
 }

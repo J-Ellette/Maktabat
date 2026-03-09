@@ -839,4 +839,199 @@ This file tracks the implementation progress of the Maktabat Quran Study Softwar
 - [x] Root input with demo root (كتب)
 - [x] Clickable conjugated forms → library search
 
-### Phases 8–14 — _future sessions_
+### Phase 8: Notes, Annotations & Khutbah Workflow ✅ (Session 8)
+
+- [x] Phase 1: Main Process & IPC Layer ✅
+- [x] Phase 2: Core UI Shell ✅
+- [x] Phase 3: Quran Reading Module ✅
+- [x] Phase 4: Tafsir Module ✅
+- [x] Phase 5: Hadith Module ✅
+- [x] Phase 6: Search & AI Study Assistant ✅
+
+### Phases 9–14 — _future sessions_
+
+---
+
+### Session 8 — Phase 8: Notes, Annotations & Khutbah Workflow
+
+**Date**: 2026-03-09
+
+**Status**: ✅ Complete
+
+#### Changes Made
+
+**`packages/shared/types/ipc.ts`** — Updated
+
+- Added 13 new `IpcChannel` constants: `USER_UPDATE_NOTE`, `USER_DELETE_NOTE`, `USER_SEARCH_NOTES`, `USER_GET_ALL_HIGHLIGHTS`, `USER_DELETE_HIGHLIGHT`, `USER_SAVE_KHUTBAH`, `USER_GET_KHUTBAHS`, `USER_GET_KHUTBAH`, `USER_UPDATE_KHUTBAH`, `USER_DELETE_KHUTBAH`, `USER_ADD_KHUTBAH_MATERIAL`, `USER_GET_KHUTBAH_MATERIALS`, `USER_REMOVE_KHUTBAH_MATERIAL`
+- Added `KhutbahRow`, `KhutbahMaterialRow`, `SaveKhutbahRequest`, `UpdateKhutbahRequest`, `SearchNotesRequest` types
+
+**`packages/main/src/user-service.ts`** — Enhanced
+
+- Added `KhutbahRow` and `KhutbahMaterialRow` interfaces
+- Expanded `CachedStatements` type with 8 new statement entries
+- Added `searchNotes(query, limit)` — FTS5 full-text search with sanitized phrase query
+- Added `getAllHighlights()` — returns all highlights sorted by date
+- Added `saveKhutbah(title, date, templateKey, body)` → returns id
+- Added `getKhutbahs()` → all khutbahs ordered by date
+- Added `getKhutbah(id)` → single khutbah
+- Added `updateKhutbah(id, title, date, body, status)`
+- Added `deleteKhutbah(id)`
+- Added `addKhutbahMaterial(khutbahId, contentRef, orderIndex)` → returns id
+- Added `getKhutbahMaterials(khutbahId)` → ordered materials
+- Added `removeKhutbahMaterial(id)`
+
+**`packages/main/src/ipc-handlers.ts`** — Enhanced
+
+- Added 13 new IPC handlers with full input validation:
+  - `user:update-note` — update note body and tags
+  - `user:delete-note` — delete by ID
+  - `user:search-notes` — FTS5 full-text search
+  - `user:get-all-highlights` — all highlights
+  - `user:delete-highlight` — delete by ID
+  - `user:save-khutbah` — create khutbah (with template allowlist validation)
+  - `user:get-khutbahs` — list all
+  - `user:get-khutbah` — get single by ID
+  - `user:update-khutbah` — update fields
+  - `user:delete-khutbah` — delete by ID
+  - `user:add-khutbah-material` — add passage to khutbah
+  - `user:get-khutbah-materials` — list materials for khutbah
+  - `user:remove-khutbah-material` — remove by ID
+
+**`packages/main/src/preload.ts`** — Updated
+
+- Added all 13 new IPC channel names to the `validChannels` whitelist
+
+**`packages/renderer/src/components/annotations/HighlightToolbar.tsx`** — New file
+
+- Global floating toolbar that appears near any text selection
+- Listens to `selectionchange` + `mouseup` events
+- Shows 8 colour-coded circle buttons mapped to AE palette
+- Saves highlight via `user:save-highlight` IPC with resource key from current route hash
+- Closes on outside click or after selecting a color
+- Mounted in `AppShell` so it's available on every route
+
+**`packages/renderer/src/components/annotations/HighlightsPanel.tsx`** — New file
+
+- Route: `/bookmarks`
+- Loads all highlights via `user:get-all-highlights` IPC
+- Color-coded cards with left border color matching the highlight color
+- Filter by color (pill buttons) + text search
+- Navigate to source (Quran/Hadith routes)
+- Delete highlight button
+- "Export" → downloads as plain text file
+
+**`packages/renderer/src/components/annotations/NotesPanel.tsx`** — New file
+
+- Route: `/notes`
+- Two-panel layout: note list (left, 280px) + note editor (right)
+- Note list: search (live FTS5 via `user:search-notes`), type filter pills, note cards with tags
+- Note editor: type selector dropdown, Markdown-capable textarea, tags input with comma-separated entry, auto-save on blur
+- "New Note" modal: resource key, reference, note type selector, body textarea, tags
+- Export all notes as Markdown via Blob download
+- Full CRUD: create, read, update (`user:update-note`), delete (`user:delete-note`)
+
+**`packages/renderer/src/components/khutbah/KhutbahBuilder.tsx`** — New file
+
+- Route: `/khutbah`
+- Sidebar: list of all khutbahs with status badges (draft/final)
+- "New Khutbah" modal: title, date, template selector (6 templates with icons)
+- Editor header: title input, date picker, template label, status selector, Save/Delete
+- Three tabs:
+  - **Editor**: full-page Markdown textarea, pre-populated with template section scaffold
+  - **Preview**: formatted preview of title, date, materials, and body text
+  - **Materials**: list of all passages added via "Add to Khutbah" context menu, with remove button
+- Export button → downloads as plain text
+- Full CRUD via IPC: `user:save-khutbah`, `user:update-khutbah`, `user:delete-khutbah`, `user:add-khutbah-material`, `user:get-khutbah-materials`, `user:remove-khutbah-material`
+- `IS_PREMIUM_DEMO = true` flag — set to `false` to enforce premium gate
+
+**`packages/renderer/src/components/study-templates/StudyTemplates.tsx`** — New file
+
+- Route: `/study-templates`
+- 7 templates: Verse Deep-Dive, Topical Study, Character Study, Word Study, Comparative Madhab, Historical Event, Custom
+- Template grid with icon, name, description, and step preview tags
+- **Template Runner** sub-view:
+  - Anchor input (verse ref, topic, word, etc.)
+  - Left step navigator with completion indicators
+  - Per-step description, "Open Panel" deep-link button, and notes textarea
+  - "Mark Complete & Continue" button with progress bar
+  - Completion celebration card when all steps done
+- `IS_PREMIUM_DEMO = true` flag — set to `false` to enforce premium gate
+
+**`packages/renderer/src/components/quran/ArabicVerse.tsx`** — Updated
+
+- Wired `onAddToKhutbah` callback — now calls `user:get-khutbahs` to find most recent draft khutbah, then adds the verse ref as a material via `user:add-khutbah-material`. If no draft exists, creates a new "My Khutbah" automatically.
+
+**`packages/renderer/src/components/layout/AppShell.tsx`** — Updated
+
+- Imported and mounted `<HighlightToolbar />` at the end of the shell so it's globally available
+
+**`packages/renderer/src/components/dashboard/Dashboard.tsx`** — Updated
+
+- `RecentNotesCard` now loads live data via `user:get-notes` IPC (falls back to mock if no notes yet)
+- Added "View all notes →" link to `/notes`
+
+**`packages/renderer/src/components/navigation/CommandPalette.tsx`** — Updated
+
+- Added `nav-study-templates` command: "Open Study Templates" → `/study-templates`
+
+**`packages/renderer/src/routes/index.tsx`** — Updated
+
+- Replaced `PlaceholderRoute` for `/notes`, `/bookmarks`, `/khutbah` with real components
+- Added new `/study-templates` route
+
+---
+
+## Phase Completion Status
+
+### Phase 0: Project Foundation ✅ (pre-existing)
+
+- [x] Monorepo (pnpm workspaces) initialized
+- [x] TypeScript strict mode configured
+- [x] ESLint + Prettier + Husky
+- [x] electron-builder configured
+- [x] GitHub Actions CI/CD
+- [x] UAE Design System color tokens
+- [x] Tailwind configured with tokens
+- [x] Dark / Light / Sepia themes
+- [x] Arabic fonts (Noto Naskh, Amiri, IBM Plex Arabic)
+- [x] Latin fonts (Cormorant Garamond, Source Serif 4)
+- [x] Quranic font (KFGQPC Uthmanic Hafs)
+- [ ] Storybook component library (deferred to Phase 2+)
+- [x] SQLite `library.db` schema
+- [x] SQLite `user.db` schema
+- [x] Migration system
+- [x] Seed scripts (Al-Fatiha + 10 sample hadiths)
+
+### Phase 1: Main Process & IPC Layer ✅
+### Phase 2: Core UI Shell ✅
+### Phase 3: Quran Reading Module ✅
+### Phase 4: Tafsir Module ✅
+### Phase 5: Hadith Module ✅
+### Phase 6: Search & AI Study Assistant ✅
+### Phase 7: Linguistic Analysis Module ✅
+
+### Phase 8: Notes, Annotations & Khutbah Workflow ✅ (Session 8)
+
+- [x] Select text in any panel → highlight toolbar appears (`HighlightToolbar`)
+- [x] 8 highlight colors mapped to AE palette (gold, green, red, blue, yellow, orange, fuchsia, slate)
+- [x] Highlights persist across sessions (stored in user.db via `user:save-highlight`)
+- [x] All highlights visible in Highlights panel (`/bookmarks` route)
+- [x] Export highlights as plain text
+- [x] Margin notes: anchored to specific verse/hadith/passage
+- [x] Free-form notes: resource_key = `notes:free`
+- [x] Rich text editor (Markdown-capable textarea with Arabic `dir="auto"` support)
+- [x] Note types: Study, Question, Reflection, Khutbah, Application
+- [x] Tagging system (user-defined comma-separated tags)
+- [x] Note search (FTS5 via `user:search-notes`)
+- [x] Note export as Markdown (plain text and Markdown formats)
+- [x] Mark any verse as "Khutbah material" from ArabicVerse context menu
+- [x] Khutbah Builder panel (title, date, template, 3-tab editor/preview/materials)
+- [x] Live preview (formatted preview tab)
+- [x] Export khutbah as text file
+- [x] Khutbah archive (list of all past khutbahs with status)
+- [ ] Khutbah marker (requires cross-reference query — deferred)
+- [x] Study Template library (7 types)
+- [x] Template runner with step navigator, anchor input, and step notes
+- [ ] Save & share completed studies (requires account system — deferred to Phase 11)
+
+### Phases 9–14 — _future sessions_

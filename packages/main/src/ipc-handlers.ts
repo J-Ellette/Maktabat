@@ -278,6 +278,119 @@ export function registerIpcHandlers(
     return userService.getHighlightsByResource(rk)
   })
 
+  // ── user:get-all-highlights ─────────────────────────────────────────────────
+  ipcMain.handle('user:get-all-highlights', () => {
+    return userService.getAllHighlights()
+  })
+
+  // ── user:delete-highlight ───────────────────────────────────────────────────
+  ipcMain.handle('user:delete-highlight', (_event, id: unknown) => {
+    const highlightId = assertNumber(id, 'id')
+    userService.deleteHighlight(highlightId)
+    return true
+  })
+
+  // ── user:update-note ────────────────────────────────────────────────────────
+  ipcMain.handle(
+    'user:update-note',
+    (_event, id: unknown, body: unknown, tags: unknown) => {
+      const noteId = assertNumber(id, 'id')
+      const b = assertString(body, 'body')
+      const tg = tags !== undefined && isStringArray(tags) ? assertStringArray(tags, 'tags') : []
+      userService.updateNote(noteId, b, tg)
+      return true
+    }
+  )
+
+  // ── user:delete-note ────────────────────────────────────────────────────────
+  ipcMain.handle('user:delete-note', (_event, id: unknown) => {
+    const noteId = assertNumber(id, 'id')
+    userService.deleteNote(noteId)
+    return true
+  })
+
+  // ── user:search-notes ───────────────────────────────────────────────────────
+  ipcMain.handle('user:search-notes', (_event, query: unknown, limit: unknown) => {
+    const q = assertString(query, 'query')
+    if (q.length > 500) throw new Error('Query too long (max 500 characters)')
+    const lim = limit !== undefined ? Math.min(assertNumber(limit, 'limit'), 200) : 50
+    return userService.searchNotes(q, lim)
+  })
+
+  // ── user:save-khutbah ───────────────────────────────────────────────────────
+  ipcMain.handle(
+    'user:save-khutbah',
+    (_event, title: unknown, date: unknown, templateKey: unknown, body: unknown) => {
+      const t = assertString(title, 'title')
+      const d = date != null ? assertString(date, 'date') : null
+      const tk = assertString(templateKey, 'templateKey')
+      const b = typeof body === 'string' ? body : ''
+
+      const VALID_TEMPLATES = ['jumuah', 'eid-al-fitr', 'eid-al-adha', 'janazah', 'nikah', 'custom']
+      if (!VALID_TEMPLATES.includes(tk)) {
+        throw new Error(`Invalid templateKey. Must be one of: ${VALID_TEMPLATES.join(', ')}`)
+      }
+
+      return userService.saveKhutbah(t, d, tk, b)
+    }
+  )
+
+  // ── user:get-khutbahs ───────────────────────────────────────────────────────
+  ipcMain.handle('user:get-khutbahs', () => {
+    return userService.getKhutbahs()
+  })
+
+  // ── user:get-khutbah ────────────────────────────────────────────────────────
+  ipcMain.handle('user:get-khutbah', (_event, id: unknown) => {
+    const khutbahId = assertNumber(id, 'id')
+    return userService.getKhutbah(khutbahId) ?? null
+  })
+
+  // ── user:update-khutbah ─────────────────────────────────────────────────────
+  ipcMain.handle(
+    'user:update-khutbah',
+    (_event, id: unknown, title: unknown, date: unknown, body: unknown, status: unknown) => {
+      const khutbahId = assertNumber(id, 'id')
+      const t = assertString(title, 'title')
+      const d = date != null ? assertString(date, 'date') : null
+      const b = typeof body === 'string' ? body : ''
+      const s = typeof status === 'string' && ['draft', 'final'].includes(status) ? status : 'draft'
+      userService.updateKhutbah(khutbahId, t, d, b, s)
+      return true
+    }
+  )
+
+  // ── user:delete-khutbah ─────────────────────────────────────────────────────
+  ipcMain.handle('user:delete-khutbah', (_event, id: unknown) => {
+    const khutbahId = assertNumber(id, 'id')
+    userService.deleteKhutbah(khutbahId)
+    return true
+  })
+
+  // ── user:add-khutbah-material ───────────────────────────────────────────────
+  ipcMain.handle(
+    'user:add-khutbah-material',
+    (_event, khutbahId: unknown, contentRef: unknown, orderIndex: unknown) => {
+      const kid = assertNumber(khutbahId, 'khutbahId')
+      const cr = assertString(contentRef, 'contentRef')
+      const oi = orderIndex !== undefined ? assertNumber(orderIndex, 'orderIndex') : 0
+      return userService.addKhutbahMaterial(kid, cr, oi)
+    }
+  )
+
+  // ── user:get-khutbah-materials ──────────────────────────────────────────────
+  ipcMain.handle('user:get-khutbah-materials', (_event, khutbahId: unknown) => {
+    const kid = assertNumber(khutbahId, 'khutbahId')
+    return userService.getKhutbahMaterials(kid)
+  })
+
+  // ── user:remove-khutbah-material ────────────────────────────────────────────
+  ipcMain.handle('user:remove-khutbah-material', (_event, id: unknown) => {
+    const materialId = assertNumber(id, 'id')
+    userService.removeKhutbahMaterial(materialId)
+    return true
+  })
+
   // ── user:get-reading-plan ───────────────────────────────────────────────────
   ipcMain.handle('user:get-reading-plan', (_event, planKey: unknown) => {
     const pk = assertString(planKey, 'planKey')

@@ -10,6 +10,10 @@ const SearchPanel = lazy(() => import('../components/search/SearchPanel'))
 const WordStudyPanel = lazy(() => import('../components/linguistics/WordStudyPanel'))
 const IrabViewer = lazy(() => import('../components/linguistics/IrabViewer'))
 const ConjugationTable = lazy(() => import('../components/linguistics/ConjugationTable'))
+const NotesPanel = lazy(() => import('../components/annotations/NotesPanel'))
+const HighlightsPanel = lazy(() => import('../components/annotations/HighlightsPanel'))
+const KhutbahBuilder = lazy(() => import('../components/khutbah/KhutbahBuilder'))
+const StudyTemplates = lazy(() => import('../components/study-templates/StudyTemplates'))
 const PlaceholderRoute = lazy(() => import('./PlaceholderRoute'))
 
 function RouteSpinner() {
@@ -44,13 +48,15 @@ export default function AppRoutes(): React.ReactElement {
         <Route path="/word-study" element={<WordStudyPanel />} />
         <Route path="/irab/:surah/:ayah" element={<IrabViewer />} />
         <Route path="/conjugation" element={<ConjugationTable />} />
+        {/* Phase 8 — Notes, Annotations & Khutbah */}
+        <Route path="/notes" element={<NotesPanel />} />
+        <Route path="/bookmarks" element={<HighlightsPanel />} />
+        <Route path="/khutbah" element={<KhutbahBuilder />} />
+        <Route path="/study-templates" element={<StudyTemplates />} />
         <Route path="/library" element={<PlaceholderRoute title="Library Manager" />} />
         <Route path="/reading-plans" element={<PlaceholderRoute title="Reading Plans" />} />
-        <Route path="/bookmarks" element={<PlaceholderRoute title="Bookmarks" />} />
-        <Route path="/notes" element={<PlaceholderRoute title="Notes" />} />
         <Route path="/factbook" element={<PlaceholderRoute title="Factbook" />} />
         <Route path="/atlas" element={<PlaceholderRoute title="Atlas" />} />
-        <Route path="/khutbah" element={<PlaceholderRoute title="Khutbah Builder" />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Suspense>
