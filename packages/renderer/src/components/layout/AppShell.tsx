@@ -36,7 +36,6 @@ function ThemeSynchronizer() {
 // ────────────────────────────────────────────────────────────────
 function IpcMenuListener({ onLayoutChange }: { onLayoutChange: (layout: PanelLayout) => void }) {
   const navigate = useNavigate()
-  const openCommandPalette = useAppStore((s) => s.openCommandPalette)
   const setTheme = useSettingsStore((s) => s.setTheme)
 
   type MaktabatBridge = { on: (channel: string, cb: (data: unknown) => void) => void }
@@ -47,8 +46,8 @@ function IpcMenuListener({ onLayoutChange }: { onLayoutChange: (layout: PanelLay
     if (!maktabat) return
 
     maktabat.on('menu:preferences', () => void navigate('/settings'))
-    maktabat.on('menu:find', () => openCommandPalette())
-    maktabat.on('menu:find-in-library', () => openCommandPalette())
+    maktabat.on('menu:find', () => void navigate('/search'))
+    maktabat.on('menu:find-in-library', () => void navigate('/search'))
     maktabat.on('menu:layout-single', () => onLayoutChange('single'))
     maktabat.on('menu:layout-two', () => onLayoutChange('two-column'))
     maktabat.on('menu:layout-three', () => onLayoutChange('three-column'))
@@ -63,14 +62,40 @@ function IpcMenuListener({ onLayoutChange }: { onLayoutChange: (layout: PanelLay
       const url = String(data ?? '').replace('maktabat://', '/')
       void navigate(url)
     })
-  }, [navigate, openCommandPalette, onLayoutChange, setTheme, maktabatBridge])
+  }, [navigate, onLayoutChange, setTheme, maktabatBridge])
 
   return null
 }
 
 // ────────────────────────────────────────────────────────────────
-// Top toolbar
+// Global keyboard shortcuts listener
 // ────────────────────────────────────────────────────────────────
+function GlobalKeyListener() {
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      const isMac = navigator.platform.toUpperCase().includes('MAC')
+      const cmdOrCtrl = isMac ? e.metaKey : e.ctrlKey
+
+      // Cmd+F / Ctrl+F → open Search panel (when focus is not inside an input)
+      if (cmdOrCtrl && e.key === 'f' && !e.shiftKey && !e.altKey) {
+        const tag = (e.target as HTMLElement).tagName.toLowerCase()
+        if (tag !== 'input' && tag !== 'textarea') {
+          e.preventDefault()
+          void navigate('/search')
+        }
+      }
+      // Cmd+K is handled by useCommandPalette; no duplication needed here.
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [navigate])
+
+  return null
+}
+
 function Toolbar({
   onLayoutChange,
 }: {
@@ -242,6 +267,7 @@ export default function AppShell(): React.ReactElement {
     <div className="flex flex-col h-screen overflow-hidden bg-[var(--bg-primary)] text-[var(--text-primary)]">
       <ThemeSynchronizer />
       <IpcMenuListener onLayoutChange={handleLayoutChange} />
+      <GlobalKeyListener />
 
       {/* Top toolbar */}
       <Toolbar onLayoutChange={handleLayoutChange} />

@@ -871,36 +871,36 @@ Everything in Premium, plus:
 
 #### Step 6.1 — Full-Text Search
 
-- [ ] Search bar (always accessible, Cmd+F)
-- [ ] Query parser: handles Arabic, English, transliteration
-- [ ] Results grouped by resource type (Quran, Tafsir, Hadith, Fiqh, etc.)
-- [ ] Filters sidebar (collection, madhab, language, date range)
-- [ ] Relevance ranking (combines text match + resource authority score)
-- [ ] Highlighted search terms in results
+- [x] Search bar (always accessible, Cmd+F)
+- [x] Query parser: handles Arabic, English, transliteration
+- [x] Results grouped by resource type (Quran, Tafsir, Hadith, Fiqh, etc.)
+- [x] Filters sidebar (collection, madhab, language, date range)
+- [x] Relevance ranking (combines text match + resource authority score)
+- [x] Highlighted search terms in results
 - [ ] Morphological expansion: search "pray" also finds "prayer", "prayed", "salah", "salat"
 
 #### Step 6.2 — Smart Search (Premium)
 
-- [ ] Natural language question input
+- [x] Natural language question input
 - [ ] Query classified and decomposed into sub-searches
 - [ ] Results synthesized with:
   - Direct Quran verses (if applicable)
   - Related hadiths (graded)
   - Tafsir commentary
   - Scholarly opinions
-- [ ] Synopsis view: short answer with footnotes
-- [ ] "Dig deeper" links for each result
+- [x] Synopsis view: short answer with footnotes
+- [x] "Dig deeper" links for each result
 - [ ] Summarize button: get 2-3 sentence summary of any resource
 
 #### Step 6.3 — AI Study Assistant (Premium)
 
-- [ ] Chat interface panel
-- [ ] Conversational multi-turn: ask follow-up questions
+- [x] Chat interface panel
+- [x] Conversational multi-turn: ask follow-up questions
 - [ ] Every answer anchored in installed library (no hallucination)
-- [ ] Citations shown inline with every claim
-- [ ] "Show me in the text" → opens resource at exact location
-- [ ] Suggested follow-up questions
-- [ ] Session history (saved per study session)
+- [x] Citations shown inline with every claim
+- [x] "Show me in the text" → opens resource at exact location
+- [x] Suggested follow-up questions
+- [x] Session history (saved per study session)
 - [ ] Cannot contradict explicit text in library (guardrail)
 
 ---

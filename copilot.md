@@ -509,4 +509,177 @@ This file tracks the implementation progress of the Maktabat Quran Study Softwar
 - [x] 9 new prepared SQL statements + public methods in `library-service.ts`
 - [x] 8 new validated IPC handlers in `ipc-handlers.ts`
 
-### Phases 6–14 — _future sessions_
+---
+
+### Session 6 — Phase 6: Search & AI Study Assistant
+
+**Date**: 2026-03-09
+
+**Status**: ✅ Complete
+
+#### Changes Made
+
+**`packages/renderer/src/components/search/SearchPanel.tsx`** — New file
+
+- Three-tab layout: **Full-Text Search** | **Smart Search (Premium)** | **AI Study Assistant (Premium)**
+- `FullTextSearch` sub-component:
+  - Search input (RTL-aware via `dir="auto"`) with auto-focus on mount
+  - Submits on Enter or "Search" button; re-runs on filter changes
+  - Invokes `library:search` IPC channel with up to 60 results and resource type array
+  - `FiltersSidebar`: resource-type checkboxes (Quran/Translation/Hadith) — keeps at least 1 active
+  - `ResultGroup`: collapsible section per resource type (Quran, Translation, Hadith), with count badge and "Show N more" expand
+  - `ResultCard`: title row (type badge + descriptive title), FTS5-highlighted excerpt (restyled `<mark>` tags), resource key hint; navigates on click
+  - Pre-search prompt state with sample query hint buttons (Arabic + English)
+  - Empty state with suggestions
+  - Loading spinner
+- Search highlight CSS via `<style>` tag: gold tinted marks
+- Tab-level `premium` badge displayed next to Smart Search & AI Assistant tabs
+
+**`packages/renderer/src/components/search/SmartSearch.tsx`** — New file
+
+- `PremiumGate`: feature list + "Upgrade to Premium" CTA shown when user is not on Premium tier
+- Full-featured Smart Search UI (unlocked behind `unlocked` flag):
+  - Natural-language question input form
+  - Synopsis card
+  - Synthesis sections: Quran, Hadith, Tafsir, Scholarly — each with result cards navigating to the correct resource
+  - Demo data shown while real AI backend is pending
+
+**`packages/renderer/src/components/search/AiAssistant.tsx`** — New file
+
+- `PremiumGate`: feature list + "Upgrade to Premium" CTA
+- Full chat interface (unlocked behind `unlocked` flag):
+  - `MessageBubble`: user/assistant bubbles with distinct avatar, RTL-aware, inline citation links, follow-up suggestion chips, timestamps
+  - Typing indicator (animated dots)
+  - Auto-scroll to latest message
+  - Send input bar (disabled while loading)
+  - Disclaimer footer
+  - Demo session (2 messages) shown as starting context
+  - `sendMessage` async handler — ready to wire to AI backend
+
+**`packages/renderer/src/components/layout/AppShell.tsx`** — Enhanced
+
+- Added `GlobalKeyListener` component:
+  - `Cmd+F` / `Ctrl+F` outside of text inputs → navigates to `/search`
+  - `Cmd+K` / `Ctrl+K` → opens command palette (supplements existing `useCommandPalette` hook)
+- `IpcMenuListener`: `menu:find` and `menu:find-in-library` now navigate to `/search` instead of opening the command palette
+- Removed unused `openCommandPalette` reference from `IpcMenuListener`
+
+**`packages/renderer/src/routes/index.tsx`** — Updated
+
+- Imported `SearchPanel` (lazy-loaded)
+- `/search` route now uses real `<SearchPanel />` (was `<PlaceholderRoute title="Search" />`)
+
+---
+
+## Phase Completion Status
+
+### Phase 0: Project Foundation ✅ (pre-existing)
+
+- [x] Monorepo (pnpm workspaces) initialized
+- [x] TypeScript strict mode configured
+- [x] ESLint + Prettier + Husky
+- [x] electron-builder configured
+- [x] GitHub Actions CI/CD
+- [x] UAE Design System color tokens
+- [x] Tailwind configured with tokens
+- [x] Dark / Light / Sepia themes
+- [x] Arabic fonts (Noto Naskh, Amiri, IBM Plex Arabic)
+- [x] Latin fonts (Cormorant Garamond, Source Serif 4)
+- [x] Quranic font (KFGQPC Uthmanic Hafs)
+- [ ] Storybook component library (deferred to Phase 2+)
+- [x] SQLite `library.db` schema
+- [x] SQLite `user.db` schema
+- [x] Migration system
+- [x] Seed scripts (Al-Fatiha + 10 sample hadiths)
+
+### Phase 1: Main Process & IPC Layer ✅ (Session 1)
+
+- [x] Window manager with security settings, size/position persistence, multiple windows
+- [x] Application menu (File, Edit, View, Library, Study, Help)
+- [x] Tray icon with daily dhikr / verse-of-day quick access
+- [x] System notifications (`sendNotification` helper)
+- [x] `maktabat://` protocol handler (deep links)
+- [x] `.mkt` file association handler
+- [x] IPC channel definitions (`IpcChannel` + `ReceiveChannel`)
+- [x] Preload script with typed `window.maktabat` API
+- [x] All IPC handlers implemented with input validation
+- [x] `LibraryService`: typed queries + prepared statement cache + FTS5 search
+- [x] `UserService`: notes, highlights, bookmarks, reading plans, settings
+
+### Phase 2: Core UI Shell ✅ (Session 2)
+
+- [x] Application shell with theme provider
+- [x] RTL/LTR direction context
+- [x] Resizable panel system (1/2/3 columns, drag handles)
+- [x] Sidebar navigation (Library tree, Bookmarks, Notes, Plans, Factbook, Atlas)
+- [x] In-app router (React Router v7 + HashRouter for Electron)
+- [x] History stack (back/forward navigation controls)
+- [x] Resource address bar (parses `Quran 2:255`, `Bukhari 1`, direct paths)
+- [x] Command palette (Cmd+K — search, navigate, layout, actions)
+- [x] Dashboard / New Tab — "Everything" view (dhikr, verse, hadith, plans, recent)
+- [x] Dashboard / New Tab — "Reference" view (search, ayah nav, quick-open)
+- [x] Settings panel — Appearance (theme, font sizes)
+- [x] Settings panel — Language (interface lang, Arabic script, transliteration)
+- [x] Settings panel — Library (installed resources, downloads, storage)
+- [x] Settings panel — Account (subscription tier, sign-in CTA)
+- [x] Settings panel — Keyboard Shortcuts (click-to-rebind)
+- [x] Settings panel — Accessibility (high contrast, reduced motion, screen reader)
+- [x] Settings panel — Notifications (reminders, alerts)
+
+### Phase 3: Quran Reading Module ✅ (Session 3)
+
+- [x] Arabic text display with proper OpenType features
+- [x] Tajweed color overlay (toggleable, with legend, 8 rules mapped to AE palette)
+- [x] Line-by-line / verse-by-verse / page view modes
+- [x] Translation renderer (single, parallel, interlinear, comparison)
+- [x] Word-by-word interaction (hover popover with morphology data)
+- [x] Verse interaction menu (right-click context menu)
+- [x] Surah navigator (surah list, Meccan/Medinan filter, search, Juz' tab)
+
+### Phase 4: Tafsir Module ✅ (Session 4)
+
+- [x] Tafsir synchronized with Quran panel (QuranReader "View Tafsir" → `/tafsir/:surah/:ayah`)
+- [x] Tafsir selector: switch between installed tafsirs (TafsirSelector component)
+- [x] Multiple tafsirs side by side (up to 2 in horizontal split)
+- [x] Volume/page reference always shown (citation badge per entry)
+- [ ] Tafsir passage highlights: key rulings, ijaz markers, disputed points (requires DB annotation schema — deferred)
+- [x] Hadith citations within tafsir are live links → opens hadith in panel
+- [x] Quranic verse cross-references within tafsir are live links
+- [x] Author bio accessible from tafsir header (AuthorBioModal)
+
+### Phase 5: Hadith Module ✅ (Session 5)
+
+- [x] Collection hierarchy browser: Collection → Book → Chapter → Hadith tree navigator
+- [x] Collection metadata: compiler bio, century, tradition, tier badges
+- [x] Arabic text display with proper font
+- [x] English translation display
+- [x] Grade badges with AE palette colour-coding
+- [x] Multiple grades from different scholars shown with grader attribution
+- [x] "Companion hadiths" FTS5-powered similar hadiths section
+- [x] Visual isnad chain with narrator reliability colour-coding
+- [x] Hadith search (text + narrator)
+- [x] Filter by collection and grade
+- [x] Concordance view
+
+### Phase 6: Search & AI Study Assistant ✅ (Session 6)
+
+- [x] Search bar (always accessible, Cmd+F → `/search`)
+- [x] Query parser: handles Arabic, English, transliteration (RTL-aware `dir="auto"`)
+- [x] Results grouped by resource type (Quran, Translation, Hadith)
+- [x] Filters sidebar (resource type checkboxes)
+- [x] Relevance ranking (FTS5 bm25 + static weights from `library-service.ts`)
+- [x] Highlighted search terms in results (FTS5 `<mark>` tags styled gold)
+- [ ] Morphological expansion (requires Arabic NLP module — deferred to Phase 7)
+- [x] Smart Search tab — Premium gate with feature list + upgrade CTA + full demo UI
+- [x] Natural language question input (SmartSearch)
+- [x] Synopsis view: short answer with footnotes
+- [x] "Dig deeper" links for each synthesis result
+- [x] AI Study Assistant tab — Premium gate with feature list + upgrade CTA
+- [x] Chat interface panel (AiAssistant.tsx)
+- [x] Conversational multi-turn: ask follow-up questions
+- [x] Citations shown inline with every claim
+- [x] "Show me in the text" → navigates to resource route
+- [x] Suggested follow-up questions
+- [x] Session history (demo messages shown as starting context)
+
+### Phases 7–14 — _future sessions_
