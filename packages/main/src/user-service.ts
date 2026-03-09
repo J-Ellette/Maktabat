@@ -37,6 +37,7 @@ export interface ReadingPlanRow {
   start_date: string
   target_date: string
   progress_data: string
+  created_at: string
 }
 
 export interface KhutbahRow {
@@ -72,7 +73,10 @@ type CachedStatements = {
   getBookmarksByResource: Statement
   deleteBookmark: Statement
   getReadingPlan: Statement
+  getAllReadingPlans: Statement
   upsertReadingPlan: Statement
+  updateReadingPlanProgress: Statement
+  deleteReadingPlan: Statement
   getSetting: Statement
   upsertSetting: Statement
   insertKhutbah: Statement
@@ -171,6 +175,10 @@ export class UserService {
         SELECT * FROM reading_plans WHERE plan_key = ? LIMIT 1
       `),
 
+      getAllReadingPlans: this.db.prepare(`
+        SELECT * FROM reading_plans ORDER BY created_at DESC
+      `),
+
       upsertReadingPlan: this.db.prepare(`
         INSERT INTO reading_plans (plan_key, start_date, target_date, progress_data)
         VALUES (?, ?, ?, ?)
@@ -179,6 +187,12 @@ export class UserService {
           target_date = excluded.target_date,
           progress_data = excluded.progress_data
       `),
+
+      updateReadingPlanProgress: this.db.prepare(`
+        UPDATE reading_plans SET progress_data = ? WHERE plan_key = ?
+      `),
+
+      deleteReadingPlan: this.db.prepare(`DELETE FROM reading_plans WHERE plan_key = ?`),
 
       getSetting: this.db.prepare(`SELECT value FROM settings WHERE key = ? LIMIT 1`),
 
@@ -299,13 +313,25 @@ export class UserService {
     return this.stmts.getReadingPlan.get(planKey) as ReadingPlanRow | undefined
   }
 
+  getAllReadingPlans(): ReadingPlanRow[] {
+    return this.stmts.getAllReadingPlans.all() as ReadingPlanRow[]
+  }
+
   saveReadingPlan(
     planKey: string,
     startDate: string,
     targetDate: string,
-    progressData: Record<string, boolean>
+    progressData: Record<string, unknown>
   ): void {
     this.stmts.upsertReadingPlan.run(planKey, startDate, targetDate, JSON.stringify(progressData))
+  }
+
+  updateReadingPlanProgress(planKey: string, progressData: Record<string, unknown>): void {
+    this.stmts.updateReadingPlanProgress.run(JSON.stringify(progressData), planKey)
+  }
+
+  deleteReadingPlan(planKey: string): void {
+    this.stmts.deleteReadingPlan.run(planKey)
   }
 
   // ─── Settings ──────────────────────────────────────────────────────────────
@@ -339,7 +365,13 @@ export class UserService {
     return this.stmts.getKhutbah.get(id) as KhutbahRow | undefined
   }
 
-  updateKhutbah(id: number, title: string, date: string | null, body: string, status: string): void {
+  updateKhutbah(
+    id: number,
+    title: string,
+    date: string | null,
+    body: string,
+    status: string
+  ): void {
     this.stmts.updateKhutbah.run(title, date ?? null, body, status, id)
   }
 

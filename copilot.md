@@ -1173,4 +1173,113 @@ This file tracks the implementation progress of the Maktabat Quran Study Softwar
 - [ ] Download reciters for offline use (deferred)
 - [ ] Translation audio paired with Arabic (deferred)
 
-### Phases 11–14 — _future sessions_
+### Phases 11–12 — _future sessions_
+
+---
+
+### Session 10 — Phase 13: Reading Plans & Progress
+
+**Date**: 2026-03-09
+
+**Status**: ✅ Complete
+
+#### Changes Made
+
+**`packages/database/migrations/003_reading_plans_update.sql`** — New file
+
+- Recreates `reading_plans` table with `UNIQUE` constraint on `plan_key` (required for upsert)
+- Adds `created_at` column (for ordering plans by creation date)
+- Migrates existing data safely via `INSERT OR IGNORE`
+
+**`packages/shared/types/ipc.ts`** — Updated
+
+- Added 4 new IPC channel constants: `USER_GET_ALL_READING_PLANS`, `USER_SAVE_READING_PLAN`, `USER_UPDATE_READING_PLAN_PROGRESS`, `USER_DELETE_READING_PLAN`
+
+**`packages/main/src/user-service.ts`** — Enhanced
+
+- Updated `ReadingPlanRow` interface to include `created_at`
+- Added 3 new prepared statements: `getAllReadingPlans`, `updateReadingPlanProgress`, `deleteReadingPlan`
+- Added `getAllReadingPlans()` method
+- Updated `saveReadingPlan()` to accept `Record<string, unknown>` (more flexible progress shape)
+- Added `updateReadingPlanProgress(planKey, progressData)` method
+- Added `deleteReadingPlan(planKey)` method
+
+**`packages/main/src/ipc-handlers.ts`** — Enhanced
+
+- Added 4 new IPC handlers with input validation:
+  - `user:get-all-reading-plans` — returns all plans ordered by creation date
+  - `user:save-reading-plan` — create or upsert plan (validates all fields)
+  - `user:update-reading-plan-progress` — update only the progress blob
+  - `user:delete-reading-plan` — remove a plan by key
+
+**`packages/main/src/preload.ts`** — Updated
+
+- Added all 4 new IPC channel names to the `validChannels` whitelist
+
+**`packages/renderer/src/components/reading-plans/ReadingPlansPanel.tsx`** — New file
+
+- Route: `/reading-plans`
+- 5 built-in plan definitions: Quran 30, Quran 60, Quran 365, Al-Nawawi 40 Hadith, Riyadh al-Salihin
+- **Plan grid**: shows available plans; each card has icon, name, description, progress ring, streak count
+- **Active plan detail view**: progress ring, stats (days completed, streak, start/target dates), today's assignment, "Open in Reader" navigation button, "Mark as Complete" toggle
+- **14-day calendar strip**: shows last 14 days; click to toggle any day complete/incomplete
+- **Streak tracking**: computed in real-time by walking backwards from today
+- **Progress ring** SVG component with animated stroke-dashoffset
+- **Export progress certificate**: downloads a plain-text `.txt` file with plan stats and completion message
+- **Custom plan builder**: slider for total days, name input, date picker
+- **Delete plan** confirmation dialog
+- All CRUD operations via IPC (fully offline, no external services)
+
+**`packages/renderer/src/routes/index.tsx`** — Updated
+
+- Replaced `PlaceholderRoute` for `/reading-plans` with real `ReadingPlansPanel`
+
+**`packages/renderer/src/components/dashboard/Dashboard.tsx`** — Updated
+
+- `ReadingPlanCard` now loads live data via `user:get-all-reading-plans` IPC
+- Shows first active plan name, day number, progress bar, and completion percentage
+- Shows "Start a Plan" CTA when no plans are active
+
+**`build_sheet.md`** — Updated
+
+- Checked off all implemented Phase 13 items
+
+---
+
+## Phase Completion Status
+
+### Phase 0: Project Foundation ✅ (pre-existing)
+
+### Phase 1: Main Process & IPC Layer ✅
+
+### Phase 2: Core UI Shell ✅
+
+### Phase 3: Quran Reading Module ✅
+
+### Phase 4: Tafsir Module ✅
+
+### Phase 5: Hadith Module ✅
+
+### Phase 6: Search & AI Study Assistant ✅
+
+### Phase 7: Linguistic Analysis Module ✅
+
+### Phase 8: Notes, Annotations & Khutbah Workflow ✅
+
+### Phase 9: Factbook & Islamic Atlas ✅
+
+### Phase 10: Audio & Recitation ✅
+
+### Phase 13: Reading Plans & Progress ✅ (Session 10)
+
+- [x] Built-in plans: Quran 30 days, 60 days, 1 year; Al-Nawawi 40 Hadith; Riyadh al-Salihin 1 year
+- [x] Custom plan builder (name, total days slider, start date)
+- [x] Daily reading assigned and shown on dashboard
+- [x] Progress ring (SVG, animated) per plan
+- [x] 14-day calendar strip with click-to-toggle
+- [x] Streak tracking (computed live by walking back from today)
+- [x] Completion certificates (plain text export)
+- [x] Full CRUD via IPC (create, read, update progress, delete)
+- [ ] Desktop notification reminders (time configurable) — deferred to Phase 14
+
+### Phases 11, 12, 14 — _future sessions_
