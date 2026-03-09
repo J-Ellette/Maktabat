@@ -156,6 +156,16 @@ export interface FactbookAyahRef {
   arabic_text: string
 }
 
+export interface TafsirAnnotationRow {
+  id: number
+  tafsir_key: string
+  ayah_id: number
+  type: 'key_ruling' | 'ijaz' | 'disputed' | 'linguistic_note' | 'historical_context'
+  label: string
+  note: string
+  created_at: string
+}
+
 // ─── Statement cache ──────────────────────────────────────────────────────────
 
 type CachedStatements = {
@@ -184,6 +194,7 @@ type CachedStatements = {
   searchFactbook: Statement
   getFactbookEntry: Statement
   getFactbookAyahRefs: Statement
+  getTafsirAnnotations: Statement | null
 }
 
 export class LibraryService {
@@ -403,6 +414,9 @@ export class LibraryService {
         JOIN surahs s ON s.id = a.surah_id
         WHERE far.entry_id = ?
       `),
+
+      // Prepared lazily (table may not exist until migration 006 runs)
+      getTafsirAnnotations: null,
     }
   }
 
@@ -649,6 +663,29 @@ export class LibraryService {
 
   getFactbookAyahRefs(entryId: number): FactbookAyahRef[] {
     return this.stmts.getFactbookAyahRefs.all(entryId) as FactbookAyahRef[]
+  }
+
+  /**
+   * Get tafsir passage annotations for a single ayah + tafsir combination.
+   * Returns highlights like key rulings (ahkam), ijaz markers, disputed points, etc.
+   * Gracefully returns empty array if the table doesn't exist yet (migration 006 pending).
+   */
+  getTafsirAnnotations(ayahId: number, tafsirKey: string): TafsirAnnotationRow[] {
+    try {
+      // Lazy-prepare the statement — the tafsir_annotations table is created by
+      // migration 006 and may not exist if migrations haven't been run yet.
+      if (!this.stmts.getTafsirAnnotations) {
+        this.stmts.getTafsirAnnotations = this.db.prepare(`
+          SELECT id, tafsir_key, ayah_id, type, label, note, created_at
+          FROM tafsir_annotations
+          WHERE ayah_id = ? AND tafsir_key = ?
+          ORDER BY type, id
+        `)
+      }
+      return this.stmts.getTafsirAnnotations.all(ayahId, tafsirKey) as TafsirAnnotationRow[]
+    } catch {
+      return []
+    }
   }
 }
 

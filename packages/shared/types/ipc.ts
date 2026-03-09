@@ -67,6 +67,8 @@ export const IpcChannel = {
   RESOURCE_IMPORT_MKT: 'resource:import-mkt',
   RESOURCE_IMPORT_EPUB: 'resource:import-epub',
   RESOURCE_IMPORT_PDF: 'resource:import-pdf',
+  // ── Tafsir Annotations (Phase 4) ──────────────────────────────────────────
+  LIBRARY_GET_TAFSIR_ANNOTATIONS: 'library:get-tafsir-annotations',
 } as const
 
 export type IpcChannelType = (typeof IpcChannel)[keyof typeof IpcChannel]
@@ -93,6 +95,8 @@ export const ReceiveChannel = {
   TRAY_VERSE_OF_DAY: 'tray:verse-of-day',
   FILE_OPEN_MKT: 'file:open-mkt',
   PROTOCOL_OPEN_URL: 'protocol:open-url',
+  // ── Resource download progress ─────────────────────────────────────────────
+  RESOURCE_DOWNLOAD_PROGRESS: 'resource:download-progress',
 } as const
 
 export type ReceiveChannelType = (typeof ReceiveChannel)[keyof typeof ReceiveChannel]
@@ -233,6 +237,36 @@ export interface GetTafsirsForAyahRequest {
 export interface GetTafsirsBySurahRequest {
   surahNumber: number
   tafsirKey: string
+}
+
+// ─── Tafsir Annotation Types ──────────────────────────────────────────────────
+
+export type TafsirAnnotationType =
+  | 'key_ruling'
+  | 'ijaz'
+  | 'disputed'
+  | 'linguistic_note'
+  | 'historical_context'
+
+export interface TafsirAnnotation {
+  id: number
+  tafsirKey: string
+  ayahId: number
+  type: TafsirAnnotationType
+  label: string
+  note: string
+  createdAt: string
+}
+
+// ─── Download Progress Types ───────────────────────────────────────────────────
+
+export interface ResourceDownloadProgress {
+  resourceKey: string
+  bytesDownloaded: number
+  totalBytes: number
+  percentage: number
+  status: 'downloading' | 'complete' | 'error'
+  message?: string
 }
 
 // ─── Hadith Module Types ───────────────────────────────────────────────────────

@@ -283,6 +283,12 @@ function ResourceDetailModal({
 
 // ─── Available Resources Tab ──────────────────────────────────────────────────
 
+interface DownloadProgress {
+  percentage: number
+  status: DownloadStatus
+  message?: string
+}
+
 function AvailableTab({ ipc }: { ipc: IpcBridge }): React.ReactElement {
   const [resources, setResources] = useState<AvailableResource[]>([])
   const [loading, setLoading] = useState(true)
@@ -290,6 +296,8 @@ function AvailableTab({ ipc }: { ipc: IpcBridge }): React.ReactElement {
   const [filterTier, setFilterTier] = useState<ResourceTier | 'all'>('all')
   const [selectedResource, setSelectedResource] = useState<AvailableResource | null>(null)
   const [installMessage, setInstallMessage] = useState<string | null>(null)
+  // Track download progress per resource key
+  const [downloadProgress, setDownloadProgress] = useState<Record<string, DownloadProgress>>({})
 
   const loadResources = useCallback(async (): Promise<void> => {
     if (!ipc) {
@@ -310,6 +318,27 @@ function AvailableTab({ ipc }: { ipc: IpcBridge }): React.ReactElement {
     void loadResources()
   }, [loadResources])
 
+  // Subscribe to download progress events from the main process
+  useEffect(() => {
+    if (!ipc) return
+    const unsubscribe = ipc.on(
+      'resource:download-progress',
+      (...args: unknown[]) => {
+        const p = args[0] as { resourceKey: string; percentage: number; status: DownloadStatus; message?: string }
+        if (!p?.resourceKey) return
+        setDownloadProgress((prev) => ({
+          ...prev,
+          [p.resourceKey]: { percentage: p.percentage, status: p.status, message: p.message },
+        }))
+        // When download completes, refresh the resource list
+        if (p.status === 'installed') {
+          void loadResources()
+        }
+      }
+    )
+    return unsubscribe
+  }, [ipc, loadResources])
+
   async function handleInstall(key: string): Promise<void> {
     if (!ipc) return
     try {
@@ -318,8 +347,11 @@ function AvailableTab({ ipc }: { ipc: IpcBridge }): React.ReactElement {
         message: string
       }
       setInstallMessage(result.message)
-      // Refresh the list
-      await loadResources()
+      if (result.queued) {
+        setDownloadProgress((prev) => ({ ...prev, [key]: { percentage: 0, status: 'downloading' } }))
+        // Update the resource status in the list immediately
+        setResources((prev) => prev.map((r) => r.key === key ? { ...r, status: 'downloading' } : r))
+      }
     } catch {
       setInstallMessage('Failed to start download.')
     }
@@ -405,8 +437,21 @@ function AvailableTab({ ipc }: { ipc: IpcBridge }): React.ReactElement {
                 <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300 font-medium flex-shrink-0">
                   Installed
                 </span>
-              ) : r.status === 'downloading' ? (
-                <div className="w-4 h-4 border-2 border-[var(--accent-primary)] border-t-transparent rounded-full animate-spin flex-shrink-0" />
+              ) : r.status === 'downloading' || downloadProgress[r.key]?.status === 'downloading' ? (
+                <div className="flex flex-col items-end gap-1 min-w-[80px] flex-shrink-0">
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-3 h-3 border-2 border-[var(--accent-primary)] border-t-transparent rounded-full animate-spin" />
+                    <span className="text-xs text-[var(--text-secondary)]">
+                      {downloadProgress[r.key]?.percentage ?? 0}%
+                    </span>
+                  </div>
+                  <div className="w-full h-1.5 rounded-full bg-[var(--bg-secondary)] overflow-hidden">
+                    <div
+                      className="h-full rounded-full bg-[var(--accent-primary)] transition-all duration-300"
+                      style={{ width: `${downloadProgress[r.key]?.percentage ?? 0}%` }}
+                    />
+                  </div>
+                </div>
               ) : (
                 <button
                   onClick={(e) => {

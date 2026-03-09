@@ -14,6 +14,15 @@ interface TafsirEntry {
   page: number | null
 }
 
+interface TafsirAnnotation {
+  id: number
+  tafsir_key: string
+  ayah_id: number
+  type: 'key_ruling' | 'ijaz' | 'disputed' | 'linguistic_note' | 'historical_context'
+  label: string
+  note: string
+}
+
 interface SurahMeta {
   id: number
   number: number
@@ -360,12 +369,74 @@ function AyahNav({ ayahNumber, verseCount, onNavigate }: AyahNavProps): React.Re
   )
 }
 
+// ─── Annotation callout ───────────────────────────────────────────────────────
+
+const ANNOTATION_CONFIG: Record<
+  TafsirAnnotation['type'],
+  { label: string; icon: string; colorClass: string }
+> = {
+  key_ruling: {
+    label: 'Key Ruling',
+    icon: '⚖️',
+    colorClass:
+      'bg-[var(--ae-gold-50)] border-[var(--ae-gold-300)] text-[var(--ae-gold-800)]',
+  },
+  ijaz: {
+    label: 'Linguistic Miracle',
+    icon: '✨',
+    colorClass:
+      'bg-emerald-50 border-emerald-300 text-emerald-800 dark:bg-emerald-900/20 dark:text-emerald-300 dark:border-emerald-700',
+  },
+  disputed: {
+    label: 'Disputed Point',
+    icon: '⚠️',
+    colorClass:
+      'bg-orange-50 border-orange-300 text-orange-800 dark:bg-orange-900/20 dark:text-orange-300 dark:border-orange-700',
+  },
+  linguistic_note: {
+    label: 'Linguistic Note',
+    icon: '📝',
+    colorClass:
+      'bg-blue-50 border-blue-300 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-700',
+  },
+  historical_context: {
+    label: 'Historical Context',
+    icon: '🕌',
+    colorClass:
+      'bg-slate-50 border-slate-300 text-slate-700 dark:bg-slate-800/40 dark:text-slate-300 dark:border-slate-600',
+  },
+}
+
+function AnnotationCallout({
+  annotation,
+}: {
+  annotation: TafsirAnnotation
+}): React.ReactElement {
+  const config = ANNOTATION_CONFIG[annotation.type]
+  return (
+    <div className={`mt-3 p-3 rounded-lg border text-sm ${config.colorClass}`}>
+      <div className="flex items-center gap-1.5 font-semibold mb-1 text-xs uppercase tracking-wide">
+        <span>{config.icon}</span>
+        <span>{config.label}</span>
+        {annotation.label && (
+          <>
+            <span className="opacity-40">·</span>
+            <span className="normal-case tracking-normal">{annotation.label}</span>
+          </>
+        )}
+      </div>
+      <p className="leading-relaxed">{annotation.note}</p>
+    </div>
+  )
+}
+
 // ─── Single tafsir panel ──────────────────────────────────────────────────────
 
 interface TafsirPanelProps {
   entry: TafsirEntry | null
   tafsirKey: string
   loading: boolean
+  annotations: TafsirAnnotation[]
   onNavigateVerse: (surah: number, ayah: number) => void
   onNavigateHadith: (collection: string, number: string) => void
   onShowAuthorBio: (key: string) => void
@@ -375,6 +446,7 @@ function TafsirPanel({
   entry,
   tafsirKey,
   loading,
+  annotations,
   onNavigateVerse,
   onNavigateHadith,
   onShowAuthorBio,
@@ -439,6 +511,18 @@ function TafsirPanel({
                 {parseCrossRefs(entry.text, onNavigateVerse, onNavigateHadith)}
               </p>
             </div>
+
+            {/* Passage annotations (key rulings, ijaz, disputed, etc.) */}
+            {annotations.length > 0 && (
+              <div className="mt-4 space-y-0">
+                <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-2">
+                  Scholarly Annotations
+                </p>
+                {annotations.map((ann) => (
+                  <AnnotationCallout key={ann.id} annotation={ann} />
+                ))}
+              </div>
+            )}
           </>
         )}
       </div>
@@ -476,6 +560,7 @@ export default function TafsirViewer(): React.ReactElement {
   const [availableTafsirKeys, setAvailableTafsirKeys] = useState<string[]>([])
   const [selectedKeys, setSelectedKeys] = useState<string[]>(['ibn-kathir'])
   const [entries, setEntries] = useState<Record<string, TafsirEntry | null>>({})
+  const [annotations, setAnnotations] = useState<Record<string, TafsirAnnotation[]>>({})
   const [ayahArabic, setAyahArabic] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [authorBioKey, setAuthorBioKey] = useState<string | null>(null)
@@ -530,24 +615,29 @@ export default function TafsirViewer(): React.ReactElement {
 
         setAyahArabic(ayahData.ayah.arabic_text)
 
-        // Fetch each selected tafsir
+        // Fetch each selected tafsir and its annotations
         const results: Record<string, TafsirEntry | null> = {}
+        const annotationResults: Record<string, TafsirAnnotation[]> = {}
         await Promise.all(
           selectedKeys.map(async (key) => {
             try {
-              const entry = (await ipc.invoke(
-                'library:get-tafsir',
-                ayahData.ayah.id,
-                key
-              )) as TafsirEntry | null
-              results[key] = entry
+              const [entry, anns] = await Promise.all([
+                ipc.invoke('library:get-tafsir', ayahData.ayah.id, key),
+                ipc
+                  .invoke('library:get-tafsir-annotations', ayahData.ayah.id, key)
+                  .catch(() => []),
+              ])
+              results[key] = (entry as TafsirEntry) ?? null
+              annotationResults[key] = (anns as TafsirAnnotation[]) ?? []
             } catch {
               results[key] = null
+              annotationResults[key] = []
             }
           })
         )
 
         setEntries(results)
+        setAnnotations(annotationResults)
       } catch {
         setEntries({})
       } finally {
@@ -687,6 +777,7 @@ export default function TafsirViewer(): React.ReactElement {
                 entry={entries[key] ?? null}
                 tafsirKey={key}
                 loading={loading}
+                annotations={annotations[key] ?? []}
                 onNavigateVerse={handleNavigateVerse}
                 onNavigateHadith={handleNavigateHadith}
                 onShowAuthorBio={setAuthorBioKey}
