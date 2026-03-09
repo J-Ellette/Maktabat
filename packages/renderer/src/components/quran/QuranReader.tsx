@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useIpc } from '../../hooks/useIpc'
 import ArabicVerse from './ArabicVerse'
+import InsightsPanel from './InsightsPanel'
 import TranslationView, {
   TranslationSelector,
   type Translation,
@@ -790,6 +791,12 @@ export default function QuranReader(): React.ReactElement {
                             <KhutbahMarker surah={surahNumber} ayah={ayah.ayah_number} />
                           </div>
                         )}
+                        {/* Insights panel */}
+                        <InsightsPanel
+                          surahNumber={surahNumber}
+                          ayahNumber={ayah.ayah_number}
+                          onViewEntry={(slug) => void navigate('/factbook/' + slug)}
+                        />
                       </div>
                     )
                   })}

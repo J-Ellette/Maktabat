@@ -99,6 +99,47 @@ const DEMO_ENTRIES: FactbookEntry[] = [
   },
 ]
 
+// ─── Static commentary data ───────────────────────────────────────────────────
+
+const ENTRY_COMMENTARIES: Record<
+  string,
+  Array<{ source: string; text: string; route?: string }>
+> = {
+  ibrahim: [
+    {
+      source: 'Ibn Kathir — Stories of the Prophets',
+      text: 'Ibrahim (peace be upon him) is called Khalilullah, the intimate friend of Allah, a title given to no prophet before or after except him...',
+      route: '/library',
+    },
+    {
+      source: 'Tafsir al-Tabari on 2:127',
+      text: "And when Ibrahim raised the foundations of the Ka'bah together with his son Ismail, they supplicated: 'Our Lord, accept this from us...'",
+      route: '/tafsir/2/127',
+    },
+  ],
+  musa: [
+    {
+      source: 'Ibn Kathir — Stories of the Prophets',
+      text: 'Musa ibn Imran is the most frequently mentioned prophet in the Quran. He was given the title Kalimullah (the one to whom Allah spoke directly)...',
+      route: '/library',
+    },
+  ],
+  mecca: [
+    {
+      source: 'Tafsir al-Jalalayn on 3:96',
+      text: 'Indeed, the first House established for the people was that at Makkah, blessed and a guidance for the worlds...',
+      route: '/tafsir/3/96',
+    },
+  ],
+  tawbah: [
+    {
+      source: 'Riyadh al-Salihin — Chapter on Repentance',
+      text: "The Prophet ﷺ said: 'Allah accepts the repentance of His slave as long as he does not give up his spirit (at the time of death).'",
+      route: '/hadith/riyadh/1',
+    },
+  ],
+}
+
 // ─── Entry card ────────────────────────────────────────────────────────────────
 
 function EntryCard({ entry, onClick }: { entry: FactbookEntry; onClick: () => void }) {
@@ -256,6 +297,63 @@ function EntryDetail({
             Related hadith cross-references will appear here once hadith data is seeded.
           </div>
         </section>
+
+        {/* Commentaries (static, premium) */}
+        {(ENTRY_COMMENTARIES[entry.slug] ?? []).length > 0 && (
+          <section>
+            <div className="flex items-center gap-2 mb-3">
+              <h2 className="text-sm font-semibold uppercase tracking-wide text-[var(--text-muted)]">
+                📝 Commentaries
+              </h2>
+              <span
+                className="text-[10px] px-2 py-0.5 rounded-full font-semibold"
+                style={{
+                  backgroundColor:
+                    'color-mix(in srgb, var(--ae-gold-400, #f59e0b) 20%, transparent)',
+                  color: 'var(--ae-gold-700, #b45309)',
+                  border:
+                    '1px solid color-mix(in srgb, var(--ae-gold-400, #f59e0b) 40%, transparent)',
+                }}
+              >
+                🔒 Premium
+              </span>
+            </div>
+            <div className="space-y-3">
+              {(ENTRY_COMMENTARIES[entry.slug] ?? []).map((commentary, i) => (
+                <div
+                  key={i}
+                  className="rounded-lg border-l-4 pl-4 pr-3 py-3"
+                  style={{
+                    borderLeftColor: 'var(--accent-primary)',
+                    backgroundColor: 'var(--bg-panel)',
+                  }}
+                >
+                  <p
+                    className="text-[10px] font-semibold uppercase tracking-wider mb-1"
+                    style={{ color: 'var(--text-muted)' }}
+                  >
+                    {commentary.source}
+                  </p>
+                  <p
+                    className="text-sm leading-relaxed italic"
+                    style={{ color: 'var(--text-secondary)' }}
+                  >
+                    &ldquo;{commentary.text}&rdquo;
+                  </p>
+                  {commentary.route && (
+                    <button
+                      onClick={() => void navigate(commentary.route!)}
+                      className="text-xs mt-2 hover:underline"
+                      style={{ color: 'var(--accent-primary)' }}
+                    >
+                      Read in context →
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
       </div>
     </div>
   )
