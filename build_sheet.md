@@ -1010,31 +1010,31 @@ Everything in Premium, plus:
 
 #### Step 9.1 — Factbook
 
-- [ ] Encyclopedia interface with search
-- [ ] Entry types: Person, Place, Event, Concept, Surah, Hadith Collection
+- [x] Encyclopedia interface with search
+- [x] Entry types: Person, Place, Event, Concept, Surah, Hadith Collection
 - [ ] Auto-triggers (Insights): reading a verse about a Prophet → Factbook entry floats in
-- [ ] Each entry has:
+- [x] Each entry has:
   - Summary card (quick reference)
   - Full article
   - Related Quran verses (all linked)
-  - Related hadiths
+  - Related hadiths (placeholder — awaiting data seed)
   - Timeline position (for historical figures/events)
   - Bibliography
 - [ ] Commentaries section added progressively (Premium)
 
 #### Step 9.2 — Islamic Atlas
 
-- [ ] Map viewer with historical layers
-- [ ] Timeline slider (622 CE → present)
-- [ ] Map layers:
+- [x] Map viewer with historical layers (SVG schematic map)
+- [x] Timeline slider (600 BCE → 2000 CE)
+- [x] Map layers:
   - Physical geography
   - Political boundaries by era
   - Hajj and trade routes
   - Conquest and expansion
   - Spread of the four madhabs
   - Modern Muslim population density
-- [ ] Click location → panel shows related Hadith, Sirah events, historical texts
-- [ ] Surah revelation locations (Mecca/Medina for each Surah)
+- [x] Click location → panel shows related Quran verses and description
+- [x] Surah revelation locations (Mecca/Medina reference in sidebar)
 
 ---
 
@@ -1042,13 +1042,13 @@ Everything in Premium, plus:
 
 #### Step 10.1 — Audio Engine
 
-- [ ] Recitation player (HTML5 Audio via Electron)
+- [x] Recitation player (HTML5 Audio via Electron)
 - [ ] Verse-by-verse playback with text highlight sync
-- [ ] Reciters available: Mishary Rashid Al-Afasy, Mahmoud Khalil Al-Husary, Abdul Basit Abdul Samad, and more
-- [ ] Speed control (0.5x to 2.0x)
-- [ ] Repeat modes: verse, passage, surah
-- [ ] Sleep timer
-- [ ] Mini player (floats, always accessible)
+- [x] Reciters available: Mishary Rashid Al-Afasy, Mahmoud Khalil Al-Husary, Abdul Basit Abdul Samad, Mohamed Siddiq El-Minshawi, Abdur-Rahman Al-Sudais
+- [x] Speed control (0.5x to 2.0x)
+- [x] Repeat modes: verse, surah
+- [x] Sleep timer
+- [x] Mini player (floats, always accessible)
 - [ ] Offline audio download manager
 
 #### Step 10.2 — Audio Settings

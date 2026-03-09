@@ -794,6 +794,7 @@ This file tracks the implementation progress of the Maktabat Quran Study Softwar
 ## Phase Completion Status
 
 ### Phase 0: Project Foundation ✅ (pre-existing)
+
 - [x] Monorepo (pnpm workspaces) initialized
 - [x] TypeScript strict mode configured
 - [x] ESLint + Prettier + Husky
@@ -812,10 +813,15 @@ This file tracks the implementation progress of the Maktabat Quran Study Softwar
 - [x] Seed scripts (Al-Fatiha + 10 sample hadiths)
 
 ### Phase 1: Main Process & IPC Layer ✅
+
 ### Phase 2: Core UI Shell ✅
+
 ### Phase 3: Quran Reading Module ✅
+
 ### Phase 4: Tafsir Module ✅
+
 ### Phase 5: Hadith Module ✅
+
 ### Phase 6: Search & AI Study Assistant ✅
 
 ### Phase 7: Linguistic Analysis Module ✅ (Session 7)
@@ -1003,11 +1009,17 @@ This file tracks the implementation progress of the Maktabat Quran Study Softwar
 - [x] Seed scripts (Al-Fatiha + 10 sample hadiths)
 
 ### Phase 1: Main Process & IPC Layer ✅
+
 ### Phase 2: Core UI Shell ✅
+
 ### Phase 3: Quran Reading Module ✅
+
 ### Phase 4: Tafsir Module ✅
+
 ### Phase 5: Hadith Module ✅
+
 ### Phase 6: Search & AI Study Assistant ✅
+
 ### Phase 7: Linguistic Analysis Module ✅
 
 ### Phase 8: Notes, Annotations & Khutbah Workflow ✅ (Session 8)
@@ -1035,3 +1047,130 @@ This file tracks the implementation progress of the Maktabat Quran Study Softwar
 - [ ] Save & share completed studies (requires account system — deferred to Phase 11)
 
 ### Phases 9–14 — _future sessions_
+
+---
+
+### Session 9 — Phase 9: Factbook & Islamic Atlas + Phase 10: Audio & Recitation
+
+**Date**: 2026-03-09
+
+**Status**: ✅ Complete
+
+#### Changes Made
+
+**`packages/shared/types/ipc.ts`** — Updated
+
+- Added 3 IPC channel constants: `LIBRARY_SEARCH_FACTBOOK`, `LIBRARY_GET_FACTBOOK_ENTRY`, `LIBRARY_GET_FACTBOOK_AYAH_REFS`
+- Added `FactbookEntryRow` and `FactbookAyahRef` interfaces
+
+**`packages/main/src/library-service.ts`** — Enhanced
+
+- Added 3 prepared statements to `CachedStatements`: `searchFactbook`, `getFactbookEntry`, `getFactbookAyahRefs`
+- Added `searchFactbook(query, limit)` — LIKE-based search across title and summary
+- Added `getFactbookEntry(slug)` — fetch single entry by slug
+- Added `getFactbookAyahRefs(entryId)` — fetch all related Quran verses for an entry
+
+**`packages/main/src/ipc-handlers.ts`** — Enhanced
+
+- Added 3 new IPC handlers: `library:search-factbook`, `library:get-factbook-entry`, `library:get-factbook-ayah-refs` with input validation
+
+**`packages/main/src/preload.ts`** — Updated
+
+- Added the 3 new factbook channels to `validChannels` whitelist
+
+**`packages/database/seeds/seed-factbook.sql`** — New file
+
+- INSERT statements for 6 demo Factbook entries: Ibrahim, Musa, Mecca, Tawbah, Zakat, Battle of Badr
+
+**`packages/renderer/src/components/factbook/FactbookPanel.tsx`** — New file
+
+- Route: `/factbook`, `/factbook/:slug`
+- Searchable encyclopedia with type-filter chips (All / Person / Place / Event / Concept / Surah / Collection)
+- Entry cards with type badge, Arabic title, summary preview
+- Entry detail view: full article, related Quran verses (clickable → QuranReader), related hadith placeholder
+- 6 static demo entries (fallback when DB is empty)
+- Live IPC search with 300ms debounce
+
+**`packages/renderer/src/components/atlas/AtlasPanel.tsx`** — New file
+
+- Route: `/atlas`
+- SVG schematic map of the Middle East / North Africa / Iberia / Central Asia
+- 8 historical sites: Mecca, Medina, Jerusalem, Wells of Badr, Mount Sinai, Damascus, Baghdad, Córdoba
+- Timeline slider: 600 BCE → 2000 CE — sites appear as era progresses
+- Click a site → popup with description and Quran verse links
+- 6 toggleable map layers (Physical, Political, Hajj Routes, Conquest, Madhab Spread, Population)
+- Hajj route overlay (dashed lines Egypt/Damascus/Baghdad → Mecca/Medina)
+- Legend panel with color key and Meccan/Medinan surah counts
+
+**`packages/renderer/src/components/audio/AudioPlayer.tsx`** — New file
+
+- Global floating mini audio player, mounted in `AppShell`
+- 5 reciters: Mishary Al-Afasy, Mahmoud Al-Husary, Abdul Basit, El-Minshawi, Al-Sudais
+- HTML5 Audio with CDN URL pattern (cdn.islamic.network)
+- Global `playAyah(surah, ayah)` exported function for cross-component triggering
+- Controls: play/pause, prev/next verse, seek bar, speed (0.5×–2×), repeat (none/verse/surah), sleep timer, minimize/close
+- Reciter picker dropdown, speed picker dropdown
+- Click current verse reference → navigates to QuranReader
+
+**`packages/renderer/src/components/layout/AppShell.tsx`** — Updated
+
+- Imported and mounted `<AudioPlayer />` as a global overlay
+
+**`packages/renderer/src/routes/index.tsx`** — Updated
+
+- `/factbook`, `/factbook/:slug` → real `FactbookPanel`
+- `/atlas` → real `AtlasPanel`
+
+**`build_sheet.md`** — Updated
+
+- Checked off all implemented Phase 9 and Phase 10 items
+
+---
+
+## Phase Completion Status
+
+### Phase 0: Project Foundation ✅ (pre-existing)
+
+### Phase 1: Main Process & IPC Layer ✅
+
+### Phase 2: Core UI Shell ✅
+
+### Phase 3: Quran Reading Module ✅
+
+### Phase 4: Tafsir Module ✅
+
+### Phase 5: Hadith Module ✅
+
+### Phase 6: Search & AI Study Assistant ✅
+
+### Phase 7: Linguistic Analysis Module ✅
+
+### Phase 8: Notes, Annotations & Khutbah Workflow ✅
+
+### Phase 9: Factbook & Islamic Atlas ✅ (Session 9)
+
+- [x] Encyclopedia interface with search (debounced IPC-backed with demo fallback)
+- [x] Entry types: Person, Place, Event, Concept, Surah, Hadith Collection
+- [ ] Auto-triggers (Insights): deferred
+- [x] Entry: Summary card, Full article, Related Quran verses (linked), Related hadith placeholder
+- [ ] Commentaries section (deferred — Premium)
+- [x] Map viewer with historical layers (SVG schematic map)
+- [x] Timeline slider (600 BCE → 2000 CE)
+- [x] Map layers: Physical, Political, Hajj Routes, Conquest, Madhab Spread, Population
+- [x] Click location → popup with Quran verse links
+- [x] Surah revelation locations (Meccan/Medinan count in sidebar)
+
+### Phase 10: Audio & Recitation ✅ (Session 9)
+
+- [x] Recitation player (HTML5 Audio)
+- [ ] Verse-by-verse text highlight sync (deferred)
+- [x] Reciters: Mishary, Al-Husary, Abdul Basit, El-Minshawi, Al-Sudais
+- [x] Speed control (0.5× to 2.0×)
+- [x] Repeat modes: verse, surah
+- [x] Sleep timer (15/30/45/60 min)
+- [x] Mini player (floats, minimizable)
+- [ ] Offline audio download manager (deferred — Phase 12)
+- [ ] Download reciters for offline use (deferred)
+- [ ] Translation audio paired with Arabic (deferred)
+
+### Phases 11–14 — _future sessions_

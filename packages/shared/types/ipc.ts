@@ -41,6 +41,9 @@ export const IpcChannel = {
   AUDIO_PAUSE: 'audio:pause',
   SETTINGS_GET: 'settings:get',
   SETTINGS_SET: 'settings:set',
+  LIBRARY_SEARCH_FACTBOOK: 'library:search-factbook',
+  LIBRARY_GET_FACTBOOK_ENTRY: 'library:get-factbook-entry',
+  LIBRARY_GET_FACTBOOK_AYAH_REFS: 'library:get-factbook-ayah-refs',
 } as const
 
 export type IpcChannelType = (typeof IpcChannel)[keyof typeof IpcChannel]
@@ -374,4 +377,25 @@ export interface UpdateKhutbahRequest {
 export interface SearchNotesRequest {
   query: string
   limit?: number
+}
+
+// ─── Factbook ─────────────────────────────────────────────────────────────────
+
+export interface FactbookEntryRow {
+  id: number
+  slug: string
+  title_arabic: string | null
+  title_english: string
+  type: 'person' | 'place' | 'event' | 'concept' | 'surah' | 'collection'
+  summary: string | null
+  body: string | null
+}
+
+export interface FactbookAyahRef {
+  id: number
+  entry_id: number
+  ayah_id: number
+  surah_number: number
+  ayah_number: number
+  arabic_text: string
 }
