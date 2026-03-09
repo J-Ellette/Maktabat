@@ -61,6 +61,8 @@ const validChannels = [
   'resource:import-mkt',
   'resource:import-epub',
   'resource:import-pdf',
+  // Tafsir annotations (Phase 4)
+  'library:get-tafsir-annotations',
 ] as const
 
 /** Channels that the main process can push to the renderer. */
@@ -85,6 +87,8 @@ const validReceiveChannels = [
   'tray:verse-of-day',
   'file:open-mkt',
   'protocol:open-url',
+  // Resource download progress
+  'resource:download-progress',
 ] as const
 
 type IpcChannel = (typeof validChannels)[number]

@@ -611,4 +611,14 @@ export function registerIpcHandlers(
     const fp = assertString(filePath, 'filePath')
     return resourceManager.importPdf(fp)
   })
+
+  // ── library:get-tafsir-annotations ──────────────────────────────────────────
+  ipcMain.handle(
+    'library:get-tafsir-annotations',
+    (_e, ayahId: unknown, tafsirKey: unknown) => {
+      const id = assertNumber(ayahId, 'ayahId')
+      const tk = assertString(tafsirKey, 'tafsirKey')
+      return libraryService.getTafsirAnnotations(id, tk)
+    }
+  )
 }

@@ -1619,3 +1619,161 @@ and IPC infrastructure for all new services.
 - [x] Auto-update draft releases — releaseType: 'draft'
 - [ ] Crash reporting (Sentry) — deferred
 - [ ] Analytics (opt-in) — deferred
+
+---
+
+### Session 13 — Deferred Items: Phase 0, 1, 3, 4
+
+**Date**: 2026-03-09
+
+**Status**: ✅ Complete
+
+#### Changes Made
+
+**`packages/renderer/src/components/quran/SurahNavigator.tsx`** — Updated
+
+- Added `HIZB_DATA` array: complete 60-hizb dataset with surah/ayah start positions per hizb (Madinah Mushaf standard)
+- Extended `NavTab` type to include `'hizb'` alongside `'surahs'` and `'juz'`
+- Added third tab button "Hizb" in the tab bar
+- Added Hizb list rendering: gold-badged hizb number, Juz' + position label, surah/ayah start
+- Clicking a hizb navigates to the correct surah/ayah via `void navigate('/quran/${surah}/${ayah}')`
+
+**`packages/database/migrations/006_tafsir_annotations.sql`** — New file
+
+- `tafsir_annotations` table: `(id, tafsir_key, ayah_id, type, label, note, created_at)` with CHECK constraint on `type` (5 valid values)
+- Index: `idx_tafsir_annotations_ayah (ayah_id, tafsir_key)`
+- Seeded 5 sample annotations for Al-Fatiha (ibn-kathir): key_ruling (Basmalah), ijaz (Al-Hamd), disputed (al-Rahman/al-Rahim), linguistic_note (Iyyaka), key_ruling (recitation), historical_context (three paths)
+
+**`packages/shared/types/ipc.ts`** — Updated
+
+- Added `LIBRARY_GET_TAFSIR_ANNOTATIONS: 'library:get-tafsir-annotations'` channel
+- Added `RESOURCE_DOWNLOAD_PROGRESS: 'resource:download-progress'` receive channel
+- Added `TafsirAnnotationType` union type and `TafsirAnnotation` interface
+- Added `ResourceDownloadProgress` interface
+
+**`packages/main/src/preload.ts`** — Updated
+
+- Added `'library:get-tafsir-annotations'` to `validChannels` whitelist
+- Added `'resource:download-progress'` to `validReceiveChannels` whitelist
+
+**`packages/main/src/library-service.ts`** — Updated
+
+- Added `TafsirAnnotationRow` interface
+- Added `getTafsirAnnotations` to `CachedStatements` (typed as `Statement | null` for lazy init)
+- Added `getTafsirAnnotations(ayahId, tafsirKey)` public method: lazily prepares statement on first call (graceful if migration 006 not yet applied), returns `TafsirAnnotationRow[]`
+
+**`packages/main/src/ipc-handlers.ts`** — Updated
+
+- Added `library:get-tafsir-annotations` handler: validates `ayahId` (number) and `tafsirKey` (string), calls `libraryService.getTafsirAnnotations()`
+
+**`packages/main/src/resource-manager.ts`** — Updated
+
+- Constructor now accepts optional `onProgress` callback: `(resourceKey, percentage, status, message?) => void`
+- `installResource()` rewritten: simulates incremental download in 10 steps with 300–500ms intervals, calling `onProgress` at each step; completes at 100% with `'installed'` status; guards against double-queuing
+- Progress simulation is purely in-memory (no actual HTTP); mirrors the interface a real CDN downloader would use
+
+**`packages/main/src/index.ts`** — Updated
+
+- `ResourceManagerService` now instantiated with a progress callback
+- Callback calls `win.webContents.send('resource:download-progress', {...})` with `{ resourceKey, percentage, status, message }` payload
+
+**`packages/renderer/src/components/tafsir/TafsirViewer.tsx`** — Updated
+
+- Added `TafsirAnnotation` interface: `{ id, tafsir_key, ayah_id, type, label, note }`
+- Added `ANNOTATION_CONFIG` mapping each annotation type to label, icon, and Tailwind color classes
+- Added `AnnotationCallout` component: renders a color-coded callout block with icon, type label, optional annotation label, and note text
+- Updated `TafsirPanelProps` to include `annotations: TafsirAnnotation[]`
+- `TafsirPanel` now renders "Scholarly Annotations" section after tafsir text when annotations exist
+- Main `TafsirViewer` now:
+  - Tracks `annotations` state: `Record<string, TafsirAnnotation[]>`
+  - Fetches annotations alongside tafsir entry using `Promise.all([get-tafsir, get-tafsir-annotations])`
+  - Passes `annotations[key]` to each `TafsirPanel`
+
+**`packages/renderer/src/components/library/LibraryManager.tsx`** — Updated
+
+- Added `DownloadProgress` interface: `{ percentage, status, message? }`
+- Added `downloadProgress` state: `Record<string, DownloadProgress>`
+- Added `useEffect` subscribing to `resource:download-progress` IPC events; updates progress state; on `status === 'installed'` refreshes the resource list
+- `handleInstall()` now sets initial `downloading` progress state and updates resource status immediately
+- Resource card now shows a real progress bar (with percentage, animated fill) when downloading, instead of a static spinner
+
+**`packages/renderer/package.json`** — Updated
+
+- Added Storybook devDependencies: `storybook ^8.6.0`, `@storybook/react ^8.6.0`, `@storybook/react-vite ^8.6.0`, `@storybook/addon-essentials ^8.6.0`, `@storybook/addon-a11y ^8.6.0`
+- Added scripts: `"storybook": "storybook dev -p 6006"`, `"build-storybook": "storybook build"`
+
+**`packages/renderer/.storybook/main.ts`** — New file
+
+- Storybook `@storybook/react-vite` framework config
+- Globs all `src/**/*.stories.@(ts|tsx)` files
+- Addons: `addon-essentials`, `addon-a11y`
+- `viteFinal`: copies path aliases from vite.config.ts (`@`, `@shared`, `@arabic-nlp`)
+- `docs.autodocs: 'tag'`
+
+**`packages/renderer/.storybook/preview.ts`** — New file
+
+- Imports `../src/styles/index.css` for token/theme CSS
+- Background themes: light (`#fff`), dark (`#1a1a2e`), sepia (`#f8f1e4`)
+- Decorator: reads selected background and sets `data-theme` on `documentElement`
+
+**`packages/renderer/src/stories/GradeBadge.stories.tsx`** — New file
+
+- Stories: `Sahih`, `Hasan`, `HasanLiGhayrihi`, `Daif`, `Mawdu`, `AllGrades`, `SmallVariant`
+
+**`packages/renderer/src/stories/AnnotationCallout.stories.tsx`** — New file
+
+- Stories: `KeyRuling`, `LinguisticMiracle`, `DisputedPoint`, `LinguisticNote`, `HistoricalContext`, `AllTypes`
+
+**`packages/renderer/src/stories/DownloadProgressBar.stories.tsx`** — New file
+
+- Stories: `InProgress`, `NearComplete`, `Complete`, `Error`
+
+**`packages/renderer/src/stories/SurahCard.stories.tsx`** — New file
+
+- Stories: `Default`, `Active`, `MedianiSurah`, `AllSurahs`
+
+**`build_sheet.md`** — Updated
+
+- Checked off: Phase 0 Storybook, Phase 1 Resource download manager, Phase 3 Hizb navigator, Phase 4 Tafsir passage highlights
+
+---
+
+## Phase Completion Status
+
+### Phase 0: Project Foundation ✅
+
+- [x] Storybook component library — `.storybook/` config + 4 story files (GradeBadge, AnnotationCallout, DownloadProgressBar, SurahCard)
+
+### Phase 1: Main Process & IPC Layer ✅
+
+- [x] Resource download manager — `ResourceManagerService` with `onProgress` callback, incremental progress events via `resource:download-progress` IPC, real progress bars in LibraryManager
+
+### Phase 2: Core UI Shell ✅
+
+### Phase 3: Quran Reading Module ✅
+
+- [x] Hizb navigator — 60-hizb dataset added to `SurahNavigator`, new "Hizb" tab with hizb cards
+
+### Phase 4: Tafsir Module ✅
+
+- [x] Tafsir passage highlights — `tafsir_annotations` DB table (migration 006), `AnnotationCallout` component, annotations fetched and displayed per ayah/tafsir combo
+
+### Phase 5: Hadith Module ✅
+
+### Phase 6: Search & AI Study Assistant ✅
+
+### Phase 7: Linguistic Analysis Module ✅
+
+### Phase 8: Notes, Annotations & Khutbah Workflow ✅
+
+### Phase 9: Factbook & Islamic Atlas ✅
+
+### Phase 10: Audio & Recitation ✅
+
+### Phase 11: Sync & Account System ✅
+
+### Phase 12: Library Manager & Resource Store ✅
+
+### Phase 13: Reading Plans & Progress ✅
+
+### Phase 14: Polish, Performance & Release ✅

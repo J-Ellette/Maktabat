@@ -84,7 +84,24 @@ void app.whenReady().then(() => {
   userService = new UserService(userDbPath)
   accountService = new AccountService(userDbPath)
   syncService = new SyncService(userService)
-  resourceManager = new ResourceManagerService(libraryService, userData)
+
+  // Create ResourceManagerService with a progress callback that sends IPC events
+  // to the renderer via webContents.
+  resourceManager = new ResourceManagerService(
+    libraryService,
+    userData,
+    (resourceKey, percentage, status, message) => {
+      const win = windowManager.getMainWindow()
+      if (win && !win.isDestroyed()) {
+        win.webContents.send('resource:download-progress', {
+          resourceKey,
+          percentage,
+          status,
+          message,
+        })
+      }
+    }
+  )
 
   // Register IPC handlers
   registerIpcHandlers(libraryService, userService, accountService, syncService, resourceManager)

@@ -571,7 +571,7 @@ Everything in Premium, plus:
 - [x] Load and configure Arabic fonts (Noto Naskh, Amiri, IBM Plex Arabic)
 - [x] Load and configure Latin fonts (Cormorant Garamond, Source Serif 4)
 - [x] Load Quranic font (KFGQPC Uthmanic Hafs)
-- [ ] Build Storybook component library for design QA
+- [x] Build Storybook component library for design QA
 
 #### Step 0.3 — Database Schema Design
 
@@ -681,7 +681,7 @@ Everything in Premium, plus:
   - Index English text
   - Support transliteration search
 - [x] Query builder for complex cross-resource queries
-- [ ] Resource download manager
+- [x] Resource download manager
   - Check which resources are licensed
   - Download encrypted resource packages from CDN
   - Decrypt and import into library.db
@@ -803,7 +803,7 @@ Everything in Premium, plus:
 - [x] Surah list with: number, Arabic name, English name, Meccan/Medinan, verse count
 - [x] Filter by: Meccan/Medinan, theme, length
 - [x] Juz' navigator
-- [ ] Hizb navigator
+- [x] Hizb navigator
 - [x] Search within Quran
 
 ---
@@ -818,7 +818,7 @@ Everything in Premium, plus:
 - [x] Tafsir selector: switch between installed tafsirs easily
 - [x] Multiple tafsirs side by side
 - [x] Volume/page reference always shown (for citation)
-- [ ] Tafsir passage highlights: key rulings, ijaz markers, disputed points
+- [x] Tafsir passage highlights: key rulings, ijaz markers, disputed points
 
 #### Step 4.2 — Tafsir Cross-References
 

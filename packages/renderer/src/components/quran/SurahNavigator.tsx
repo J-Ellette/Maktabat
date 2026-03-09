@@ -13,6 +13,71 @@ export interface SurahInfo {
   verse_count: number
 }
 
+// Hizb start data (60 hizbs × 4 rub' = 240 sections; each row is the start of a hizb)
+// Source: Standard Madinah Mushaf (King Fahd Complex) hizb divisions
+const HIZB_DATA: Array<{ hizb: number; juz: number; surah: number; ayah: number }> = [
+  { hizb: 1, juz: 1, surah: 1, ayah: 1 },
+  { hizb: 2, juz: 1, surah: 2, ayah: 26 },
+  { hizb: 3, juz: 2, surah: 2, ayah: 50 },
+  { hizb: 4, juz: 2, surah: 2, ayah: 77 },
+  { hizb: 5, juz: 3, surah: 2, ayah: 142 },
+  { hizb: 6, juz: 3, surah: 2, ayah: 177 },
+  { hizb: 7, juz: 4, surah: 2, ayah: 203 },
+  { hizb: 8, juz: 4, surah: 2, ayah: 232 },
+  { hizb: 9, juz: 5, surah: 2, ayah: 253 },
+  { hizb: 10, juz: 5, surah: 3, ayah: 14 },
+  { hizb: 11, juz: 6, surah: 3, ayah: 92 },
+  { hizb: 12, juz: 6, surah: 3, ayah: 152 },
+  { hizb: 13, juz: 7, surah: 4, ayah: 1 },
+  { hizb: 14, juz: 7, surah: 4, ayah: 24 },
+  { hizb: 15, juz: 8, surah: 4, ayah: 57 },
+  { hizb: 16, juz: 8, surah: 4, ayah: 88 },
+  { hizb: 17, juz: 9, surah: 4, ayah: 148 },
+  { hizb: 18, juz: 9, surah: 5, ayah: 3 },
+  { hizb: 19, juz: 10, surah: 5, ayah: 52 },
+  { hizb: 20, juz: 10, surah: 5, ayah: 82 },
+  { hizb: 21, juz: 11, surah: 6, ayah: 20 },
+  { hizb: 22, juz: 11, surah: 6, ayah: 111 },
+  { hizb: 23, juz: 12, surah: 6, ayah: 151 },
+  { hizb: 24, juz: 12, surah: 7, ayah: 38 },
+  { hizb: 25, juz: 13, surah: 7, ayah: 87 },
+  { hizb: 26, juz: 13, surah: 7, ayah: 170 },
+  { hizb: 27, juz: 14, surah: 8, ayah: 41 },
+  { hizb: 28, juz: 14, surah: 9, ayah: 33 },
+  { hizb: 29, juz: 15, surah: 9, ayah: 93 },
+  { hizb: 30, juz: 15, surah: 10, ayah: 26 },
+  { hizb: 31, juz: 16, surah: 11, ayah: 6 },
+  { hizb: 32, juz: 16, surah: 11, ayah: 84 },
+  { hizb: 33, juz: 17, surah: 12, ayah: 53 },
+  { hizb: 34, juz: 17, surah: 13, ayah: 18 },
+  { hizb: 35, juz: 18, surah: 15, ayah: 1 },
+  { hizb: 36, juz: 18, surah: 16, ayah: 51 },
+  { hizb: 37, juz: 19, surah: 17, ayah: 1 },
+  { hizb: 38, juz: 19, surah: 18, ayah: 16 },
+  { hizb: 39, juz: 20, surah: 19, ayah: 1 },
+  { hizb: 40, juz: 20, surah: 20, ayah: 82 },
+  { hizb: 41, juz: 21, surah: 21, ayah: 51 },
+  { hizb: 42, juz: 21, surah: 22, ayah: 19 },
+  { hizb: 43, juz: 22, surah: 23, ayah: 75 },
+  { hizb: 44, juz: 22, surah: 25, ayah: 21 },
+  { hizb: 45, juz: 23, surah: 27, ayah: 1 },
+  { hizb: 46, juz: 23, surah: 27, ayah: 56 },
+  { hizb: 47, juz: 24, surah: 29, ayah: 46 },
+  { hizb: 48, juz: 24, surah: 31, ayah: 22 },
+  { hizb: 49, juz: 25, surah: 33, ayah: 31 },
+  { hizb: 50, juz: 25, surah: 34, ayah: 24 },
+  { hizb: 51, juz: 26, surah: 36, ayah: 28 },
+  { hizb: 52, juz: 26, surah: 38, ayah: 1 },
+  { hizb: 53, juz: 27, surah: 39, ayah: 32 },
+  { hizb: 54, juz: 27, surah: 41, ayah: 47 },
+  { hizb: 55, juz: 28, surah: 44, ayah: 1 },
+  { hizb: 56, juz: 28, surah: 46, ayah: 1 },
+  { hizb: 57, juz: 29, surah: 51, ayah: 31 },
+  { hizb: 58, juz: 29, surah: 57, ayah: 1 },
+  { hizb: 59, juz: 30, surah: 67, ayah: 1 },
+  { hizb: 60, juz: 30, surah: 78, ayah: 1 },
+]
+
 // Juz' start data (which surah:ayah each juz' begins at)
 const JUZ_DATA: Array<{ juz: number; surah: number; ayah: number; label: string }> = [
   { juz: 1, surah: 1, ayah: 1, label: "Juz' 1 — Al-Fatiha 1:1" },
@@ -48,7 +113,7 @@ const JUZ_DATA: Array<{ juz: number; surah: number; ayah: number; label: string 
 ]
 
 type FilterType = 'all' | 'meccan' | 'medinan'
-type NavTab = 'surahs' | 'juz'
+type NavTab = 'surahs' | 'juz' | 'hizb'
 
 interface SurahCardProps {
   surah: SurahInfo
@@ -256,9 +321,9 @@ export default function SurahNavigator({
         </div>
       </div>
 
-      {/* Tab navigation: Surahs | Juz' */}
+      {/* Tab navigation: Surahs | Juz' | Hizb */}
       <div className="flex border-b border-[var(--border-color)]">
-        {(['surahs', 'juz'] as NavTab[]).map((tab) => (
+        {(['surahs', 'juz', 'hizb'] as NavTab[]).map((tab) => (
           <button
             key={tab}
             onClick={() => setNavTab(tab)}
@@ -271,7 +336,7 @@ export default function SurahNavigator({
               }
             `}
           >
-            {tab === 'surahs' ? 'Surahs' : "Juz'"}
+            {tab === 'surahs' ? 'Surahs' : tab === 'juz' ? "Juz'" : 'Hizb'}
           </button>
         ))}
       </div>
@@ -315,7 +380,7 @@ export default function SurahNavigator({
               })}
             </div>
           )
-        ) : (
+        ) : navTab === 'juz' ? (
           /* Juz' list (30 items — no virtualization needed) */
           <div className="p-2 space-y-1">
             {JUZ_DATA.map((juz) => (
@@ -337,6 +402,38 @@ export default function SurahNavigator({
                 </div>
               </button>
             ))}
+          </div>
+        ) : (
+          /* Hizb list (60 hizbs — each hizb comprises 4 rub') */
+          <div className="p-2 space-y-1">
+            {HIZB_DATA.map((hizb) => {
+              const hizbInJuz = hizb.hizb % 2 === 0 ? 2 : 1
+              return (
+                <button
+                  key={hizb.hizb}
+                  onClick={() => void navigate(`/quran/${hizb.surah}/${hizb.ayah}`)}
+                  className="w-full flex items-center gap-3 p-3 rounded-lg text-left hover:bg-[var(--bg-secondary)] transition-colors"
+                >
+                  {/* Hizb number badge */}
+                  <div className="flex-shrink-0 w-9 h-9 rounded-full bg-[var(--ae-gold-100)] flex items-center justify-center text-sm font-semibold text-[var(--ae-gold-700)]">
+                    {hizb.hizb}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-medium text-[var(--text-primary)]">
+                        Hizb {hizb.hizb}
+                      </p>
+                      <span className="text-xs px-1.5 py-0.5 rounded bg-[var(--bg-secondary)] text-[var(--text-secondary)]">
+                        Juz&apos; {hizb.juz}, Hizb {hizbInJuz}/2
+                      </span>
+                    </div>
+                    <p className="text-xs text-[var(--text-secondary)] mt-0.5">
+                      Surah {hizb.surah}, Ayah {hizb.ayah}
+                    </p>
+                  </div>
+                </button>
+              )
+            })}
           </div>
         )}
       </div>

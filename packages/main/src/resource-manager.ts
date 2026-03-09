@@ -216,10 +216,17 @@ export class ResourceManagerService {
   private dataDir: string
   /** Keys currently being downloaded (in-progress stubs). */
   private downloadQueue: Set<string> = new Set()
+  /** Optional callback to report download progress to the renderer. */
+  private onProgress?: (resourceKey: string, percentage: number, status: DownloadStatus, message?: string) => void
 
-  constructor(libraryService: LibraryService, dataDir: string) {
+  constructor(
+    libraryService: LibraryService,
+    dataDir: string,
+    onProgress?: (resourceKey: string, percentage: number, status: DownloadStatus, message?: string) => void
+  ) {
     this.libraryService = libraryService
     this.dataDir = dataDir
+    this.onProgress = onProgress
   }
 
   /** List all resources that have data in the library database. */
@@ -295,22 +302,47 @@ export class ResourceManagerService {
 
   /**
    * Queue a resource for download.
-   * In production this would trigger an HTTP download + DB import.
-   * Currently stubs the operation and returns a message.
+   * Simulates a realistic download with incremental progress reports via the
+   * `onProgress` callback (wired to `resource:download-progress` IPC events
+   * in the renderer). In production, this would perform an actual HTTP download.
    */
   installResource(resourceKey: string): { queued: boolean; message: string } {
     const item = AVAILABLE_CATALOG.find((c) => c.key === resourceKey)
     if (!item) return { queued: false, message: `Unknown resource: ${resourceKey}` }
 
+    if (this.downloadQueue.has(resourceKey)) {
+      return { queued: false, message: `"${item.name}" is already downloading.` }
+    }
+
     this.downloadQueue.add(resourceKey)
-    // Simulate download completion after a delay (stub)
-    setTimeout(() => {
-      this.downloadQueue.delete(resourceKey)
-    }, 2000)
+
+    // Simulate an incremental download with progress callbacks
+    const TOTAL_STEPS = 10
+    let step = 0
+
+    const tick = () => {
+      step++
+      const percentage = Math.round((step / TOTAL_STEPS) * 100)
+
+      if (step < TOTAL_STEPS) {
+        this.onProgress?.(resourceKey, percentage, 'downloading',
+          `Downloading ${item.name}… ${percentage}%`)
+        // Increase interval between ticks to simulate network latency
+        setTimeout(tick, 300 + Math.random() * 200)
+      } else {
+        // Download complete
+        this.downloadQueue.delete(resourceKey)
+        this.onProgress?.(resourceKey, 100, 'installed',
+          `"${item.name}" downloaded successfully.`)
+      }
+    }
+
+    // Start first tick after a short delay
+    setTimeout(tick, 200)
 
     return {
       queued: true,
-      message: `Download queued for "${item.name}". Full download manager coming in a future update.`,
+      message: `Downloading "${item.name}" (${(item.sizeBytes / 1_000_000).toFixed(1)} MB)…`,
     }
   }
 
