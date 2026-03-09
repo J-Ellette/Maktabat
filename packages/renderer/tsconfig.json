@@ -11,7 +11,9 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
-      "@shared/*": ["../shared/*"]
+      "@shared/*": ["../shared/*"],
+      "@arabic-nlp/*": ["../arabic-nlp/src/*"],
+      "@arabic-nlp": ["../arabic-nlp/src/index.ts"]
     }
   },
   "include": ["src/**/*.ts", "src/**/*.tsx", "vite.config.ts"]

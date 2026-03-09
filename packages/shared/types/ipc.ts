@@ -18,6 +18,7 @@ export const IpcChannel = {
   LIBRARY_GET_ISNAD: 'library:get-isnad',
   LIBRARY_SEARCH_HADITHS: 'library:search-hadiths',
   LIBRARY_GET_MORPHOLOGY: 'library:get-morphology',
+  LIBRARY_GET_WORD_OCCURRENCES: 'library:get-word-occurrences',
   USER_SAVE_NOTE: 'user:save-note',
   USER_GET_NOTES: 'user:get-notes',
   USER_SAVE_HIGHLIGHT: 'user:save-highlight',
@@ -303,4 +304,11 @@ export interface SearchHadithsRequest {
   grade?: string
   limit?: number
   offset?: number
+}
+
+export interface WordOccurrenceRow {
+  surah_number: number
+  ayah_number: number
+  surface_form: string
+  pos: string
 }

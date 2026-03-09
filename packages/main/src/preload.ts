@@ -12,6 +12,7 @@ const validChannels = [
   'library:get-tafsir-keys',
   'library:get-hadith',
   'library:get-morphology',
+  'library:get-word-occurrences',
   'user:save-note',
   'user:get-notes',
   'user:save-highlight',
