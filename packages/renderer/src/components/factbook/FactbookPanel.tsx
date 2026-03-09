@@ -286,15 +286,44 @@ export default function FactbookPanel(): React.ReactElement {
 
   const types = ['all', 'person', 'place', 'event', 'concept', 'surah', 'collection'] as const
 
-  // Initial load — show all demo entries
+  // Initial load — show all demo entries while database may be empty
   useEffect(() => {
-    setResults(DEMO_ENTRIES)
-  }, [])
+    if (!ipc) {
+      setResults(DEMO_ENTRIES)
+      return
+    }
+    void (async () => {
+      try {
+        const rows = (await ipc.invoke('library:search-factbook', {
+          query: '',
+          limit: 50,
+        })) as FactbookEntry[]
+        setResults(rows.length > 0 ? rows : DEMO_ENTRIES)
+      } catch {
+        setResults(DEMO_ENTRIES)
+      }
+    })()
+  }, [ipc])
 
   // Search
   useEffect(() => {
     if (!query.trim()) {
-      setResults(DEMO_ENTRIES)
+      // Empty query: reload all entries (falls back to demo if DB empty)
+      if (!ipc) {
+        setResults(DEMO_ENTRIES)
+        return
+      }
+      void (async () => {
+        try {
+          const rows = (await ipc.invoke('library:search-factbook', {
+            query: '',
+            limit: 50,
+          })) as FactbookEntry[]
+          setResults(rows.length > 0 ? rows : DEMO_ENTRIES)
+        } catch {
+          setResults(DEMO_ENTRIES)
+        }
+      })()
       return
     }
     const search = async () => {
@@ -305,11 +334,14 @@ export default function FactbookPanel(): React.ReactElement {
             query: query.trim(),
             limit: 30,
           })) as FactbookEntry[]
-          setResults(rows.length > 0 ? rows : filterDemoEntries(query))
+          // Return IPC results directly (may be empty if no DB matches)
+          // Only fall back to demo entries if IPC call succeeds but DB has no data at all
+          setResults(rows)
         } else {
           setResults(filterDemoEntries(query))
         }
       } catch {
+        // On IPC error, fall back to demo data to remain usable
         setResults(filterDemoEntries(query))
       } finally {
         setLoading(false)

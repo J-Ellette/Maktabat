@@ -63,6 +63,10 @@ const INITIAL_LAYERS: MapLayer[] = [
   },
 ]
 
+// Sites whose founding era is within this many years ahead of the timeline slider are shown,
+// to account for approximate dates and ensure cities appear as the slider approaches their era.
+const ERA_LOOKAHEAD_YEARS = 50
+
 const HISTORICAL_SITES: HistoricalSite[] = [
   {
     id: 'mecca',
@@ -386,7 +390,7 @@ export default function AtlasPanel(): React.ReactElement {
     setLayers((prev) => prev.map((l) => (l.id === id ? { ...l, enabled: !l.enabled } : l)))
   }
 
-  const visibleSites = HISTORICAL_SITES.filter((s) => s.era <= year + 50)
+  const visibleSites = HISTORICAL_SITES.filter((s) => s.era <= year + ERA_LOOKAHEAD_YEARS)
   const showHajjRoutes = layers.find((l) => l.id === 'hajj')?.enabled ?? false
 
   return (

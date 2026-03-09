@@ -4,6 +4,8 @@ import type { UserService } from './user-service.js'
 
 // ─── Input validation helpers ─────────────────────────────────────────────────
 
+const MAX_FACTBOOK_QUERY_LENGTH = 100
+
 function assertString(value: unknown, name: string): string {
   if (typeof value !== 'string' || value.trim().length === 0) {
     throw new Error(`Invalid input: '${name}' must be a non-empty string`)
@@ -424,7 +426,7 @@ export function registerIpcHandlers(
   ipcMain.handle('library:search-factbook', (_e, args: unknown) => {
     const { query, limit } = args as { query: string; limit?: number }
     if (typeof query !== 'string' || query.trim().length === 0) return []
-    const sanitized = query.trim().slice(0, 100)
+    const sanitized = query.trim().slice(0, MAX_FACTBOOK_QUERY_LENGTH)
     return libraryService.searchFactbook(
       sanitized,
       typeof limit === 'number' ? Math.min(limit, 100) : 20
@@ -435,7 +437,7 @@ export function registerIpcHandlers(
   ipcMain.handle('library:get-factbook-entry', (_e, args: unknown) => {
     const { slug } = args as { slug: string }
     if (typeof slug !== 'string' || !slug) return null
-    return libraryService.getFactbookEntry(slug.slice(0, 100))
+    return libraryService.getFactbookEntry(slug.slice(0, MAX_FACTBOOK_QUERY_LENGTH))
   })
 
   // ── library:get-factbook-ayah-refs ──────────────────────────────────────────

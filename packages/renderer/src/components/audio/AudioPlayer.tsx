@@ -120,6 +120,8 @@ export default function AudioPlayer(): React.ReactElement | null {
   const [showSpeedMenu, setShowSpeedMenu] = useState(false)
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const sleepTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  // Ref to hold the current onended parameters so we can update it without reloading audio
+  const onEndedParamsRef = useRef({ repeatMode: state.repeatMode, ayah: state.ayah, totalAyahs })
 
   const reciter = RECITERS.find((r) => r.id === state.reciterId) ?? RECITERS[0]
   const totalAyahs = AYAH_COUNTS[state.surah - 1] ?? 7
@@ -134,7 +136,12 @@ export default function AudioPlayer(): React.ReactElement | null {
     }
   }, [])
 
-  // Load audio when surah/ayah/reciter changes
+  // Keep onEndedParams ref up to date without reloading audio
+  useEffect(() => {
+    onEndedParamsRef.current = { repeatMode: state.repeatMode, ayah: state.ayah, totalAyahs }
+  }, [state.repeatMode, state.ayah, totalAyahs])
+
+  // Load audio when track identity changes (surah/ayah/reciter/visible)
   useEffect(() => {
     if (!state.visible) return
     const url = buildAudioUrl(reciter, state.surah, state.ayah)
@@ -149,18 +156,17 @@ export default function AudioPlayer(): React.ReactElement | null {
     }
     audio.ontimeupdate = () =>
       setState((s) => ({ ...s, currentTime: audio.currentTime, duration: audio.duration || 0 }))
-    // Capture current values in closure to avoid stale references in onended
-    const currentRepeatMode = state.repeatMode
-    const currentAyah = state.ayah
-    const currentTotalAyahs = totalAyahs
+    // onended reads from the ref so it always has current repeatMode/ayah/totalAyahs
+    // without needing to reload the audio track when those values change.
     audio.onended = () => {
-      if (currentRepeatMode === 'verse') {
+      const { repeatMode, ayah, totalAyahs: total } = onEndedParamsRef.current
+      if (repeatMode === 'verse') {
         void audio.play()
       } else {
         let nextAyah: number | null
-        if (currentAyah < currentTotalAyahs) {
-          nextAyah = currentAyah + 1
-        } else if (currentRepeatMode === 'surah') {
+        if (ayah < total) {
+          nextAyah = ayah + 1
+        } else if (repeatMode === 'surah') {
           nextAyah = 1
         } else {
           nextAyah = null
@@ -172,9 +178,7 @@ export default function AudioPlayer(): React.ReactElement | null {
         }
       }
     }
-    // This effect intentionally depends only on track identity (surah/ayah/reciter/visible).
-    // play/pause and speed are handled by their own dedicated effects below.
-  }, [state.surah, state.ayah, state.reciterId, state.visible, state.repeatMode, totalAyahs])
+  }, [state.surah, state.ayah, state.reciterId, state.visible])
 
   // Speed change
   useEffect(() => {
