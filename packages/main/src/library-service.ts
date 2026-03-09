@@ -62,6 +62,51 @@ export interface HadithGradeRow {
   source: string | null
 }
 
+export interface HadithCollectionRow {
+  id: number
+  key: string
+  name_arabic: string
+  name_english: string
+  tradition: string
+  tier: string
+  compiler: string
+  century: number
+}
+
+export interface HadithBookRow {
+  id: number
+  collection_id: number
+  book_number: number
+  name_arabic: string
+  name_english: string
+}
+
+export interface HadithChapterRow {
+  id: number
+  book_id: number
+  chapter_number: number
+  name_arabic: string
+  name_english: string
+}
+
+export interface IsnadNarratorRow {
+  id: number
+  position: number
+  name_arabic: string
+  name_english: string
+  birth_year: number | null
+  death_year: number | null
+  reliability: string
+}
+
+export interface HadithSearchRow {
+  id: number
+  hadith_number: string
+  collection_key: string
+  collection_name_english: string
+  excerpt: string
+}
+
 export interface MorphologyRow {
   id: number
   ayah_id: number
@@ -98,10 +143,18 @@ type CachedStatements = {
   getTafsirKeys: Statement
   getHadith: Statement
   getHadithGrades: Statement
+  getHadithCollections: Statement
+  getHadithBooks: Statement
+  getHadithChapters: Statement
+  getHadithsByBook: Statement
+  getHadithsByChapter: Statement
+  getHadithById: Statement
+  getIsnad: Statement
   getMorphologyForAyah: Statement
   ftsAyah: Statement
   ftsTranslation: Statement
   ftsHadith: Statement
+  ftsHadithNarrator: Statement
 }
 
 export class LibraryService {
@@ -223,12 +276,80 @@ export class LibraryService {
 
       ftsHadith: this.db.prepare(`
         SELECT h.id, h.collection_id, h.hadith_number, c.key AS collection_key,
+               c.name_english AS collection_name_english,
                snippet(hadiths_fts, 1, '<mark>', '</mark>', '…', 32) AS excerpt
         FROM hadiths_fts
         JOIN hadiths h ON hadiths_fts.rowid = h.id
         JOIN hadith_collections c ON h.collection_id = c.id
         WHERE hadiths_fts MATCH ?
         ORDER BY rank
+        LIMIT ?
+        OFFSET ?
+      `),
+
+      getHadithCollections: this.db.prepare(`
+        SELECT * FROM hadith_collections ORDER BY tier, century
+      `),
+
+      getHadithBooks: this.db.prepare(`
+        SELECT * FROM hadith_books
+        WHERE collection_id = (SELECT id FROM hadith_collections WHERE key = ?)
+        ORDER BY book_number
+      `),
+
+      getHadithChapters: this.db.prepare(`
+        SELECT * FROM hadith_chapters
+        WHERE book_id = ?
+        ORDER BY chapter_number
+      `),
+
+      getHadithsByBook: this.db.prepare(`
+        SELECT h.*, c.key AS collection_key, c.name_english AS collection_name_english
+        FROM hadiths h
+        JOIN hadith_collections c ON h.collection_id = c.id
+        WHERE h.book_id = ?
+        -- Sort numerically first (for integer hadith numbers), then lexicographically
+        -- as a fallback for compound numbers like "1a", "1b" etc.
+        ORDER BY CAST(h.hadith_number AS INTEGER), h.hadith_number
+      `),
+
+      getHadithsByChapter: this.db.prepare(`
+        SELECT h.*, c.key AS collection_key, c.name_english AS collection_name_english
+        FROM hadiths h
+        JOIN hadith_collections c ON h.collection_id = c.id
+        WHERE h.chapter_id = ?
+        -- Sort numerically first (for integer hadith numbers), then lexicographically
+        -- as a fallback for compound numbers like "1a", "1b" etc.
+        ORDER BY CAST(h.hadith_number AS INTEGER), h.hadith_number
+      `),
+
+      getHadithById: this.db.prepare(`
+        SELECT h.*, c.key AS collection_key, c.name_english AS collection_name_english
+        FROM hadiths h
+        JOIN hadith_collections c ON h.collection_id = c.id
+        WHERE h.id = ?
+        LIMIT 1
+      `),
+
+      getIsnad: this.db.prepare(`
+        SELECT ie.position, hn.*
+        FROM isnad_entries ie
+        JOIN hadith_narrators hn ON ie.narrator_id = hn.id
+        WHERE ie.hadith_id = ?
+        ORDER BY ie.position
+      `),
+
+      ftsHadithNarrator: this.db.prepare(`
+        SELECT h.id, h.hadith_number,
+               c.key AS collection_key, c.name_english AS collection_name_english,
+               hn.name_english AS narrator_name,
+               snippet(hadiths_fts, 1, '<mark>', '</mark>', '…', 32) AS excerpt
+        FROM hadiths_fts
+        JOIN hadiths h ON hadiths_fts.rowid = h.id
+        JOIN hadith_collections c ON h.collection_id = c.id
+        JOIN isnad_entries ie ON ie.hadith_id = h.id
+        JOIN hadith_narrators hn ON ie.narrator_id = hn.id
+        WHERE hn.name_english LIKE ?
         LIMIT ?
         OFFSET ?
       `),
@@ -276,6 +397,61 @@ export class LibraryService {
 
   getHadithGrades(hadithId: number): HadithGradeRow[] {
     return this.stmts.getHadithGrades.all(hadithId) as HadithGradeRow[]
+  }
+
+  getHadithCollections(): HadithCollectionRow[] {
+    return this.stmts.getHadithCollections.all() as HadithCollectionRow[]
+  }
+
+  getHadithBooks(collectionKey: string): HadithBookRow[] {
+    return this.stmts.getHadithBooks.all(collectionKey) as HadithBookRow[]
+  }
+
+  getHadithChapters(bookId: number): HadithChapterRow[] {
+    return this.stmts.getHadithChapters.all(bookId) as HadithChapterRow[]
+  }
+
+  getHadithsByBook(bookId: number): HadithRow[] {
+    return this.stmts.getHadithsByBook.all(bookId) as HadithRow[]
+  }
+
+  getHadithsByChapter(chapterId: number): HadithRow[] {
+    return this.stmts.getHadithsByChapter.all(chapterId) as HadithRow[]
+  }
+
+  getHadithById(hadithId: number): HadithRow | undefined {
+    return this.stmts.getHadithById.get(hadithId) as HadithRow | undefined
+  }
+
+  getIsnad(hadithId: number): IsnadNarratorRow[] {
+    return this.stmts.getIsnad.all(hadithId) as IsnadNarratorRow[]
+  }
+
+  searchHadiths(
+    query: string,
+    collectionKey?: string,
+    grade?: string,
+    limit = 20,
+    offset = 0
+  ): HadithSearchRow[] {
+    const safeQuery = sanitizeFtsQuery(query)
+    try {
+      const rows = this.stmts.ftsHadith.all(safeQuery, limit, offset) as HadithSearchRow[]
+      return rows.filter((r) => {
+        if (collectionKey && r.collection_key !== collectionKey) return false
+        return true
+      })
+    } catch {
+      return []
+    }
+  }
+
+  searchHadithsByNarrator(narrator: string, limit = 20, offset = 0): HadithSearchRow[] {
+    try {
+      return this.stmts.ftsHadithNarrator.all(`%${narrator}%`, limit, offset) as HadithSearchRow[]
+    } catch {
+      return []
+    }
   }
 
   getMorphologyForAyah(ayahId: number): MorphologyRow[] {
@@ -344,6 +520,7 @@ export class LibraryService {
           collection_id: number
           hadith_number: string
           collection_key: string
+          collection_name_english: string
           excerpt: string
         }>
         for (const row of hadithRows) {
@@ -356,6 +533,7 @@ export class LibraryService {
             metadata: {
               collectionId: row.collection_id,
               collectionKey: row.collection_key,
+              collectionNameEnglish: row.collection_name_english,
               hadithNumber: row.hadith_number,
             },
           })

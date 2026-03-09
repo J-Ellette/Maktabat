@@ -486,4 +486,27 @@ This file tracks the implementation progress of the Maktabat Quran Study Softwar
 - [x] Quranic verse cross-references within tafsir are live links
 - [x] Author bio accessible from tafsir header (AuthorBioModal)
 
-### Phases 5–14 — _future sessions_
+### Phase 5: Hadith Module ✅ (Session 5)
+
+- [x] Collection hierarchy browser: Collection → Book → Chapter → Hadith tree navigator (`CollectionTree.tsx`)
+- [x] Collection metadata: compiler bio, century, tradition (Sunni/Shia/Ibadi), tier badges
+- [x] Arabic text display (large, prominent RTL) with proper font (`HadithViewer.tsx`)
+- [x] English translation display
+- [x] Hadith number with collection name
+- [x] Grade badges with AE palette colour-coding: Sahih (green-600), Hasan (green-400), Hasan li-ghayrihi (gold-500), Da'if (red-400), Mawdu' (red-700) (`GradeBadge.tsx`)
+- [x] Multiple grades from different scholars shown with grader attribution
+- [x] "Companion hadiths" — FTS5-powered similar hadiths section
+- [x] Visual isnad chain: Narrator → Narrator → Prophet ﷺ (`IsnadViewer.tsx`)
+- [x] Each narrator: Arabic/English name, birth/death dates, click-to-expand bio tooltip
+- [x] Narrator reliability colour-coded (thiqah=green, sadooq=gold, daif=red, unknown=gray)
+- [x] Weak narrators highlighted with warning icon
+- [x] Hadith search by text — Arabic or English (`HadithSearch.tsx`)
+- [x] Hadith search by narrator name
+- [x] Filter by collection (checkboxes) and grade (checkboxes)
+- [x] Concordance view: group matching hadiths by collection
+- [x] `HadithBrowser.tsx` — split-panel container wired to `/hadith`, `/hadith/:collection`, `/hadith/:collection/:number` routes
+- [x] 8 new IPC channels + 10 new TypeScript types in `shared/types/ipc.ts`
+- [x] 9 new prepared SQL statements + public methods in `library-service.ts`
+- [x] 8 new validated IPC handlers in `ipc-handlers.ts`
+
+### Phases 6–14 — _future sessions_
