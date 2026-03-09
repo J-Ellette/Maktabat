@@ -1064,7 +1064,7 @@ Everything in Premium, plus:
 #### Step 11.1 — Account System
 
 - [x] Sign up / Sign in (email + password, Google SSO)
-- [ ] Subscription management (Stripe integration)
+- [ ] Subscription management (PayPal, Stripe integration)
 - [x] License validation (offline grace period: 7 days)
 - [x] Multi-device licensing (up to 3 devices per account)
 
