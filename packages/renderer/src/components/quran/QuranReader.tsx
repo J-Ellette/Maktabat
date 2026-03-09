@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useIpc } from '../../hooks/useIpc'
 import ArabicVerse from './ArabicVerse'
+import InsightsPanel from './InsightsPanel'
 import TranslationView, {
   TranslationSelector,
   type Translation,
@@ -10,6 +11,7 @@ import TranslationView, {
 import SurahNavigator from './SurahNavigator'
 import { TAJWEED_RULES, TAJWEED_RULE_NAMES, TAJWEED_COLORS } from './TajweedColors'
 import type { WordMorphology } from './WordPopover'
+import { subscribeToAudioState } from '../audio/AudioPlayer'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -347,6 +349,87 @@ function ReaderToolbar({
   )
 }
 
+// ─── Khutbah Marker ───────────────────────────────────────────────────────────
+
+function KhutbahMarker({
+  surah,
+  ayah,
+}: {
+  surah: number
+  ayah: number
+}): React.ReactElement | null {
+  const ipc = useIpc()
+  const navigate = useNavigate()
+  const [khutbahs, setKhutbahs] = useState<Array<{ id: number; title: string; date: string }>>([])
+  const [show, setShow] = useState(false)
+
+  useEffect(() => {
+    if (!ipc) return
+    const ref = `quran:${surah}:${ayah}`
+    ipc
+      .invoke('user:get-khutbahs-for-verse', ref)
+      .then((result: unknown) => {
+        if (Array.isArray(result))
+          setKhutbahs(result as Array<{ id: number; title: string; date: string }>)
+      })
+      .catch(() => {})
+  }, [ipc, surah, ayah])
+
+  if (khutbahs.length === 0) return null
+
+  return (
+    <div className="relative inline-block">
+      <button
+        type="button"
+        onClick={() => setShow((s) => !s)}
+        className="text-xs px-2 py-0.5 rounded-full font-medium transition-colors"
+        style={{
+          backgroundColor: 'color-mix(in srgb, var(--ae-gold-500, #f59e0b) 20%, transparent)',
+          color: 'var(--ae-gold-700, #b45309)',
+          border: '1px solid color-mix(in srgb, var(--ae-gold-500, #f59e0b) 40%, transparent)',
+        }}
+        title={`Used in ${khutbahs.length} khutbah${khutbahs.length > 1 ? 's' : ''}`}
+      >
+        🕌 {khutbahs.length} khutbah{khutbahs.length > 1 ? 's' : ''}
+      </button>
+      {show && (
+        <div
+          className="absolute z-20 top-7 left-0 min-w-[220px] rounded-xl border shadow-xl py-2"
+          style={{ backgroundColor: 'var(--bg-surface)', borderColor: 'var(--border-subtle)' }}
+        >
+          <p
+            className="text-[10px] font-bold uppercase tracking-wider px-3 pb-1"
+            style={{ color: 'var(--text-muted)' }}
+          >
+            Used in past khutbahs
+          </p>
+          {khutbahs.map((k) => (
+            <button
+              key={k.id}
+              type="button"
+              className="w-full text-left px-3 py-1.5 text-sm hover:bg-[var(--bg-hover)] transition-colors"
+              style={{ color: 'var(--text-secondary)' }}
+              onClick={() => {
+                void navigate(`/khutbah/${k.id}`)
+                setShow(false)
+              }}
+            >
+              <span className="font-medium" style={{ color: 'var(--text-primary)' }}>
+                {k.title}
+              </span>
+              {k.date && (
+                <span className="text-xs ml-2" style={{ color: 'var(--text-muted)' }}>
+                  {k.date}
+                </span>
+              )}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 // ─── Main QuranReader ─────────────────────────────────────────────────────────
 
 /**
@@ -366,6 +449,13 @@ export default function QuranReader(): React.ReactElement {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  // Audio playback highlight state
+  const [playingAyah, setPlayingAyah] = useState<{
+    surah: number
+    ayah: number
+    isPlaying: boolean
+  } | null>(null)
+
   // UI state
   const [viewMode, setViewMode] = useState<ViewMode>('verse-by-verse')
   const [showTranslation, setShowTranslation] = useState(true)
@@ -375,6 +465,14 @@ export default function QuranReader(): React.ReactElement {
   const [selectedTranslationKeys, setSelectedTranslationKeys] = useState<string[]>([])
 
   const contentRef = useRef<HTMLDivElement>(null)
+
+  // Subscribe to audio player state for verse highlight sync
+  useEffect(() => {
+    const unsub = subscribeToAudioState((surah, ayah, isPlaying) => {
+      setPlayingAyah({ surah, ayah, isPlaying })
+    })
+    return unsub
+  }, [])
 
   // ── Load surah data ────────────────────────────────────────────────────────
   useEffect(() => {
@@ -674,9 +772,43 @@ export default function QuranReader(): React.ReactElement {
                       <div
                         key={ayah.id}
                         id={`ayah-${ayah.ayah_number}`}
-                        className="rounded-xl border border-[var(--border-color)] bg-[var(--bg-primary)] p-5 shadow-sm hover:shadow-md transition-shadow"
+                        className="rounded-xl border bg-[var(--bg-primary)] p-5 shadow-sm hover:shadow-md transition-shadow"
+                        style={{
+                          borderLeftWidth:
+                            playingAyah?.surah === surahNumber &&
+                            playingAyah?.ayah === ayah.ayah_number &&
+                            playingAyah?.isPlaying
+                              ? '4px'
+                              : undefined,
+                          borderLeftColor:
+                            playingAyah?.surah === surahNumber &&
+                            playingAyah?.ayah === ayah.ayah_number &&
+                            playingAyah?.isPlaying
+                              ? 'var(--ae-gold-500, #f59e0b)'
+                              : undefined,
+                          backgroundColor:
+                            playingAyah?.surah === surahNumber &&
+                            playingAyah?.ayah === ayah.ayah_number &&
+                            playingAyah?.isPlaying
+                              ? 'color-mix(in srgb, var(--ae-gold-500, #f59e0b) 6%, var(--bg-primary))'
+                              : undefined,
+                          borderColor:
+                            playingAyah?.surah === surahNumber &&
+                            playingAyah?.ayah === ayah.ayah_number &&
+                            playingAyah?.isPlaying
+                              ? 'var(--ae-gold-300, #fcd34d)'
+                              : undefined,
+                        }}
                       >
                         {/* Arabic verse */}
+                        {playingAyah?.surah === surahNumber &&
+                          playingAyah?.ayah === ayah.ayah_number &&
+                          playingAyah?.isPlaying && (
+                            <div className="flex items-center gap-1.5 mb-2 text-[var(--ae-gold-500,#f59e0b)]">
+                              <span className="text-base animate-pulse">🔊</span>
+                              <span className="text-xs font-medium">Now playing</span>
+                            </div>
+                          )}
                         <ArabicVerse
                           surahNumber={surahNumber}
                           ayahNumber={ayah.ayah_number}
@@ -703,6 +835,18 @@ export default function QuranReader(): React.ReactElement {
                             ayahNumber={ayah.ayah_number}
                           />
                         )}
+                        {/* Khutbah marker */}
+                        {surahNumber && (
+                          <div className="mt-2 flex items-center gap-2">
+                            <KhutbahMarker surah={surahNumber} ayah={ayah.ayah_number} />
+                          </div>
+                        )}
+                        {/* Insights panel */}
+                        <InsightsPanel
+                          surahNumber={surahNumber}
+                          ayahNumber={ayah.ayah_number}
+                          onViewEntry={(slug) => void navigate('/factbook/' + slug)}
+                        />
                       </div>
                     )
                   })}

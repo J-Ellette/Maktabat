@@ -9,6 +9,7 @@ export interface SearchResult {
   excerpt: string
   relevance: number
   metadata: Record<string, unknown>
+  expanded?: boolean
 }
 
 export interface AyahRow {
@@ -544,10 +545,19 @@ export class LibraryService {
   /**
    * Full-text search across Quran (Arabic), translations (English), and Hadith.
    * Returns unified SearchResult array sorted by relevance.
+   * When expandMorphology is true, attempts to expand the query using MORPHOLOGICAL_EXPANSIONS
+   * before falling back to standard FTS5 sanitization.
    */
-  search(query: string, limit = 20, offset = 0, resourceTypes?: string[]): SearchResult[] {
-    // Sanitize query: wrap in quotes if it contains special characters to avoid FTS syntax errors
-    const safeQuery = sanitizeFtsQuery(query)
+  search(
+    query: string,
+    limit = 20,
+    offset = 0,
+    resourceTypes?: string[],
+    expandMorphology = false
+  ): SearchResult[] {
+    const expandedQuery = expandMorphology ? expandQuery(query) : null
+    const safeQuery = expandedQuery ?? sanitizeFtsQuery(query)
+    const wasExpanded = expandedQuery !== null
 
     const results: SearchResult[] = []
 
@@ -569,6 +579,7 @@ export class LibraryService {
             excerpt: row.excerpt,
             relevance: 1,
             metadata: { surahId: row.surah_id, ayahNumber: row.ayah_number },
+            expanded: wasExpanded,
           })
         }
       }
@@ -593,6 +604,7 @@ export class LibraryService {
               translationKey: row.translation_key,
               translator: row.translator,
             },
+            expanded: wasExpanded,
           })
         }
       }
@@ -619,6 +631,7 @@ export class LibraryService {
               collectionNameEnglish: row.collection_name_english,
               hadithNumber: row.hadith_number,
             },
+            expanded: wasExpanded,
           })
         }
       }
@@ -702,4 +715,46 @@ function sanitizeFtsQuery(query: string): string {
     return stripped
   }
   return `"${stripped}"`
+}
+
+// ─── Morphological Expansions ─────────────────────────────────────────────────
+
+/**
+ * Map of common Islamic/English terms to their related morphological forms.
+ * Keys are lowercase English root words; values are FTS5 search terms (English + Arabic).
+ */
+const MORPHOLOGICAL_EXPANSIONS: Record<string, string[]> = {
+  pray: ['pray', 'prayer', 'prayers', 'prayed', 'praying', 'salah', 'salat', 'صلاة'],
+  fast: ['fast', 'fasting', 'fasted', 'sawm', 'siyam', 'صوم'],
+  patience: ['patience', 'patient', 'sabr', 'صبر'],
+  charity: ['charity', 'zakat', 'sadaqah', 'صدقة', 'زكاة'],
+  faith: ['faith', 'iman', 'belief', 'إيمان'],
+  repentance: ['repentance', 'repent', 'tawbah', 'توبة'],
+  forgiveness: ['forgiveness', 'forgive', 'maghfirah', 'مغفرة'],
+  guidance: ['guidance', 'hidayah', 'هداية'],
+}
+
+/**
+ * Attempt to expand the raw query using MORPHOLOGICAL_EXPANSIONS.
+ * Accumulates expansions from all matched words and returns an FTS5 OR query,
+ * or null if no word in the query matches the map.
+ */
+function expandQuery(query: string): string | null {
+  const words = query.toLowerCase().split(/\s+/)
+  const allForms: string[] = []
+  const seen = new Set<string>()
+
+  for (const word of words) {
+    const forms = MORPHOLOGICAL_EXPANSIONS[word]
+    if (forms) {
+      for (const f of forms) {
+        if (!seen.has(f)) {
+          seen.add(f)
+          allForms.push(f)
+        }
+      }
+    }
+  }
+
+  return allForms.length > 0 ? allForms.map((f) => `"${f}"`).join(' OR ') : null
 }

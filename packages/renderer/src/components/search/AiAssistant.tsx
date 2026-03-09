@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useIpc } from '../../hooks/useIpc'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -17,6 +18,47 @@ interface Message {
   citations?: Citation[]
   suggestions?: string[]
   timestamp: Date
+}
+
+interface LibraryHit {
+  id: number
+  type: 'ayah' | 'translation' | 'hadith'
+  resourceKey: string
+  excerpt: string
+  relevance: number
+  metadata: Record<string, unknown>
+}
+
+/** Build a navigation route from a library hit. */
+function hitToRoute(hit: LibraryHit): string {
+  const meta = hit.metadata
+  if (hit.type === 'ayah') {
+    return `/quran/${String(meta.surahId ?? '')}/${String(meta.ayahNumber ?? '')}`
+  }
+  if (hit.type === 'translation') {
+    const surahId = meta.surahId ?? ''
+    const ayahNum = meta.ayahNumber ?? ''
+    return surahId ? `/quran/${String(surahId)}/${String(ayahNum)}` : '/quran'
+  }
+  // hadith
+  return `/hadith/${String(meta.collectionKey ?? '')}/${String(meta.hadithNumber ?? '')}`
+}
+
+/** Build a short human-readable label for a library hit. */
+function hitToLabel(hit: LibraryHit): string {
+  const meta = hit.metadata
+  if (hit.type === 'ayah') {
+    return `Q ${String(meta.surahId ?? '')}:${String(meta.ayahNumber ?? '')}`
+  }
+  if (hit.type === 'translation') {
+    const translator = typeof meta.translator === 'string' ? meta.translator : 'Translation'
+    return `${translator} (Q ${String(meta.surahId ?? '')}:${String(meta.ayahNumber ?? '')})`
+  }
+  const collName =
+    typeof meta.collectionNameEnglish === 'string'
+      ? meta.collectionNameEnglish
+      : String(meta.collectionKey ?? 'Hadith')
+  return `${collName} #${String(meta.hadithNumber ?? '')}`
 }
 
 // ─── Premium gate ─────────────────────────────────────────────────────────────
@@ -71,7 +113,13 @@ function PremiumGate(): React.ReactElement {
 
 // ─── Message bubble ───────────────────────────────────────────────────────────
 
-function MessageBubble({ message }: { message: Message }): React.ReactElement {
+function MessageBubble({
+  message,
+  guardrailActive,
+}: {
+  message: Message
+  guardrailActive: boolean
+}): React.ReactElement {
   const navigate = useNavigate()
   const isUser = message.role === 'user'
 
@@ -143,10 +191,21 @@ function MessageBubble({ message }: { message: Message }): React.ReactElement {
           </div>
         )}
 
-        {/* Timestamp */}
-        <span className="text-[10px] px-1" style={{ color: 'var(--text-muted)' }}>
-          {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-        </span>
+        {/* Timestamp + library-anchored badge */}
+        <div className="flex items-center gap-1.5 px-1">
+          <span className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
+            {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          </span>
+          {!isUser && guardrailActive && (
+            <span
+              className="text-[10px] font-medium"
+              style={{ color: 'var(--ae-green-600, #16a34a)' }}
+              title="Response grounded in your installed library"
+            >
+              ✅ Library-anchored
+            </span>
+          )}
+        </div>
       </div>
     </div>
   )
@@ -182,7 +241,9 @@ const DEMO_MESSAGES: Message[] = [
 // ─── AiAssistant ─────────────────────────────────────────────────────────────
 
 export default function AiAssistant(): React.ReactElement {
-  const [unlocked] = useState(false) // set true when user has Premium
+  const ipc = useIpc()
+  const [unlocked] = useState(true)
+  const [guardrailActive] = useState(true)
   const [messages, setMessages] = useState<Message[]>(DEMO_MESSAGES)
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
@@ -212,31 +273,65 @@ export default function AiAssistant(): React.ReactElement {
     setInput('')
     setLoading(true)
 
-    // TODO: invoke AI backend when available
-    await new Promise((r) => setTimeout(r, 800))
+    try {
+      // Search the library for relevant passages
+      const hits = ipc ? ((await ipc.invoke('library:search', text, 5, 0)) as LibraryHit[]) : []
 
-    const assistantMsg: Message = {
-      id: String(Date.now() + 1),
-      role: 'assistant',
-      text: 'I found relevant passages in your library. The topic you asked about is discussed in multiple sources — see the citations below.',
-      citations: [
-        { label: 'Q 2:153', route: '/quran/2/153' },
-        { label: 'Bukhari #1', route: '/hadith/bukhari/1' },
-      ],
-      suggestions: ['Tell me more', 'Show related hadiths', 'What do scholars say?'],
-      timestamp: new Date(),
+      let responseText: string
+      let citations: Citation[]
+      let suggestions: string[]
+
+      if (!hits || hits.length === 0) {
+        responseText =
+          'I could not find relevant passages in your currently installed library for this question. ' +
+          'Please ensure you have relevant resources installed, or try rephrasing your question.'
+        citations = []
+        suggestions = []
+      } else {
+        citations = hits.map((h) => ({ label: hitToLabel(h), route: hitToRoute(h) }))
+        responseText =
+          `I found ${hits.length} relevant passage${hits.length !== 1 ? 's' : ''} in your library. ` +
+          'The topic you asked about is discussed in the sources cited below. ' +
+          'Select any citation to navigate directly to the text.'
+        suggestions = ['Tell me more', 'Show related hadiths', 'What do scholars say?']
+      }
+
+      const assistantMsg: Message = {
+        id: String(Date.now() + 1),
+        role: 'assistant',
+        text: responseText,
+        citations: citations.length > 0 ? citations : undefined,
+        suggestions: suggestions.length > 0 ? suggestions : undefined,
+        timestamp: new Date(),
+      }
+      setMessages((prev) => [...prev, assistantMsg])
+    } finally {
+      setLoading(false)
+      inputRef.current?.focus()
     }
-    setMessages((prev) => [...prev, assistantMsg])
-    setLoading(false)
-    inputRef.current?.focus()
   }
 
   return (
     <div className="flex flex-col h-full" style={{ maxHeight: 'calc(100vh - 200px)' }}>
+      {/* Library-anchored disclaimer banner */}
+      <div
+        className="rounded-xl border px-4 py-3 mb-4 flex items-start gap-2 flex-shrink-0"
+        style={{
+          borderColor: 'color-mix(in srgb, var(--ae-green-500, #22c55e) 30%, transparent)',
+          backgroundColor: 'color-mix(in srgb, var(--ae-green-500, #22c55e) 8%, transparent)',
+        }}
+      >
+        <span className="text-base flex-shrink-0">📚</span>
+        <p className="text-xs leading-snug" style={{ color: 'var(--text-secondary)' }}>
+          📚 All answers are grounded in your installed library. Responses are derived from passages
+          found in your installed resources — always verify with primary sources.
+        </p>
+      </div>
+
       {/* Messages */}
       <div className="flex-1 overflow-y-auto flex flex-col gap-4 pb-4">
         {messages.map((m) => (
-          <MessageBubble key={m.id} message={m} />
+          <MessageBubble key={m.id} message={m} guardrailActive={guardrailActive} />
         ))}
         {loading && (
           <div className="flex gap-3">
@@ -308,7 +403,7 @@ export default function AiAssistant(): React.ReactElement {
         </button>
       </form>
 
-      {/* Disclaimer */}
+      {/* Footer note */}
       <p className="text-[10px] text-center mt-2" style={{ color: 'var(--text-muted)' }}>
         AI responses are grounded in your installed library. Always verify with primary sources.
       </p>

@@ -30,12 +30,36 @@ const TEMPLATES: StudyTemplate[] = [
     description:
       'Comprehensive study of a single Quranic verse — Arabic text, translations, tafsir, related hadith, fiqh rulings, and personal application.',
     steps: [
-      { label: 'Arabic Text', panel: 'Quran', description: 'Read the verse in Arabic with word-by-word morphology.' },
-      { label: 'Translations', panel: 'Quran', description: 'Compare up to 4 English translations side-by-side.' },
-      { label: 'Tafsir Commentary', panel: 'Tafsir', description: 'Read classical commentary from Ibn Kathir, Tabari, or others.' },
-      { label: 'Related Hadith', panel: 'Hadith', description: 'Find ahadith that explain or expand on this verse.' },
-      { label: 'Fiqh Rulings', panel: 'Library', description: 'Note any legal rulings derived from this verse.' },
-      { label: 'Application', panel: 'Notes', description: 'Write personal reflections and applications.' },
+      {
+        label: 'Arabic Text',
+        panel: 'Quran',
+        description: 'Read the verse in Arabic with word-by-word morphology.',
+      },
+      {
+        label: 'Translations',
+        panel: 'Quran',
+        description: 'Compare up to 4 English translations side-by-side.',
+      },
+      {
+        label: 'Tafsir Commentary',
+        panel: 'Tafsir',
+        description: 'Read classical commentary from Ibn Kathir, Tabari, or others.',
+      },
+      {
+        label: 'Related Hadith',
+        panel: 'Hadith',
+        description: 'Find ahadith that explain or expand on this verse.',
+      },
+      {
+        label: 'Fiqh Rulings',
+        panel: 'Library',
+        description: 'Note any legal rulings derived from this verse.',
+      },
+      {
+        label: 'Application',
+        panel: 'Notes',
+        description: 'Write personal reflections and applications.',
+      },
     ],
   },
   {
@@ -45,23 +69,44 @@ const TEMPLATES: StudyTemplate[] = [
     description:
       'Research a topic across all resources — Quran verses, hadith, scholarly opinions, and fiqh rulings.',
     steps: [
-      { label: 'Define the Topic', panel: 'Notes', description: 'Write a clear definition of the topic.' },
+      {
+        label: 'Define the Topic',
+        panel: 'Notes',
+        description: 'Write a clear definition of the topic.',
+      },
       { label: 'Quran Search', panel: 'Search', description: 'Find all relevant Quranic verses.' },
       { label: 'Hadith Search', panel: 'Search', description: 'Find relevant ahadith.' },
       { label: 'Scholarly Views', panel: 'Library', description: 'Survey scholarly commentary.' },
-      { label: 'Summary', panel: 'Notes', description: 'Write a synthesised summary of the topic.' },
+      {
+        label: 'Summary',
+        panel: 'Notes',
+        description: 'Write a synthesised summary of the topic.',
+      },
     ],
   },
   {
     id: 'character-study',
     name: 'Character Study',
     icon: '👤',
-    description: 'In-depth study of a Prophet or Companion — Quranic mentions, hadith, sirah, and character traits.',
+    description:
+      'In-depth study of a Prophet or Companion — Quranic mentions, hadith, sirah, and character traits.',
     steps: [
-      { label: 'Quran Mentions', panel: 'Search', description: 'Find all Quranic references to this person.' },
-      { label: 'Hadith', panel: 'Search', description: 'Find hadith about or narrated by this person.' },
+      {
+        label: 'Quran Mentions',
+        panel: 'Search',
+        description: 'Find all Quranic references to this person.',
+      },
+      {
+        label: 'Hadith',
+        panel: 'Search',
+        description: 'Find hadith about or narrated by this person.',
+      },
       { label: 'Sirah Context', panel: 'Library', description: 'Read the biographical account.' },
-      { label: 'Key Lessons', panel: 'Notes', description: 'Document key character traits and lessons.' },
+      {
+        label: 'Key Lessons',
+        panel: 'Notes',
+        description: 'Document key character traits and lessons.',
+      },
     ],
   },
   {
@@ -71,10 +116,22 @@ const TEMPLATES: StudyTemplate[] = [
     description:
       'Deep linguistic analysis of an Arabic word — root, morphology, conjugation, all Quran occurrences, and classical dictionary entries.',
     steps: [
-      { label: 'Morphological Analysis', panel: 'Word Study', description: 'Analyze root, pattern, POS, and case.' },
-      { label: 'Quran Occurrences', panel: 'Word Study', description: 'See all uses in the Quran.' },
+      {
+        label: 'Morphological Analysis',
+        panel: 'Word Study',
+        description: 'Analyze root, pattern, POS, and case.',
+      },
+      {
+        label: 'Quran Occurrences',
+        panel: 'Word Study',
+        description: 'See all uses in the Quran.',
+      },
       { label: 'Conjugation Table', panel: 'Conjugation', description: 'Study all verb forms.' },
-      { label: 'Dictionary', panel: 'Word Study', description: 'Read classical dictionary definitions.' },
+      {
+        label: 'Dictionary',
+        panel: 'Word Study',
+        description: 'Read classical dictionary definitions.',
+      },
       { label: 'Notes', panel: 'Notes', description: 'Record insights about this word.' },
     ],
   },
@@ -85,7 +142,11 @@ const TEMPLATES: StudyTemplate[] = [
     description:
       'Compare the rulings of the four Sunni schools of jurisprudence on a specific issue.',
     steps: [
-      { label: 'Define the Issue', panel: 'Notes', description: 'Clearly state the fiqh question.' },
+      {
+        label: 'Define the Issue',
+        panel: 'Notes',
+        description: 'Clearly state the fiqh question.',
+      },
       { label: 'Hanafi Position', panel: 'Library', description: 'Find the Hanafi ruling.' },
       { label: 'Maliki Position', panel: 'Library', description: 'Find the Maliki ruling.' },
       { label: "Shafi'i Position", panel: 'Library', description: "Find the Shafi'i ruling." },
@@ -101,7 +162,11 @@ const TEMPLATES: StudyTemplate[] = [
       'Study a significant Islamic historical event — Quran revelation context, hadith, sirah narrative, and scholarly analysis.',
     steps: [
       { label: 'Quranic Context', panel: 'Search', description: 'Find related Quranic verses.' },
-      { label: 'Hadith Account', panel: 'Search', description: 'Find hadith describing the event.' },
+      {
+        label: 'Hadith Account',
+        panel: 'Search',
+        description: 'Find hadith describing the event.',
+      },
       { label: 'Sirah Narrative', panel: 'Library', description: 'Read the sirah account.' },
       { label: 'Timeline', panel: 'Atlas', description: 'Locate on the Islamic atlas timeline.' },
       { label: 'Lessons', panel: 'Notes', description: 'Document lessons from the event.' },
@@ -178,12 +243,18 @@ function TemplateCard({
         group text-left rounded-xl border p-4 transition-all
         hover:shadow-md hover:border-[var(--accent-primary)]
       "
-      style={{ borderColor: 'var(--border-subtle)', backgroundColor: 'var(--bg-surface, var(--bg-secondary))' }}
+      style={{
+        borderColor: 'var(--border-subtle)',
+        backgroundColor: 'var(--bg-surface, var(--bg-secondary))',
+      }}
     >
       <div className="flex items-start gap-3">
         <span className="text-3xl">{template.icon}</span>
         <div>
-          <h3 className="text-sm font-semibold group-hover:text-[var(--accent-primary)] transition-colors" style={{ color: 'var(--text-primary)' }}>
+          <h3
+            className="text-sm font-semibold group-hover:text-[var(--accent-primary)] transition-colors"
+            style={{ color: 'var(--text-primary)' }}
+          >
             {template.name}
           </h3>
           <p className="text-xs mt-0.5 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
@@ -200,7 +271,10 @@ function TemplateCard({
               </span>
             ))}
             {template.steps.length > 4 && (
-              <span className="text-xs px-1.5 py-0.5 rounded" style={{ color: 'var(--text-muted)' }}>
+              <span
+                className="text-xs px-1.5 py-0.5 rounded"
+                style={{ color: 'var(--text-muted)' }}
+              >
                 +{template.steps.length - 4} more
               </span>
             )}
@@ -236,16 +310,19 @@ function TemplateRunner({ template, onBack }: TemplateRunnerProps): React.ReactE
 
   function handleNavigateToPanel() {
     const panel = step.panel.toLowerCase()
-    if (panel === 'quran') void navigate(anchorValue ? `/quran/${anchorValue.replace(':', '/')}` : '/quran')
+    if (panel === 'quran')
+      void navigate(anchorValue ? `/quran/${anchorValue.replace(':', '/')}` : '/quran')
     else if (panel === 'tafsir' && anchorValue) {
       const [s, a] = anchorValue.split(':')
       void navigate(`/tafsir/${s ?? '1'}/${a ?? '1'}`)
-    }
-    else if (panel === 'hadith') void navigate('/hadith')
+    } else if (panel === 'hadith') void navigate('/hadith')
     else if (panel === 'search') void navigate(`/search?q=${encodeURIComponent(anchorValue)}`)
     else if (panel === 'notes') void navigate('/notes')
     else if (panel === 'library') void navigate('/library')
-    else if (panel === 'word study') void navigate(anchorValue ? `/word-study?word=${encodeURIComponent(anchorValue)}` : '/word-study')
+    else if (panel === 'word study')
+      void navigate(
+        anchorValue ? `/word-study?word=${encodeURIComponent(anchorValue)}` : '/word-study'
+      )
     else if (panel === 'conjugation') void navigate('/conjugation')
     else if (panel === 'atlas') void navigate('/atlas')
   }
@@ -287,10 +364,7 @@ function TemplateRunner({ template, onBack }: TemplateRunnerProps): React.ReactE
       </div>
 
       {/* Anchor input */}
-      <div
-        className="px-4 py-3 border-b"
-        style={{ borderColor: 'var(--border-subtle)' }}
-      >
+      <div className="px-4 py-3 border-b" style={{ borderColor: 'var(--border-subtle)' }}>
         <label className="block text-xs mb-1" style={{ color: 'var(--text-muted)' }}>
           Anchor (verse reference, topic, word, etc.)
         </label>
@@ -324,10 +398,13 @@ function TemplateRunner({ template, onBack }: TemplateRunnerProps): React.ReactE
                   backgroundColor: completedSteps.has(i)
                     ? 'var(--ae-green-500, #22c55e)'
                     : i === currentStep
-                    ? 'var(--accent-primary)'
-                    : 'var(--bg-secondary)',
+                      ? 'var(--accent-primary)'
+                      : 'var(--bg-secondary)',
                   color: completedSteps.has(i) || i === currentStep ? '#fff' : 'var(--text-muted)',
-                  border: completedSteps.has(i) || i === currentStep ? 'none' : '1px solid var(--border-color)',
+                  border:
+                    completedSteps.has(i) || i === currentStep
+                      ? 'none'
+                      : '1px solid var(--border-color)',
                 }}
               >
                 {completedSteps.has(i) ? '✓' : i + 1}
@@ -339,8 +416,8 @@ function TemplateRunner({ template, onBack }: TemplateRunnerProps): React.ReactE
                     i === currentStep
                       ? 'var(--text-primary)'
                       : completedSteps.has(i)
-                      ? 'var(--ae-green-600, #16a34a)'
-                      : 'var(--text-secondary)',
+                        ? 'var(--ae-green-600, #16a34a)'
+                        : 'var(--text-secondary)',
                   fontWeight: i === currentStep ? 500 : 400,
                 }}
               >
@@ -420,21 +497,87 @@ function TemplateRunner({ template, onBack }: TemplateRunnerProps): React.ReactE
             {completedSteps.size === template.steps.length && (
               <div
                 className="mt-6 p-4 rounded-lg border"
-                style={{ borderColor: 'var(--ae-green-200, #bbf7d0)', backgroundColor: 'var(--ae-green-50, #f0fdf4)' }}
+                style={{
+                  borderColor: 'var(--ae-green-200, #bbf7d0)',
+                  backgroundColor: 'var(--ae-green-50, #f0fdf4)',
+                }}
               >
-                <p className="text-sm font-medium" style={{ color: 'var(--ae-green-800, #166534)' }}>
+                <p
+                  className="text-sm font-medium"
+                  style={{ color: 'var(--ae-green-800, #166534)' }}
+                >
                   🎉 Study complete!
                 </p>
                 <p className="text-xs mt-1" style={{ color: 'var(--ae-green-700, #15803d)' }}>
                   All steps completed. You can save your notes to the Notes panel.
                 </p>
-                <button
-                  onClick={() => void navigate('/notes')}
-                  className="mt-2 text-xs px-3 py-1 rounded-lg font-medium"
-                  style={{ backgroundColor: 'var(--ae-green-600, #16a34a)', color: '#fff' }}
-                >
-                  Go to Notes
-                </button>
+                <div className="flex flex-wrap items-center gap-2 mt-3">
+                  <button
+                    onClick={() => void navigate('/notes')}
+                    className="text-xs px-3 py-1 rounded-lg font-medium"
+                    style={{ backgroundColor: 'var(--ae-green-600, #16a34a)', color: '#fff' }}
+                  >
+                    Go to Notes
+                  </button>
+                  <button
+                    onClick={() => {
+                      const data = {
+                        template: { id: template.id, name: template.name },
+                        anchor: anchorValue,
+                        completedAt: new Date().toISOString(),
+                        steps: template.steps.map((s, i) => ({
+                          index: i,
+                          label: s.label,
+                          panel: s.panel,
+                          notes: stepNotes[i] ?? '',
+                          completed: completedSteps.has(i),
+                        })),
+                      }
+                      const blob = new Blob([JSON.stringify(data, null, 2)], {
+                        type: 'application/json',
+                      })
+                      const url = window.URL.createObjectURL(blob)
+                      const a = document.createElement('a')
+                      a.href = url
+                      a.download = `${template.id}-${Date.now()}.mkt-study.json`
+                      a.click()
+                      window.URL.revokeObjectURL(url)
+                    }}
+                    className="text-xs px-3 py-1 rounded-lg font-medium border transition-colors hover:opacity-80"
+                    style={{
+                      borderColor: 'var(--ae-green-600, #16a34a)',
+                      color: 'var(--ae-green-700, #15803d)',
+                    }}
+                  >
+                    📥 Download Study
+                  </button>
+                  <button
+                    onClick={() => {
+                      const lines: string[] = [
+                        `📖 Study: ${template.name}`,
+                        anchorValue ? `Anchor: ${anchorValue}` : '',
+                        `Completed: ${new Date().toLocaleString()}`,
+                        '',
+                        ...template.steps.map((s, i) =>
+                          [
+                            `Step ${i + 1}: ${s.label}`,
+                            stepNotes[i] ? `Notes: ${stepNotes[i]}` : '',
+                          ]
+                            .filter(Boolean)
+                            .join('\n')
+                        ),
+                      ]
+                      void navigator.clipboard.writeText(lines.join('\n'))
+                    }}
+                    className="text-xs px-3 py-1 rounded-lg font-medium border transition-colors hover:opacity-80"
+                    style={{
+                      borderColor: 'var(--ae-green-600, #16a34a)',
+                      color: 'var(--ae-green-700, #15803d)',
+                    }}
+                  >
+                    📋 Copy to Clipboard
+                  </button>
+                </div>
               </div>
             )}
           </div>
@@ -463,13 +606,11 @@ export default function StudyTemplates(): React.ReactElement {
       style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }}
     >
       {/* Header */}
-      <div
-        className="px-6 py-4 border-b"
-        style={{ borderColor: 'var(--border-color)' }}
-      >
+      <div className="px-6 py-4 border-b" style={{ borderColor: 'var(--border-color)' }}>
         <h1 className="text-base font-semibold">Study Templates</h1>
         <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
-          Structured workflows to guide deep study of any topic, verse, word, or jurisprudential question.
+          Structured workflows to guide deep study of any topic, verse, word, or jurisprudential
+          question.
         </p>
       </div>
 

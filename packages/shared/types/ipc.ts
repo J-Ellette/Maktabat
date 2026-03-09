@@ -41,6 +41,7 @@ export const IpcChannel = {
   USER_ADD_KHUTBAH_MATERIAL: 'user:add-khutbah-material',
   USER_GET_KHUTBAH_MATERIALS: 'user:get-khutbah-materials',
   USER_REMOVE_KHUTBAH_MATERIAL: 'user:remove-khutbah-material',
+  USER_GET_KHUTBAHS_FOR_VERSE: 'user:get-khutbahs-for-verse',
   AUDIO_PLAY: 'audio:play',
   AUDIO_PAUSE: 'audio:pause',
   SETTINGS_GET: 'settings:get',
