@@ -42,6 +42,25 @@ const validChannels = [
   'library:search-factbook',
   'library:get-factbook-entry',
   'library:get-factbook-ayah-refs',
+  // Account (Phase 11)
+  'account:sign-up',
+  'account:sign-in',
+  'account:sign-out',
+  'account:get-profile',
+  'account:update-display-name',
+  // Sync (Phase 11)
+  'sync:export-bundle',
+  'sync:import-bundle',
+  'sync:get-status',
+  'sync:trigger',
+  // Resource Manager (Phase 12)
+  'resource:get-installed',
+  'resource:get-available',
+  'resource:install',
+  'resource:uninstall',
+  'resource:import-mkt',
+  'resource:import-epub',
+  'resource:import-pdf',
 ] as const
 
 /** Channels that the main process can push to the renderer. */

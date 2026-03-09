@@ -1063,19 +1063,19 @@ Everything in Premium, plus:
 
 #### Step 11.1 — Account System
 
-- [ ] Sign up / Sign in (email + password, Google SSO)
+- [x] Sign up / Sign in (email + password, Google SSO)
 - [ ] Subscription management (Stripe integration)
-- [ ] License validation (offline grace period: 7 days)
-- [ ] Multi-device licensing (up to 3 devices per account)
+- [x] License validation (offline grace period: 7 days)
+- [x] Multi-device licensing (up to 3 devices per account)
 
 #### Step 11.2 — Cloud Sync (Optional)
 
-- [ ] Sync: Notes, highlights, bookmarks, reading progress, khutbahs
-- [ ] Conflict resolution: last-write-wins with merge prompts for conflicts
-- [ ] Sync status indicator
-- [ ] Full offline mode: app fully functional without internet
-- [ ] Export entire personal library (backup as .mkt bundle)
-- [ ] Import .mkt bundle on new device
+- [x] Sync: Notes, highlights, bookmarks, reading progress, khutbahs
+- [x] Conflict resolution: last-write-wins with merge prompts for conflicts
+- [x] Sync status indicator
+- [x] Full offline mode: app fully functional without internet
+- [x] Export entire personal library (backup as .mkt bundle)
+- [x] Import .mkt bundle on new device
 
 ---
 
@@ -1083,17 +1083,17 @@ Everything in Premium, plus:
 
 #### Step 12.1 — Library Manager
 
-- [ ] Installed resources list with storage size
-- [ ] Available resources browser (by category, tier, language)
-- [ ] Download individual resources or bundles
-- [ ] Resource detail page: author bio, contents, reviews
-- [ ] Uninstall to free space
+- [x] Installed resources list with storage size
+- [x] Available resources browser (by category, tier, language)
+- [x] Download individual resources or bundles
+- [x] Resource detail page: author bio, contents, reviews
+- [x] Uninstall to free space
 
 #### Step 12.2 — Resource Import
 
-- [ ] Import third-party resources in MKT format
-- [ ] Import from EPUB (with Quran/Hadith detection)
-- [ ] Import personal PDFs (for annotation, not cross-linking)
+- [x] Import third-party resources in MKT format
+- [x] Import from EPUB (with Quran/Hadith detection)
+- [x] Import personal PDFs (for annotation, not cross-linking)
 
 ---
 

@@ -235,6 +235,39 @@ export default function CommandPalette({
         closePalette()
       },
     },
+    {
+      id: 'nav-library',
+      label: 'Open Library Manager',
+      category: 'navigate',
+      icon: '📚',
+      keywords: 'library resources install download epub pdf mkt',
+      action: () => {
+        void navigate('/library')
+        closePalette()
+      },
+    },
+    {
+      id: 'nav-account',
+      label: 'Open Account & Sign In',
+      category: 'navigate',
+      icon: '👤',
+      keywords: 'account sign in sign up login profile subscription',
+      action: () => {
+        void navigate('/account')
+        closePalette()
+      },
+    },
+    {
+      id: 'nav-sync',
+      label: 'Sync & Backup',
+      category: 'navigate',
+      icon: '🔄',
+      keywords: 'sync backup export import bundle mkt cloud',
+      action: () => {
+        void navigate('/sync')
+        closePalette()
+      },
+    },
   ]
 
   const filteredCommands = query

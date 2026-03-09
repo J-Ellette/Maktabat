@@ -243,6 +243,8 @@ function TreeNodeRow({ node, depth = 0 }: { node: TreeNode; depth?: number }) {
 }
 
 function LibrarySection() {
+  const navigate = useNavigate()
+
   return (
     <div className="flex flex-col gap-0.5 px-2">
       <div className="text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)] px-2 py-2">
@@ -251,6 +253,14 @@ function LibrarySection() {
       {libraryTree.map((node) => (
         <TreeNodeRow key={node.id} node={node} />
       ))}
+      <div className="mt-2 border-t border-[var(--border-color)] pt-2">
+        <button
+          onClick={() => void navigate('/library')}
+          className="w-full text-left px-2 py-2 text-xs text-[var(--accent-primary)] hover:bg-[var(--bg-secondary)] rounded-lg transition-colors"
+        >
+          📦 Manage Library Resources →
+        </button>
+      </div>
     </div>
   )
 }

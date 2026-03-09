@@ -48,6 +48,25 @@ export const IpcChannel = {
   LIBRARY_SEARCH_FACTBOOK: 'library:search-factbook',
   LIBRARY_GET_FACTBOOK_ENTRY: 'library:get-factbook-entry',
   LIBRARY_GET_FACTBOOK_AYAH_REFS: 'library:get-factbook-ayah-refs',
+  // ── Account System (Phase 11) ──────────────────────────────────────────────
+  ACCOUNT_SIGN_UP: 'account:sign-up',
+  ACCOUNT_SIGN_IN: 'account:sign-in',
+  ACCOUNT_SIGN_OUT: 'account:sign-out',
+  ACCOUNT_GET_PROFILE: 'account:get-profile',
+  ACCOUNT_UPDATE_DISPLAY_NAME: 'account:update-display-name',
+  // ── Cloud Sync (Phase 11) ─────────────────────────────────────────────────
+  SYNC_EXPORT_BUNDLE: 'sync:export-bundle',
+  SYNC_IMPORT_BUNDLE: 'sync:import-bundle',
+  SYNC_GET_STATUS: 'sync:get-status',
+  SYNC_TRIGGER: 'sync:trigger',
+  // ── Library / Resource Manager (Phase 12) ─────────────────────────────────
+  RESOURCE_GET_INSTALLED: 'resource:get-installed',
+  RESOURCE_GET_AVAILABLE: 'resource:get-available',
+  RESOURCE_INSTALL: 'resource:install',
+  RESOURCE_UNINSTALL: 'resource:uninstall',
+  RESOURCE_IMPORT_MKT: 'resource:import-mkt',
+  RESOURCE_IMPORT_EPUB: 'resource:import-epub',
+  RESOURCE_IMPORT_PDF: 'resource:import-pdf',
 } as const
 
 export type IpcChannelType = (typeof IpcChannel)[keyof typeof IpcChannel]
@@ -402,4 +421,97 @@ export interface FactbookAyahRef {
   surah_number: number
   ayah_number: number
   arabic_text: string
+}
+
+// ─── Account System (Phase 11) ───────────────────────────────────────────────
+
+export type AccountTier = 'free' | 'student' | 'scholar' | 'institution'
+
+export interface AccountProfile {
+  id: number
+  email: string
+  displayName: string | null
+  tier: AccountTier
+  licenseKey: string | null
+  licenseExpiresAt: string | null
+  isLicenseValid: boolean
+}
+
+export interface SignUpRequest {
+  email: string
+  password: string
+  displayName?: string
+}
+
+export interface SignInRequest {
+  email: string
+  password: string
+}
+
+export interface AccountAuthResponse {
+  token: string
+  profile: AccountProfile
+}
+
+// ─── Sync (Phase 11) ─────────────────────────────────────────────────────────
+
+export type SyncStatus = 'idle' | 'syncing' | 'synced' | 'error' | 'offline'
+
+export interface SyncState {
+  status: SyncStatus
+  lastSyncAt: string | null
+  errorMessage: string | null
+  pendingChanges: number
+}
+
+export interface ExportBundleRequest {
+  outputPath: string
+}
+
+export interface ImportBundleRequest {
+  bundlePath: string
+}
+
+export interface ImportBundleResult {
+  imported: Record<string, number>
+  conflicts: number
+}
+
+// ─── Resource Manager (Phase 12) ─────────────────────────────────────────────
+
+export type ResourceCategory = 'quran' | 'hadith' | 'tafsir' | 'fiqh' | 'linguistics' | 'sirah'
+export type ResourceTier = 'free' | 'student' | 'scholar'
+export type DownloadStatus = 'installed' | 'available' | 'downloading' | 'error'
+
+export interface InstalledResource {
+  key: string
+  name: string
+  category: ResourceCategory
+  sizeBytes: number
+  installedAt: string
+}
+
+export interface AvailableResource {
+  key: string
+  name: string
+  nameArabic: string
+  category: ResourceCategory
+  tier: ResourceTier
+  author: string
+  century: number | null
+  description: string
+  sizeBytes: number
+  status: DownloadStatus
+  downloadUrl: string | null
+}
+
+export interface ImportResourceRequest {
+  filePath: string
+}
+
+export interface ImportResourceResult {
+  success: boolean
+  resourceKey: string
+  message: string
+  recordsImported?: number
 }
