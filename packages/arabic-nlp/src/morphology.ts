@@ -50,9 +50,9 @@ function detectWazan(stripped: string, withDiacritics: string): { form: number; 
   // Form VI: تَفَاعَلَ — starts with تفا/يتفا
   if (stripped.startsWith('تفا') || stripped.startsWith('يتفا')) return { form: 6, wazan: 'تَفَاعَلَ' }
 
-  // Form IV: أَفْعَلَ / يُفْعِلُ — starts with أ/أف or يُفْ
-  if (stripped.startsWith('أف') || stripped.startsWith('اف') && len === 5) {
-    // Distinguish from Form VIII and Form VII
+  // Form IV: أَفْعَلَ / يُفْعِلُ — starts with أف/اف (4–5 chars stripped)
+  if ((stripped.startsWith('أف') || stripped.startsWith('اف')) && len <= 5) {
+    // Distinguish from Form VIII (افت) and Form VII (انف)
     if (!stripped.startsWith('افت') && !stripped.startsWith('انف')) {
       return { form: 4, wazan: 'أَفْعَلَ' }
     }

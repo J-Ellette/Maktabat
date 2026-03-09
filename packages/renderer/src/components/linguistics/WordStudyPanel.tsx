@@ -40,7 +40,14 @@ function posLabel(pos: string): string {
   return map[pos] ?? pos
 }
 
-// ─── Section card component ───────────────────────────────────────────────────
+// ─── Static color class map (Tailwind JIT needs static strings) ──────────────
+const CHIP_HOVER_CLASSES: Record<string, string> = {
+  blue: 'hover:bg-blue-50 dark:hover:bg-blue-900/20',
+  red: 'hover:bg-red-50 dark:hover:bg-red-900/20',
+  amber: 'hover:bg-amber-50 dark:hover:bg-amber-900/20',
+}
+
+
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -353,7 +360,7 @@ export default function WordStudyPanel(): React.ReactElement {
                       onClick={() =>
                         void navigate(`/word-study?word=${encodeURIComponent(w)}&root=${encodeURIComponent(w)}`)
                       }
-                      className={`px-3 py-1 rounded-full text-sm border transition-colors hover:bg-${color}-50 dark:hover:bg-${color}-900/20`}
+                      className={`px-3 py-1 rounded-full text-sm border transition-colors ${CHIP_HOVER_CLASSES[color] ?? ''}`}
                       style={{ borderColor: 'var(--border-color)' }}
                       dir="rtl"
                     >
