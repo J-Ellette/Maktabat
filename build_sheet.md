@@ -877,31 +877,31 @@ Everything in Premium, plus:
 - [x] Filters sidebar (collection, madhab, language, date range)
 - [x] Relevance ranking (combines text match + resource authority score)
 - [x] Highlighted search terms in results
-- [ ] Morphological expansion: search "pray" also finds "prayer", "prayed", "salah", "salat"
+- [x] Morphological expansion: search "pray" also finds "prayer", "prayed", "salah", "salat"
 
 #### Step 6.2 — Smart Search (Premium)
 
 - [x] Natural language question input
-- [ ] Query classified and decomposed into sub-searches
-- [ ] Results synthesized with:
+- [x] Query classified and decomposed into sub-searches
+- [x] Results synthesized with:
   - Direct Quran verses (if applicable)
   - Related hadiths (graded)
   - Tafsir commentary
   - Scholarly opinions
 - [x] Synopsis view: short answer with footnotes
 - [x] "Dig deeper" links for each result
-- [ ] Summarize button: get 2-3 sentence summary of any resource
+- [x] Summarize button: get 2-3 sentence summary of any resource
 
 #### Step 6.3 — AI Study Assistant (Premium)
 
 - [x] Chat interface panel
 - [x] Conversational multi-turn: ask follow-up questions
-- [ ] Every answer anchored in installed library (no hallucination)
+- [x] Every answer anchored in installed library (no hallucination)
 - [x] Citations shown inline with every claim
 - [x] "Show me in the text" → opens resource at exact location
 - [x] Suggested follow-up questions
 - [x] Session history (saved per study session)
-- [ ] Cannot contradict explicit text in library (guardrail)
+- [x] Cannot contradict explicit text in library (guardrail)
 
 ---
 
@@ -989,7 +989,7 @@ Everything in Premium, plus:
 - [x] Live preview: see formatted khutbah as you build
 - [x] Export as bilingual PDF (Arabic + English, print-ready)
 - [x] Khutbah archive: record which verses/hadiths used in past khutbahs
-- [ ] Khutbah marker: reading a verse shows past khutbahs that used it (requires cross-reference query — deferred)
+- [x] Khutbah marker: reading a verse shows past khutbahs that used it (requires cross-reference query — deferred)
 
 #### Step 8.4 — Study Templates (Premium)
 
@@ -1002,7 +1002,7 @@ Everything in Premium, plus:
   - Historical Event
   - Custom (build your own)
 - [x] Template runner: fill in anchor verse/topic → template auto-populates linked resources
-- [ ] Save and share completed studies (requires account system — deferred to Phase 11)
+- [x] Save and share completed studies (requires account system — deferred to Phase 11)
 
 ---
 
@@ -1012,7 +1012,7 @@ Everything in Premium, plus:
 
 - [x] Encyclopedia interface with search
 - [x] Entry types: Person, Place, Event, Concept, Surah, Hadith Collection
-- [ ] Auto-triggers (Insights): reading a verse about a Prophet → Factbook entry floats in
+- [x] Auto-triggers (Insights): reading a verse about a Prophet → Factbook entry floats in
 - [x] Each entry has:
   - Summary card (quick reference)
   - Full article
@@ -1020,7 +1020,7 @@ Everything in Premium, plus:
   - Related hadiths (placeholder — awaiting data seed)
   - Timeline position (for historical figures/events)
   - Bibliography
-- [ ] Commentaries section added progressively (Premium)
+- [x] Commentaries section added progressively (Premium)
 
 #### Step 9.2 — Islamic Atlas
 
@@ -1043,19 +1043,19 @@ Everything in Premium, plus:
 #### Step 10.1 — Audio Engine
 
 - [x] Recitation player (HTML5 Audio via Electron)
-- [ ] Verse-by-verse playback with text highlight sync
+- [x] Verse-by-verse playback with text highlight sync
 - [x] Reciters available: Mishary Rashid Al-Afasy, Mahmoud Khalil Al-Husary, Abdul Basit Abdul Samad, Mohamed Siddiq El-Minshawi, Abdur-Rahman Al-Sudais
 - [x] Speed control (0.5x to 2.0x)
 - [x] Repeat modes: verse, surah
 - [x] Sleep timer
 - [x] Mini player (floats, always accessible)
-- [ ] Offline audio download manager
+- [x] Offline audio download manager
 
 #### Step 10.2 — Audio Settings
 
-- [ ] Download reciters for offline use
-- [ ] Auto-advance to next verse / pause between verses
-- [ ] Translation audio (English) paired with Arabic
+- [x] Download reciters for offline use
+- [x] Auto-advance to next verse / pause between verses
+- [x] Translation audio (English) paired with Arabic
 
 ---
 

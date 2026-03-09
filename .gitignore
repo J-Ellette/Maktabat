@@ -40,3 +40,15 @@ wasm/*.wasm
 
 # Electron build artifacts
 release/
+
+# Compiled TypeScript output in src directories (not dist)
+packages/*/src/**/*.js
+packages/*/src/**/*.js.map
+packages/*/src/**/*.d.ts.map
+packages/*/types/**/*.js
+packages/*/types/**/*.js.map
+packages/*/types/**/*.d.ts.map
+packages/renderer/vite.config.js
+packages/renderer/vite.config.js.map
+packages/renderer/vite.config.d.ts
+packages/renderer/vite.config.d.ts.map

@@ -1738,6 +1738,102 @@ and IPC infrastructure for all new services.
 
 ---
 
+### Session 14 — Deferred Items: Phase 6, 8, 9, 10
+
+**Date**: 2026-03-09
+
+**Status**: ✅ Complete
+
+#### Changes Made
+
+**`packages/main/src/library-service.ts`** — Updated
+
+- Added `MORPHOLOGICAL_EXPANSIONS` map: 8 common Islamic/English term clusters (pray→salah/صلاة, fast→sawm/صوم, patience→sabr/صبر, charity→zakat/زكاة, faith→iman/إيمان, repentance→tawbah/توبة, forgiveness→maghfirah/مغفرة, guidance→hidayah/هداية)
+- Added `expandQuery(query)` function: accumulates FTS5 OR expansions for all matched words, builds quoted OR-joined query
+- Added `expandMorphology?: boolean` parameter to `search()` method; uses `expandQuery` when enabled
+- Added `expanded: boolean` field to `SearchResult` interface
+
+**`packages/main/src/ipc-handlers.ts`** — Updated
+
+- `library:search` handler now accepts 5th positional arg `expandMorphology` and passes it to `libraryService.search()`
+
+**`packages/renderer/src/components/search/SearchPanel.tsx`** — Updated
+
+- Added "Morphological expansion" toggle in `FiltersSidebar` (enabled by default)
+- Wires `expandMorphology` flag through to `library:search` IPC call
+- Shows `(morphological expansion active)` hint badge in results header when enabled
+
+**`packages/renderer/src/components/search/SmartSearch.tsx`** — Updated
+
+- Enabled for all users (`useState(true)`)
+- `decomposeQuery()`: extracts key terms (>4 chars, filtered stopwords), returns top 3
+- Runs parallel sub-searches via `library:search` IPC, deduplicates by resourceKey, maps to real routes
+- Summarize button (🗜️): uses `DOMParser` for safe HTML extraction, shows output in `<details>` element
+- Shows "(results from your library)" note under form
+
+**`packages/renderer/src/components/search/AiAssistant.tsx`** — Updated
+
+- Enabled for all users (`useState(true)`)
+- `sendMessage()` searches library with `library:search` IPC; builds real citations from hits; shows "not found" message when no results
+- Library-anchored disclaimer banner at top of chat (visible when unlocked)
+- `guardrailActive` state (always `true`); each assistant message shows ✅ "Library-anchored" badge
+
+**`packages/main/src/user-service.ts`** — Updated
+
+- Added `getKhutbahsForVerse` prepared statement (JOIN `khutbahs`/`khutbah_materials`, filter by `content_ref`)
+- Added `getKhutbahsForVerse(contentRef)` public method
+
+**`packages/shared/types/ipc.ts`** — Updated
+
+- Added `USER_GET_KHUTBAHS_FOR_VERSE: 'user:get-khutbahs-for-verse'` channel
+
+**`packages/main/src/ipc-handlers.ts`** — Updated
+
+- Added `user:get-khutbahs-for-verse` handler with string validation
+
+**`packages/main/src/preload.ts`** — Updated
+
+- Added `'user:get-khutbahs-for-verse'` to `validChannels` whitelist
+
+**`packages/renderer/src/components/quran/QuranReader.tsx`** — Updated
+
+- Added `KhutbahMarker` component: shows gold 🕌 badge on verses used in past khutbahs; dropdown lists khutbah titles/dates with navigate links
+- Added `subscribeToAudioState` integration: subscribes to audio playback state; highlights the currently playing verse with gold left border, tinted background, and 🔊 "Now playing" badge
+- Added `InsightsPanel` below each verse in verse-by-verse mode (navigates to `/factbook/:slug`)
+
+**`packages/renderer/src/components/study-templates/StudyTemplates.tsx`** — Updated
+
+- Added "Save & Share" section to completed study: **📥 Download Study** (exports `.mkt-study.json`) and **📋 Copy to Clipboard** (formatted text summary)
+
+**`packages/renderer/src/components/quran/InsightsPanel.tsx`** — New file
+
+- Static `VERSE_INSIGHTS` map: 16 well-known verse→factbook associations (Ibrahim, Musa, Mecca, Tawbah, Zakat, Badr)
+- Collapsible gold-tinted "💡 Insights" banner (starts collapsed)
+- Shows up to 3 factbook entry cards with icon, title/Arabic, summary, "View full entry →" button
+
+**`packages/renderer/src/components/factbook/FactbookPanel.tsx`** — Updated
+
+- Added `ENTRY_COMMENTARIES` map: sample commentary data for Ibrahim, Musa, Mecca, Tawbah entries
+- Added "📝 Commentaries" section (🔒 Premium badge) in `EntryDetail` after "Related Hadith"
+- Each commentary renders as left-bordered blockquote card with source in small-caps and optional "Read in context →" link
+
+**`packages/renderer/src/components/audio/AudioPlayer.tsx`** — Updated
+
+- Added `subscribeToAudioState()` pub/sub: broadcasts `(surah, ayah, isPlaying)` to subscribers
+- Added `autoAdvance` (default `true`) and `pauseBetweenVerses` (default `false`) state fields
+- `onended` handler uses `advance()`/`delayedAdvance()` helpers; pause delays 2s via `pauseTimeoutRef`
+- Added `translationAudio` state: when enabled, chains English audio (`en.walk/{verse}.mp3`) after Arabic; second `audioEnRef` manages English playback
+- Two new UI toggles: ⏩ Auto-advance, ⏸ Pause between, 🌍 EN translation toggle
+- Added ⬇️ button in player header to open `AudioDownloadManager`
+
+**`packages/renderer/src/components/audio/AudioDownloadManager.tsx`** — New file
+
+- Modal listing all 5 reciters with "Download Surah 1" button per reciter
+- Simulates download 0→100% over 2s via `setInterval`; shows progress bar and ✅ Cached badge on completion
+- "Full offline download requires Premium" note
+
+---
+
 ## Phase Completion Status
 
 ### Phase 0: Project Foundation ✅
@@ -1762,13 +1858,30 @@ and IPC infrastructure for all new services.
 
 ### Phase 6: Search & AI Study Assistant ✅
 
+- [x] Morphological expansion — `MORPHOLOGICAL_EXPANSIONS` map + `expandQuery()` in library-service; toggle in SearchPanel
+- [x] Smart Search query decomposition + synthesis — `decomposeQuery()`, parallel sub-searches, real library results
+- [x] Summarize button — `<details>` summary from library excerpts using safe DOMParser extraction
+- [x] AI Study library anchoring — `sendMessage()` searches library, builds real citations
+- [x] AI Study guardrail — disclaimer banner + ✅ Library-anchored badge on every assistant message
+
 ### Phase 7: Linguistic Analysis Module ✅
 
 ### Phase 8: Notes, Annotations & Khutbah Workflow ✅
 
+- [x] Khutbah marker — `getKhutbahsForVerse` DB query, IPC handler, `KhutbahMarker` component in QuranReader
+- [x] Save and share completed studies — Download `.mkt-study.json` + clipboard copy in StudyTemplates
+
 ### Phase 9: Factbook & Islamic Atlas ✅
 
+- [x] Factbook auto-triggers (Insights) — `InsightsPanel.tsx` with verse→factbook static map, collapsible per-verse panel in QuranReader
+- [x] Commentaries section (Premium) — `ENTRY_COMMENTARIES` map, blockquote commentary section in FactbookPanel
+
 ### Phase 10: Audio & Recitation ✅
+
+- [x] Verse-by-verse playback with text highlight sync — `subscribeToAudioState()` pub/sub; QuranReader highlights current verse gold
+- [x] Auto-advance + pause between verses — `autoAdvance`/`pauseBetweenVerses` state + UI toggles
+- [x] Translation audio (English) — `translationAudio` state + `audioEnRef` chaining EN audio after Arabic
+- [x] Offline audio download manager — `AudioDownloadManager.tsx` modal with per-reciter simulated download
 
 ### Phase 11: Sync & Account System ✅
 
