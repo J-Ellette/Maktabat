@@ -314,16 +314,16 @@ function SchematicMap({
 
       {/* Site markers */}
       {sites.map((site) => {
-        const x = (site.lng / 100) * 800
-        const y = (site.lat / 100) * 450
+        const markerX = (site.lng / 100) * 800
+        const markerY = (site.lat / 100) * 450
         const isSelected = selectedSite?.id === site.id
         const color =
           site.type === 'battle' ? '#dc2626' : site.type === 'pilgrimage' ? '#16a34a' : '#b8860b'
         return (
           <g key={site.id} onClick={() => onSelectSite(site)} style={{ cursor: 'pointer' }}>
             <circle
-              cx={x}
-              cy={y}
+              cx={markerX}
+              cy={markerY}
               r={isSelected ? 10 : 7}
               fill={color}
               stroke="white"
@@ -331,7 +331,7 @@ function SchematicMap({
               opacity={isSelected ? 1 : 0.85}
             />
             {isSelected && (
-              <circle cx={x} cy={y} r={14} fill="none" stroke={color} strokeWidth="2" opacity="0.5">
+              <circle cx={markerX} cy={markerY} r={14} fill="none" stroke={color} strokeWidth="2" opacity="0.5">
                 <animate attributeName="r" from="10" to="18" dur="1.5s" repeatCount="indefinite" />
                 <animate
                   attributeName="opacity"
@@ -343,8 +343,8 @@ function SchematicMap({
               </circle>
             )}
             <text
-              x={x}
-              y={y - 12}
+              x={markerX}
+              y={markerY - 12}
               textAnchor="middle"
               fontSize="9"
               fill="var(--text-primary)"

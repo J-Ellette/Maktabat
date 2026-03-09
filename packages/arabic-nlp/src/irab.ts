@@ -69,11 +69,11 @@ const CASE_LABELS: Record<string, { en: string; ar: string }> = {
 
 function getCaseFromMarker(caseMarker: string | null | undefined): string {
   if (!caseMarker) return 'nom'
-  const m = caseMarker.toLowerCase()
-  if (m.includes('u') || m.includes('nom') || m.includes('raf')) return 'nom'
-  if (m.includes('a') || m.includes('acc') || m.includes('nas')) return 'acc'
-  if (m.includes('i') || m.includes('gen') || m.includes('jar')) return 'gen'
-  if (m.includes('jus') || m.includes('jaz')) return 'jus'
+  const normalizedMarker = caseMarker.toLowerCase()
+  if (normalizedMarker.includes('u') || normalizedMarker.includes('nom') || normalizedMarker.includes('raf')) return 'nom'
+  if (normalizedMarker.includes('a') || normalizedMarker.includes('acc') || normalizedMarker.includes('nas')) return 'acc'
+  if (normalizedMarker.includes('i') || normalizedMarker.includes('gen') || normalizedMarker.includes('jar')) return 'gen'
+  if (normalizedMarker.includes('jus') || normalizedMarker.includes('jaz')) return 'jus'
   return 'nom'
 }
 

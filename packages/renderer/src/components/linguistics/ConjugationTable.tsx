@@ -44,14 +44,14 @@ function FormTable({
   table: ConjugationTable
   onCellClick: (cell: ConjugationCell) => void
 }) {
-  const past = table.tenses.find((t) => t.tense === 'past')
-  const present = table.tenses.find((t) => t.tense === 'present')
-  const imperative = table.tenses.find((t) => t.tense === 'imperative')
+  const past = table.tenses.find((tense) => tense.tense === 'past')
+  const present = table.tenses.find((tense) => tense.tense === 'present')
+  const imperative = table.tenses.find((tense) => tense.tense === 'imperative')
 
   const cellMap = (cells: ConjugationCell[] | undefined) => {
-    const m: Record<string, ConjugationCell> = {}
-    cells?.forEach((c) => { m[c.key] = c })
-    return m
+    const cellsByKey: Record<string, ConjugationCell> = {}
+    cells?.forEach((cellEntry) => { cellsByKey[cellEntry.key] = cellEntry })
+    return cellsByKey
   }
 
   const pastMap = cellMap(past?.forms)
@@ -239,9 +239,9 @@ export default function ConjugationTablePage(): React.ReactElement {
   }, [rootParam, activeForm])
 
   const handleSearch = useCallback(() => {
-    const r = rootInput.trim()
-    if (!r) return
-    setSearchParams({ root: r })
+    const trimmedRoot = rootInput.trim()
+    if (!trimmedRoot) return
+    setSearchParams({ root: trimmedRoot })
   }, [rootInput, setSearchParams])
 
   const handleCellClick = useCallback(

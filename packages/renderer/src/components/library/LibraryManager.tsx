@@ -86,7 +86,7 @@ function InstalledTab({ ipc }: { ipc: IpcBridge }): React.ReactElement {
     }
     ipc
       .invoke('resource:get-installed')
-      .then((r) => setResources(r as InstalledResource[]))
+      .then((installedResources) => setResources(installedResources as InstalledResource[]))
       .catch(() => {})
       .finally(() => setLoading(false))
   }, [ipc])
@@ -324,14 +324,14 @@ function AvailableTab({ ipc }: { ipc: IpcBridge }): React.ReactElement {
     const unsubscribe = ipc.on(
       'resource:download-progress',
       (...args: unknown[]) => {
-        const p = args[0] as { resourceKey: string; percentage: number; status: DownloadStatus; message?: string }
-        if (!p?.resourceKey) return
+        const progressEvent = args[0] as { resourceKey: string; percentage: number; status: DownloadStatus; message?: string }
+        if (!progressEvent?.resourceKey) return
         setDownloadProgress((prev) => ({
           ...prev,
-          [p.resourceKey]: { percentage: p.percentage, status: p.status, message: p.message },
+          [progressEvent.resourceKey]: { percentage: progressEvent.percentage, status: progressEvent.status, message: progressEvent.message },
         }))
         // When download completes, refresh the resource list
-        if (p.status === 'installed') {
+        if (progressEvent.status === 'installed') {
           void loadResources()
         }
       }

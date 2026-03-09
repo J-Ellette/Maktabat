@@ -143,15 +143,15 @@ function today(): string {
 }
 
 function addDays(dateStr: string, days: number): string {
-  const d = new Date(dateStr)
-  d.setDate(d.getDate() + days)
-  return d.toISOString().split('T')[0] ?? ''
+  const dateObj = new Date(dateStr)
+  dateObj.setDate(dateObj.getDate() + days)
+  return dateObj.toISOString().split('T')[0] ?? ''
 }
 
 function daysBetween(start: string, end: string): number {
-  const s = new Date(start)
-  const e = new Date(end)
-  return Math.max(0, Math.round((e.getTime() - s.getTime()) / 86_400_000))
+  const startDateObj = new Date(start)
+  const endDateObj = new Date(end)
+  return Math.max(0, Math.round((endDateObj.getTime() - startDateObj.getTime()) / 86_400_000))
 }
 
 function parseProgress(raw: string): ProgressData {
@@ -203,8 +203,8 @@ function ProgressRing({
   strokeWidth?: number
   color?: string
 }) {
-  const r = (size - strokeWidth) / 2
-  const circumference = 2 * Math.PI * r
+  const ringRadius = (size - strokeWidth) / 2
+  const circumference = 2 * Math.PI * ringRadius
   const offset = circumference - (percent / 100) * circumference
 
   return (
@@ -212,7 +212,7 @@ function ProgressRing({
       <circle
         cx={size / 2}
         cy={size / 2}
-        r={r}
+        r={ringRadius}
         fill="none"
         stroke="var(--border-color)"
         strokeWidth={strokeWidth}
@@ -220,7 +220,7 @@ function ProgressRing({
       <circle
         cx={size / 2}
         cy={size / 2}
-        r={r}
+        r={ringRadius}
         fill="none"
         stroke={color}
         strokeWidth={strokeWidth}
@@ -347,10 +347,10 @@ function ActivePlanDetail({
     ]
     const blob = new Blob([lines.join('\n')], { type: 'text/plain' })
     const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `${plan.key}-progress.txt`
-    a.click()
+    const downloadLink = document.createElement('a')
+    downloadLink.href = url
+    downloadLink.download = `${plan.key}-progress.txt`
+    downloadLink.click()
     URL.revokeObjectURL(url)
   }
 
@@ -358,10 +358,10 @@ function ActivePlanDetail({
   const calendarDays: { dateKey: string; label: string; done: boolean; isFuture: boolean }[] = []
   for (let i = -13; i <= 0; i++) {
     const dk = addDays(todayKey, i)
-    const d = new Date(dk)
+    const dateObj = new Date(dk)
     calendarDays.push({
       dateKey: dk,
-      label: d.getDate().toString(),
+      label: dateObj.getDate().toString(),
       done: progress.completedDays[dk] === true,
       isFuture: false,
     })
@@ -697,8 +697,8 @@ export default function ReadingPlansPanel(): React.ReactElement {
   // Overall stats
   const totalActive = activePlanKeys.size
   const totalStreak = planRows.reduce((max, r) => {
-    const p = parseProgress(r.progress_data)
-    return Math.max(max, computeStreak(p.completedDays))
+    const planProgress = parseProgress(r.progress_data)
+    return Math.max(max, computeStreak(planProgress.completedDays))
   }, 0)
 
   return (

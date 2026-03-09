@@ -80,11 +80,11 @@ export default function SyncPanel(): React.ReactElement {
     setImportResult(null)
     try {
       const result = await ipc.invoke('sync:import-bundle', importPath.trim())
-      const r = result as { imported: Record<string, number>; conflicts: number }
-      const summary = Object.entries(r.imported)
+      const importedData = result as { imported: Record<string, number>; conflicts: number }
+      const summary = Object.entries(importedData.imported)
         .map(([k, v]) => `${v} ${k}`)
         .join(', ')
-      setImportResult(`✅ Imported: ${summary || 'nothing new'}. Conflicts: ${r.conflicts}.`)
+      setImportResult(`✅ Imported: ${summary || 'nothing new'}. Conflicts: ${importedData.conflicts}.`)
     } catch (err: unknown) {
       setImportError(err instanceof Error ? err.message : 'Import failed.')
     }

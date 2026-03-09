@@ -537,10 +537,10 @@ function TemplateRunner({ template, onBack }: TemplateRunnerProps): React.ReactE
                         type: 'application/json',
                       })
                       const url = window.URL.createObjectURL(blob)
-                      const a = document.createElement('a')
-                      a.href = url
-                      a.download = `${template.id}-${Date.now()}.mkt-study.json`
-                      a.click()
+                      const downloadLink = document.createElement('a')
+                      downloadLink.href = url
+                      downloadLink.download = `${template.id}-${Date.now()}.mkt-study.json`
+                      downloadLink.click()
                       window.URL.revokeObjectURL(url)
                     }}
                     className="text-xs px-3 py-1 rounded-lg font-medium border transition-colors hover:opacity-80"

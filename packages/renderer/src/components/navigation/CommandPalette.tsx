@@ -274,12 +274,12 @@ export default function CommandPalette({
 
   const filteredCommands = query
     ? commands.filter((cmd) => {
-        const q = query.toLowerCase()
+        const lowerCaseQuery = query.toLowerCase()
         return (
-          cmd.label.toLowerCase().includes(q) ||
-          cmd.description?.toLowerCase().includes(q) ||
-          cmd.keywords?.toLowerCase().includes(q) ||
-          cmd.category.includes(q)
+          cmd.label.toLowerCase().includes(lowerCaseQuery) ||
+          cmd.description?.toLowerCase().includes(lowerCaseQuery) ||
+          cmd.keywords?.toLowerCase().includes(lowerCaseQuery) ||
+          cmd.category.includes(lowerCaseQuery)
         )
       })
     : commands
