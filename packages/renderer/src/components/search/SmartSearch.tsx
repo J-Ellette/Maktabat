@@ -306,8 +306,9 @@ export default function SmartSearch(): React.ReactElement {
     for (const section of sections) {
       const first = section.results[0]
       if (first) {
-        // Strip HTML tags from excerpt
-        const plain = first.excerpt.replace(/<[^>]+>/g, '')
+        // Use DOMParser to safely extract plain text from the HTML excerpt
+        const doc = new DOMParser().parseFromString(first.excerpt, 'text/html')
+        const plain = doc.body.textContent ?? ''
         lines.push(`According to ${first.title}: ${plain}`)
       }
     }
