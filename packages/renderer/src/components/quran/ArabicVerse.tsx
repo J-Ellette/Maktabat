@@ -28,6 +28,7 @@ export interface ArabicVerseProps {
   onAddNote?: (surah: number, ayah: number) => void
   onViewTafsir?: (surah: number, ayah: number) => void
   onViewHadith?: (surah: number, ayah: number) => void
+  onOpenWordStudy?: (word: WordMorphology, surah: number, ayah: number) => void
 }
 
 /** Map highlight colors to CSS background values */
@@ -60,6 +61,7 @@ export default function ArabicVerse({
   onAddNote,
   onViewTafsir,
   onViewHadith,
+  onOpenWordStudy,
 }: ArabicVerseProps): React.ReactElement {
   const ipc = useIpc()
 
@@ -222,9 +224,7 @@ export default function ArabicVerse({
             word={activeWord}
             onOpenWordStudy={(w) => {
               setActiveWord(null)
-              onViewTafsir?.(surahNumber, ayahNumber)
-              // TODO: open dedicated Word Study panel
-              void w
+              onOpenWordStudy?.(w, surahNumber, ayahNumber)
             }}
           />
         </div>

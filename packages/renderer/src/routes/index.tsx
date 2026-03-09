@@ -7,6 +7,9 @@ const QuranReader = lazy(() => import('../components/quran/QuranReader'))
 const TafsirViewer = lazy(() => import('../components/tafsir/TafsirViewer'))
 const HadithBrowser = lazy(() => import('../components/hadith/HadithBrowser'))
 const SearchPanel = lazy(() => import('../components/search/SearchPanel'))
+const WordStudyPanel = lazy(() => import('../components/linguistics/WordStudyPanel'))
+const IrabViewer = lazy(() => import('../components/linguistics/IrabViewer'))
+const ConjugationTable = lazy(() => import('../components/linguistics/ConjugationTable'))
 const PlaceholderRoute = lazy(() => import('./PlaceholderRoute'))
 
 function RouteSpinner() {
@@ -37,6 +40,10 @@ export default function AppRoutes(): React.ReactElement {
         <Route path="/tafsir/:surah/:ayah" element={<TafsirViewer />} />
         {/* Search module — Phase 6 */}
         <Route path="/search" element={<SearchPanel />} />
+        {/* Linguistics module — Phase 7 */}
+        <Route path="/word-study" element={<WordStudyPanel />} />
+        <Route path="/irab/:surah/:ayah" element={<IrabViewer />} />
+        <Route path="/conjugation" element={<ConjugationTable />} />
         <Route path="/library" element={<PlaceholderRoute title="Library Manager" />} />
         <Route path="/reading-plans" element={<PlaceholderRoute title="Reading Plans" />} />
         <Route path="/bookmarks" element={<PlaceholderRoute title="Bookmarks" />} />

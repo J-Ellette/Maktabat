@@ -120,6 +120,13 @@ export interface MorphologyRow {
   root_meaning_english?: string | null
 }
 
+export interface OccurrenceRow {
+  surah_number: number
+  ayah_number: number
+  surface_form: string
+  pos: string
+}
+
 export interface SurahRow {
   id: number
   number: number
@@ -456,6 +463,25 @@ export class LibraryService {
 
   getMorphologyForAyah(ayahId: number): MorphologyRow[] {
     return this.stmts.getMorphologyForAyah.all(ayahId) as MorphologyRow[]
+  }
+
+  getWordOccurrences(root: string): OccurrenceRow[] {
+    try {
+      const rows = this.db
+        .prepare(
+          `SELECT s.number AS surah_number, a.ayah_number, wm.surface_form, wm.pos
+           FROM word_morphology wm
+           JOIN ayahs a ON wm.ayah_id = a.id
+           JOIN surahs s ON a.surah_id = s.id
+           JOIN arabic_roots ar ON wm.root_id = ar.id
+           WHERE ar.root_letters = ?
+           ORDER BY s.number, a.ayah_number`
+        )
+        .all(root) as OccurrenceRow[]
+      return rows
+    } catch {
+      return []
+    }
   }
 
   /**

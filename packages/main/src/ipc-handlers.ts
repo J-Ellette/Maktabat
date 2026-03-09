@@ -195,6 +195,13 @@ export function registerIpcHandlers(
     return libraryService.getMorphologyForAyah(id)
   })
 
+  // ── library:get-word-occurrences ────────────────────────────────────────────
+  ipcMain.handle('library:get-word-occurrences', (_event, root: unknown) => {
+    const r = assertString(root, 'root')
+    if (r.length > 10) throw new Error('root exceeds maximum length of 10 characters')
+    return libraryService.getWordOccurrences(r)
+  })
+
   // ── library:search ──────────────────────────────────────────────────────────
   ipcMain.handle(
     'library:search',

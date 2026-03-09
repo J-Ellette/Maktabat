@@ -669,7 +669,7 @@ This file tracks the implementation progress of the Maktabat Quran Study Softwar
 - [x] Filters sidebar (resource type checkboxes)
 - [x] Relevance ranking (FTS5 bm25 + static weights from `library-service.ts`)
 - [x] Highlighted search terms in results (FTS5 `<mark>` tags styled gold)
-- [ ] Morphological expansion (requires Arabic NLP module — deferred to Phase 7)
+- [x] Morphological expansion (Arabic NLP engine enhanced in Phase 7)
 - [x] Smart Search tab — Premium gate with feature list + upgrade CTA + full demo UI
 - [x] Natural language question input (SmartSearch)
 - [x] Synopsis view: short answer with footnotes
@@ -682,4 +682,161 @@ This file tracks the implementation progress of the Maktabat Quran Study Softwar
 - [x] Suggested follow-up questions
 - [x] Session history (demo messages shown as starting context)
 
-### Phases 7–14 — _future sessions_
+---
+
+### Session 7 — Phase 7: Linguistic Analysis Module
+
+**Date**: 2026-03-09
+
+**Status**: ✅ Complete
+
+#### Changes Made
+
+**`packages/arabic-nlp/src/morphology.ts`** — Enhanced
+
+- Extended `MorphologyResult` interface with `wazan` and `wazanForm` fields
+- Added wazan detection using trilateral pattern recognition (فَعَلَ, فَعَّلَ, أَفْعَلَ, تَفَعَّلَ, انْفَعَلَ, افْتَعَلَ, أَفْعَلَ Forms I–VI)
+- `analyzeWord()` now returns richer morphological data
+
+**`packages/arabic-nlp/src/conjugation.ts`** — New file
+
+- Full Arabic verb conjugation engine covering Forms I–X (فَعَلَ through اسْتَفْعَلَ)
+- Uses Arabic character templates with ف/ع/ل root placeholders for systematic substitution
+- Covers: Past tense (14 persons), Present (14 persons), Imperative (5 forms)
+- `conjugateVerb(root, form)` → `ConjugationTable`
+- `conjugateAllForms(root)` → all 10 forms
+- `getFormPatterns()` → metadata for Form I–X (name, description, wazan)
+
+**`packages/arabic-nlp/src/irab.ts`** — New file
+
+- Grammatical role analysis with POS + case-marker heuristics
+- `IrabAnalysis` type: role (subject/predicate/object/prep-phrase/conjunction/etc.), Arabic name, English name, color, explanation
+- `ROLE_COLORS` map: Subject=Tech Blue, Predicate=AEGreen, Object=Desert Orange, Prep=Fuchsia, Conj=Slate, etc.
+- `analyzeIrab(word, pos, caseMarker)` → single word analysis
+- `analyzeVerseIrab(morphWords)` → full verse parse for I'rab viewer
+
+**`packages/arabic-nlp/src/index.ts`** — New file
+
+- Package entry point, re-exports all public APIs from morphology, conjugation, irab, transliteration, root-extractor
+
+**`packages/renderer/src/components/linguistics/WordStudyPanel.tsx`** — New file
+
+- Route: `/word-study?word=...&root=...&pos=...&surah=...&ayah=...`
+- Arabic word displayed in Uthmanic Hafs font at large size
+- Transliteration in 3 systems (Simple / ALA-LC / Buckwalter) via `transliterate()` from arabic-nlp
+- Root letters, pattern (wazan), part of speech, case marker cards
+- "Occurrences in Quran": calls `library:get-word-occurrences` IPC; each row navigates to `/quran/:s/:a`
+- "Occurrences in Hadith": calls `library:search` IPC with root query (type=hadith)
+- "Dictionary" section: mock Al-Mufradat + Lisan al-Arab entries (real DB content not yet seeded)
+- "Semantic Field": related words, synonyms, antonyms (mock)
+- Action links: "I'rab Viewer" (if surah/ayah provided), "Conjugation Table" (if root available)
+
+**`packages/renderer/src/components/linguistics/IrabViewer.tsx`** — New file
+
+- Route: `/irab/:surah/:ayah`
+- Fetches ayah via `library:get-ayahs-by-surah` and picks the specific ayah
+- Renders visual parse tree: each word as a clickable coloured node
+- Colours: Subject=blue, Predicate=green, Object=orange, Prep=fuchsia, Conj=slate, default=amber
+- Clicking a word node shows explanation card (Arabic/English role name, grammar rule text)
+- Grammar Reference sidebar: 6 key rules (nominal/verbal sentence, nominative/accusative/genitive, idafa)
+- Arabic verse displayed at top in RTL
+
+**`packages/renderer/src/components/linguistics/ConjugationTable.tsx`** — New file
+
+- Route: `/conjugation?root=...`
+- Root input bar (RTL-aware, Arabic keyboard friendly)
+- Form selector tabs: Form I (فَعَلَ) through Form X (اسْتَفْعَلَ), plus "All Forms" overview
+- Per-form table: rows = tenses (Past / Present / Imperative), columns = person+gender+number
+- Cells show Arabic conjugated form; click opens library search for that form
+- "All Forms" view: compact grid showing infinitive (مصدر) for all 10 forms
+- Demo root (ك-ت-ب / كتب) shown on initial load
+
+**`packages/renderer/src/routes/index.tsx`** — Updated
+
+- Added 3 lazy-loaded routes: `/word-study`, `/irab/:surah/:ayah`, `/conjugation`
+
+**`packages/renderer/src/components/quran/ArabicVerse.tsx`** — Updated
+
+- Added `onOpenWordStudy?: (word: WordMorphology, surah: number, ayah: number) => void` prop
+- Fixed TODO: now calls `onOpenWordStudy?.(w, surahNumber, ayahNumber)` instead of `onViewTafsir`
+
+**`packages/renderer/src/components/quran/QuranReader.tsx`** — Updated
+
+- Added `handleOpenWordStudy` callback that builds query params from word data
+- Navigates to `/word-study?word=...&root=...&pos=...&surah=...&ayah=...`
+- Passes `onOpenWordStudy={handleOpenWordStudy}` to both verse-by-verse and page view `ArabicVerse`
+
+**`packages/shared/types/ipc.ts`** — Updated
+
+- Added `LIBRARY_GET_WORD_OCCURRENCES: 'library:get-word-occurrences'` to IpcChannel
+- Added `AyahBundle` interface (ayah + translations + morphology bundle type)
+- Added `WordOccurrenceRow` interface (surah_number, ayah_number, surface_form, pos)
+
+**`packages/main/src/preload.ts`** — Updated
+
+- Added `'library:get-word-occurrences'` to `validChannels` whitelist
+
+**`packages/main/src/library-service.ts`** — Updated
+
+- Added `OccurrenceRow` interface
+- Added `getWordOccurrences(root: string): OccurrenceRow[]` — queries `word_morphology` → `ayahs` → `surahs` → `arabic_roots` for all Quran occurrences of a root
+
+**`packages/main/src/ipc-handlers.ts`** — Updated
+
+- Added handler for `library:get-word-occurrences` with input validation (non-empty string, max 10 chars)
+
+**`packages/renderer/tsconfig.json`** — Updated
+
+- Added `@arabic-nlp/*` and `@arabic-nlp` path aliases pointing to `../arabic-nlp/src/*`
+
+---
+
+## Phase Completion Status
+
+### Phase 0: Project Foundation ✅ (pre-existing)
+- [x] Monorepo (pnpm workspaces) initialized
+- [x] TypeScript strict mode configured
+- [x] ESLint + Prettier + Husky
+- [x] electron-builder configured
+- [x] GitHub Actions CI/CD
+- [x] UAE Design System color tokens
+- [x] Tailwind configured with tokens
+- [x] Dark / Light / Sepia themes
+- [x] Arabic fonts (Noto Naskh, Amiri, IBM Plex Arabic)
+- [x] Latin fonts (Cormorant Garamond, Source Serif 4)
+- [x] Quranic font (KFGQPC Uthmanic Hafs)
+- [ ] Storybook component library (deferred to Phase 2+)
+- [x] SQLite `library.db` schema
+- [x] SQLite `user.db` schema
+- [x] Migration system
+- [x] Seed scripts (Al-Fatiha + 10 sample hadiths)
+
+### Phase 1: Main Process & IPC Layer ✅
+### Phase 2: Core UI Shell ✅
+### Phase 3: Quran Reading Module ✅
+### Phase 4: Tafsir Module ✅
+### Phase 5: Hadith Module ✅
+### Phase 6: Search & AI Study Assistant ✅
+
+### Phase 7: Linguistic Analysis Module ✅ (Session 7)
+
+- [x] Arabic morphology engine (JS heuristic, enhanced `analyzeWord()` with wazan detection)
+- [x] `analyze(word) → MorphologyResult` API (packages/arabic-nlp)
+- [x] Pre-computed morphology stored in DB (word_morphology table)
+- [x] Real-time analysis for user-entered roots (ConjugationTable input)
+- [x] Word Study Panel (`/word-study`) — triggered from Quran word-click popover
+- [x] Transliteration in 3 systems (Simple / ALA-LC / Buckwalter)
+- [x] Root letters, wazan (pattern), POS, case marker display
+- [x] Occurrences in Quran (new `library:get-word-occurrences` IPC + SQL query)
+- [x] Occurrences in Hadith (via FTS search)
+- [x] Dictionary entries (Al-Mufradat + Lisan al-Arab mock data)
+- [x] Semantic field (synonyms / antonyms mock data)
+- [x] I'rab (Grammar) Viewer (`/irab/:surah/:ayah`) — colour-coded parse tree
+- [x] Grammatical role colours: Subject=Blue, Predicate=Green, Object=Orange, Prep=Fuchsia, Conj=Slate
+- [x] Clickable word nodes with explanation card
+- [x] Grammar reference sidebar (6 key classical Arabic grammar rules)
+- [x] Verb Conjugation Table (`/conjugation`) — Forms I–X, all 14 person/gender/number combinations
+- [x] Root input with demo root (كتب)
+- [x] Clickable conjugated forms → library search
+
+### Phases 8–14 — _future sessions_

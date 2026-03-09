@@ -463,6 +463,19 @@ export default function QuranReader(): React.ReactElement {
     [navigate]
   )
 
+  const handleOpenWordStudy = useCallback(
+    (word: import('./WordPopover').WordMorphology, wSurah: number, wAyah: number) => {
+      const params = new URLSearchParams()
+      if (word.surfaceForm) params.set('word', word.surfaceForm)
+      if (word.rootLetters) params.set('root', word.rootLetters)
+      if (word.pos) params.set('pos', word.pos)
+      params.set('surah', String(wSurah))
+      params.set('ayah', String(wAyah))
+      void navigate(`/word-study?${params.toString()}`)
+    },
+    [navigate]
+  )
+
   // Collect all available translations from loaded data
   const availableTranslations: Translation[] =
     bundles.length > 0
@@ -599,6 +612,7 @@ export default function QuranReader(): React.ReactElement {
                             onAddNote={handleAddNote}
                             onViewTafsir={handleViewTafsir}
                             onViewHadith={handleViewHadith}
+                            onOpenWordStudy={handleOpenWordStudy}
                           />
                         </span>
                       )
@@ -676,6 +690,7 @@ export default function QuranReader(): React.ReactElement {
                           onAddNote={handleAddNote}
                           onViewTafsir={handleViewTafsir}
                           onViewHadith={handleViewHadith}
+                          onOpenWordStudy={handleOpenWordStudy}
                         />
 
                         {/* Translation(s) */}
