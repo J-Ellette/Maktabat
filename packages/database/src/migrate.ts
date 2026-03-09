@@ -57,8 +57,8 @@ export function runMigrations(options: MigrationOptions): void {
     // comments or string literals) so we can manage the transaction ourselves
     // and atomically record the migration version alongside the SQL changes.
     const sql = rawSql
-      .replace(/^\s*BEGIN\s+TRANSACTION\s*;\s*$/im, '')
-      .replace(/^\s*COMMIT\s*;\s*$/im, '')
+      .replace(/^\s*BEGIN\s+TRANSACTION\s*;\s*$/gim, '')
+      .replace(/^\s*COMMIT\s*;\s*$/gim, '')
 
     db.transaction(() => {
       db.exec(sql)

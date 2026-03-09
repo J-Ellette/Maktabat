@@ -204,3 +204,17 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ─── Touch target minimum sizes (WCAG 2.5.5 — 44×44px) ───────────────────── */
+/* Ensures interactive elements meet minimum touch target size for tablet/touch use */
+@media (pointer: coarse) {
+  button,
+  [role="button"],
+  a,
+  input[type="checkbox"],
+  input[type="radio"],
+  select {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}

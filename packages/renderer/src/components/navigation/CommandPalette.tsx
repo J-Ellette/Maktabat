@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useCommandPalette } from '../../hooks/useCommandPalette'
 import { useAppStore } from '../../store/app-store'
+import { useFocusTrap } from '../../hooks/useFocusTrap'
 import type { PanelLayout } from '../../store/app-store'
 
 interface CommandItem {
@@ -30,6 +31,7 @@ export default function CommandPalette({
   const [selectedIndex, setSelectedIndex] = useState(0)
   const inputRef = useRef<HTMLInputElement>(null)
   const listRef = useRef<HTMLUListElement>(null)
+  const dialogRef = useFocusTrap(open) as React.RefObject<HTMLDivElement>
 
   const commands: CommandItem[] = [
     // Navigation
@@ -358,7 +360,10 @@ export default function CommandPalette({
       />
 
       {/* Palette window */}
-      <div className="relative w-full max-w-xl bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-xl shadow-2xl overflow-hidden">
+      <div
+        ref={dialogRef}
+        className="relative w-full max-w-xl bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-xl shadow-2xl overflow-hidden"
+      >
         {/* Search input */}
         <div className="flex items-center gap-3 px-4 py-3 border-b border-[var(--border-color)]">
           <svg

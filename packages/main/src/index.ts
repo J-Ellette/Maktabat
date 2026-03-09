@@ -23,6 +23,8 @@ let syncService: SyncService
 let resourceManager: ResourceManagerService
 const windowManager = new WindowManager()
 let trayManager: TrayManager
+let memoryMonitor: ReturnType<typeof setInterval> | undefined
+let reminderTimer: ReturnType<typeof setInterval> | undefined
 
 // ─── Protocol: maktabat:// ─────────────────────────────────────────────────────
 
@@ -150,7 +152,54 @@ void app.whenReady().then(() => {
     userService.setSetting('app.firstRun', false)
     sendNotification('Maktabat', 'Welcome to Maktabat — مكتبة. Your library is ready.')
   }
+
+  // ─── Memory health monitor ────────────────────────────────────────────────────
+  // Log memory usage every 5 minutes; warn if heap exceeds 512 MB
+  const MEMORY_CHECK_INTERVAL_MS = 5 * 60 * 1000
+  const MEMORY_WARN_THRESHOLD_MB = 512
+  memoryMonitor = setInterval(() => {
+    const mem = process.memoryUsage()
+    const heapMB = Math.round(mem.heapUsed / 1024 / 1024)
+    const rssMB = Math.round(mem.rss / 1024 / 1024)
+    if (heapMB > MEMORY_WARN_THRESHOLD_MB) {
+      console.warn(`[Maktabat] High memory usage — heap: ${heapMB} MB, RSS: ${rssMB} MB`)
+    } else {
+      console.info(`[Maktabat] Memory OK — heap: ${heapMB} MB, RSS: ${rssMB} MB`)
+    }
+  }, MEMORY_CHECK_INTERVAL_MS).unref()
+
+  // ─── Reading plan reminder scheduler ─────────────────────────────────────────
+  // Check every minute whether a reading plan reminder should fire
+  reminderTimer = scheduleReadingPlanReminders()
 })
+
+function scheduleReadingPlanReminders(): ReturnType<typeof setInterval> {
+  const CHECK_INTERVAL_MS = 60 * 1000 // every minute
+  let lastFiredDate = ''
+
+  return setInterval(() => {
+    const remindersEnabled = userService?.getSetting<boolean>(
+      'notifications.readingPlanReminders',
+      true
+    )
+    if (!remindersEnabled) return
+
+    const reminderTime = userService?.getSetting<string>('notifications.reminderTime', '08:00')
+    const now = new Date()
+    const todayKey = now.toISOString().slice(0, 10)
+    const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`
+
+    // Fire at most once per day at the configured time
+    if (currentTime === reminderTime && lastFiredDate !== todayKey) {
+      lastFiredDate = todayKey
+      const plans = userService?.getAllReadingPlans() ?? []
+      if (plans.length > 0) {
+        const planKeys = plans.map((p) => p.plan_key).join(', ')
+        sendNotification('Maktabat — Reading Reminder', `Time for your daily reading: ${planKeys}`)
+      }
+    }
+  }, CHECK_INTERVAL_MS).unref()
+}
 
 // Handle .mkt files opened while app is already running (Windows second-instance)
 app.on('second-instance', (_event, argv) => {
@@ -170,6 +219,8 @@ app.on('window-all-closed', () => {
 })
 
 app.on('before-quit', () => {
+  clearInterval(memoryMonitor)
+  clearInterval(reminderTimer)
   trayManager?.destroy()
   libraryService?.close()
   userService?.close()
