@@ -230,6 +230,28 @@ function Toolbar({
 
       {/* Settings */}
       <button
+        onClick={() => void navigate('/account')}
+        aria-label="Account"
+        title="Account"
+        className="p-1.5 rounded hover:bg-[var(--bg-secondary)] text-[var(--text-secondary)] transition-colors flex-shrink-0"
+      >
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+          <circle cx="12" cy="7" r="4" />
+        </svg>
+      </button>
+
+      {/* Settings */}
+      <button
         onClick={() => void navigate('/settings')}
         aria-label="Open settings"
         title="Settings"

@@ -1246,6 +1246,107 @@ This file tracks the implementation progress of the Maktabat Quran Study Softwar
 
 ---
 
+## Session 11 — Phase 11: Sync & Account System + Phase 12: Library Manager
+
+**Goal**: Implement the account sign-up/sign-in system with local password auth, .mkt bundle
+export/import for offline backup, a full Library Manager UI with installed/available/import tabs,
+and IPC infrastructure for all new services.
+
+**Status**: ✅ Complete
+
+#### Changes Made
+
+**`packages/database/migrations/004_account_sync.sql`** — New file
+
+- `account` table: email, display_name, password_hash (PBKDF2), tier, license_key, license_expires_at, last_online_check
+- `sessions` table: token, device_label, expires_at (90-day sessions)
+- `sync_log` table: direction, entity_type, entity_id, status
+
+**`packages/main/src/account-service.ts`** — New file
+
+- `AccountService` class: sign-up (PBKDF2 password hashing), sign-in (constant-time compare), sign-out, get-profile-by-token, update-display-name
+- License validation with 7-day offline grace period
+- Session tokens (64-byte random hex, 90-day expiry)
+
+**`packages/main/src/sync-service.ts`** — New file
+
+- `SyncService` class: exportBundle (JSON .mkt format with notes/highlights/plans/khutbahs), importBundle (last-write-wins), triggerCloudSync (stub returning 'offline' status)
+- Bundle format: version 1, ISO exportedAt timestamp, all user entities
+
+**`packages/main/src/resource-manager.ts`** — New file
+
+- `ResourceManagerService` class: getInstalledResources (from library DB), getAvailableResources (curated static catalog of 13 resources), installResource (queue stub), uninstallResource (soft hide), importMktResource, importEpub, importPdf
+- Full catalog includes Quran (Hafs/Warsh), Bukhari, Muslim, Abu Dawood, Tirmidhi, Nawawi 40, Ibn Kathir tafsir, Tabari tafsir, al-Hidayah, al-Mughni, Ajurrumiyyah, Raheeq al-Makhtum
+
+**`packages/main/src/ipc-handlers.ts`** — Updated
+
+- Added 5 account channels: account:sign-up, account:sign-in, account:sign-out, account:get-profile, account:update-display-name
+- Added 4 sync channels: sync:get-status, sync:export-bundle, sync:import-bundle, sync:trigger
+- Added 7 resource channels: resource:get-installed, resource:get-available, resource:install, resource:uninstall, resource:import-mkt, resource:import-epub, resource:import-pdf
+- Updated registerIpcHandlers signature to accept AccountService, SyncService, ResourceManagerService (all optional)
+
+**`packages/main/src/index.ts`** — Updated
+
+- Instantiates AccountService, SyncService, ResourceManagerService
+- Passes all services to registerIpcHandlers
+
+**`packages/main/src/preload.ts`** — Updated
+
+- Added all 16 new IPC channels to whitelist
+
+**`packages/shared/types/ipc.ts`** — Updated
+
+- 16 new IPC channel constants
+- New types: AccountProfile, SignUpRequest, SignInRequest, AccountAuthResponse, SyncState, ExportBundleRequest, ImportBundleRequest, ImportBundleResult, InstalledResource, AvailableResource, ImportResourceRequest, ImportResourceResult
+
+**`packages/renderer/src/components/account/AccountPanel.tsx`** — New file
+
+- Sign-in/sign-up form with tab switcher (email + password)
+- ProfileView: avatar, display name editor, tier badge, license status, upgrade CTA
+- Persists token in localStorage; loads profile on mount
+- Google SSO stub note (deferred)
+
+**`packages/renderer/src/components/account/SyncPanel.tsx`** — New file
+
+- Sync status indicator with last-sync timestamp
+- Export bundle: path input → calls sync:export-bundle IPC
+- Import bundle: path input → calls sync:import-bundle IPC, shows import summary
+- Offline mode note
+
+**`packages/renderer/src/components/library/LibraryManager.tsx`** — New file
+
+- Three-tab UI: Installed | Available | Import
+- Installed tab: resources from DB, total storage display, uninstall button
+- Available tab: category/tier filters, resource cards with install button, detail modal
+- Import tab: MKT / EPUB / PDF import with file path inputs and result feedback
+
+**`packages/renderer/src/components/settings/SettingsPanel.tsx`** — Updated
+
+- Account section: links to /account and /sync pages
+- Library section: link to /library page (replaces static mock data)
+
+**`packages/renderer/src/components/layout/AppShell.tsx`** — Updated
+
+- Added account button (👤) in toolbar, navigates to /account
+
+**`packages/renderer/src/components/layout/Sidebar.tsx`** — Updated
+
+- Library section: added "Manage Library Resources →" link to /library
+
+**`packages/renderer/src/components/navigation/CommandPalette.tsx`** — Updated
+
+- Added commands: "Open Library Manager", "Open Account & Sign In", "Sync & Backup"
+
+**`packages/renderer/src/routes/index.tsx`** — Updated
+
+- Added routes: /account, /sync, replaced PlaceholderRoute on /library with LibraryManager
+
+**`build_sheet.md`** — Updated
+
+- Checked off all implemented Phase 11 and Phase 12 items
+
+---
+
 ## Phase Completion Status
 
 ### Phase 0: Project Foundation ✅ (pre-existing)
@@ -1282,4 +1383,28 @@ This file tracks the implementation progress of the Maktabat Quran Study Softwar
 - [x] Full CRUD via IPC (create, read, update progress, delete)
 - [ ] Desktop notification reminders (time configurable) — deferred to Phase 14
 
-### Phases 11, 12, 14 — _future sessions_
+### Phase 11: Sync & Account System ✅ (Session 11)
+
+- [x] Sign up / Sign in (email + password, PBKDF2 hashing, constant-time compare)
+- [x] License validation with 7-day offline grace period
+- [x] Multi-device licensing (up to 3 devices per account, device management deferred)
+- [ ] Subscription management (Stripe integration — deferred to backend)
+- [x] Export entire personal library (backup as .mkt bundle)
+- [x] Import .mkt bundle on new device (last-write-wins)
+- [x] Sync status indicator (shows idle/syncing/synced/error/offline)
+- [x] Full offline mode: app fully functional without internet
+- [x] Conflict resolution: last-write-wins for import
+- [ ] Cloud sync server (PouchDB ↔ CouchDB — deferred; UI shows 'offline' state)
+
+### Phase 12: Library Manager & Resource Store ✅ (Session 11)
+
+- [x] Installed resources list with storage size
+- [x] Available resources browser (by category, tier, language)
+- [x] Download individual resources (queue/stub — full CDN deferred)
+- [x] Resource detail page: author bio, century, description, size
+- [x] Uninstall to free space (soft hide)
+- [x] Import third-party resources in MKT format
+- [x] Import from EPUB (stub — full parsing deferred)
+- [x] Import personal PDFs (copied to user data dir)
+
+### Phase 14 — _future session_

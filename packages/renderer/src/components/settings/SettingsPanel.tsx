@@ -223,77 +223,22 @@ function LanguageSettings() {
 // Library
 // ────────────────────────────────────────────────────────────────
 function LibrarySettings() {
-  const resources = [
-    { id: 'quran', label: 'Quran (Hafs an Asim)', size: '8.2 MB', installed: true },
-    { id: 'bukhari', label: 'Sahih al-Bukhari', size: '12.4 MB', installed: true },
-    { id: 'muslim', label: 'Sahih Muslim', size: '10.1 MB', installed: true },
-    { id: 'ibn-kathir', label: 'Tafsir Ibn Kathir', size: '45.3 MB', installed: false },
-    { id: 'tabari', label: 'Tafsir al-Tabari', size: '112.0 MB', installed: false },
-    { id: 'abu-dawood', label: 'Sunan Abu Dawood', size: '9.7 MB', installed: false },
-  ]
-
-  const installed = resources.filter((r) => r.installed)
-  const available = resources.filter((r) => !r.installed)
-  const totalSize = installed.reduce((acc, r) => acc + parseFloat(r.size), 0)
-
   return (
-    <div className="flex flex-col gap-8">
-      {/* Storage summary */}
-      <section className="p-4 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-color)]">
-        <div className="text-sm font-semibold text-[var(--text-primary)] mb-1">Storage Usage</div>
-        <div className="text-2xl font-mono text-[var(--accent-primary)]">
-          {totalSize.toFixed(1)} MB
-        </div>
-        <div className="text-xs text-[var(--text-secondary)]">
-          {installed.length} resources installed
-        </div>
-      </section>
-
-      {/* Installed */}
-      <section>
-        <h3 className="text-sm font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-4">
-          Installed Resources
-        </h3>
-        <div className="flex flex-col gap-2">
-          {installed.map((r) => (
-            <div
-              key={r.id}
-              className="flex items-center justify-between p-3 rounded-lg bg-[var(--bg-secondary)] border border-[var(--border-color)]"
-            >
-              <div>
-                <div className="text-sm font-medium text-[var(--text-primary)]">{r.label}</div>
-                <div className="text-xs text-[var(--text-secondary)]">{r.size}</div>
-              </div>
-              <span className="text-xs px-2 py-0.5 rounded-full bg-[var(--ae-green-100)] text-[var(--ae-green-700)] font-medium">
-                Installed
-              </span>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Available */}
-      <section>
-        <h3 className="text-sm font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-4">
-          Available to Download
-        </h3>
-        <div className="flex flex-col gap-2">
-          {available.map((r) => (
-            <div
-              key={r.id}
-              className="flex items-center justify-between p-3 rounded-lg bg-[var(--bg-secondary)] border border-[var(--border-color)]"
-            >
-              <div>
-                <div className="text-sm font-medium text-[var(--text-primary)]">{r.label}</div>
-                <div className="text-xs text-[var(--text-secondary)]">{r.size}</div>
-              </div>
-              <button className="text-xs px-3 py-1.5 rounded-lg bg-[var(--accent-primary)] text-white hover:opacity-90 transition-opacity">
-                Download
-              </button>
-            </div>
-          ))}
-        </div>
-      </section>
+    <div>
+      <p className="text-sm text-[var(--text-secondary)] mb-4">
+        Manage your installed resources, browse the catalog, and import your own materials.
+      </p>
+      <a
+        href="#"
+        onClick={(e) => {
+          e.preventDefault()
+          // Navigate to the dedicated Library Manager page
+          window.location.hash = '/library'
+        }}
+        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[var(--accent-primary)] text-white text-sm font-semibold hover:opacity-90 transition-opacity"
+      >
+        Open Library Manager →
+      </a>
     </div>
   )
 }
@@ -303,31 +248,33 @@ function LibrarySettings() {
 // ────────────────────────────────────────────────────────────────
 function AccountSettings() {
   return (
-    <div className="flex flex-col gap-6">
-      <div className="p-6 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-color)] flex flex-col items-center gap-3 text-center">
-        <div className="w-16 h-16 rounded-full bg-[var(--accent-primary)]/20 flex items-center justify-center text-3xl">
-          👤
-        </div>
-        <div>
-          <div className="text-lg font-semibold text-[var(--text-primary)]">Not signed in</div>
-          <div className="text-sm text-[var(--text-secondary)]">
-            Sign in to sync your notes, highlights, and reading progress
-          </div>
-        </div>
-        <button className="px-6 py-2.5 rounded-lg bg-[var(--accent-primary)] text-white hover:opacity-90 transition-opacity font-medium">
-          Sign In
-        </button>
+    <div>
+      <p className="text-sm text-[var(--text-secondary)] mb-4">
+        Sign in to sync your notes, highlights, and reading progress across devices.
+      </p>
+      <div className="mb-4">
+        <a
+          href="#"
+          onClick={(e) => {
+            e.preventDefault()
+            window.location.hash = '/account'
+          }}
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[var(--accent-primary)] text-white text-sm font-semibold hover:opacity-90 transition-opacity"
+        >
+          Open Account Panel →
+        </a>
       </div>
-
-      <div className="p-4 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-color)]">
-        <div className="text-sm font-semibold text-[var(--text-primary)] mb-1">Subscription</div>
-        <div className="text-lg font-semibold text-[var(--accent-primary)]">Free Tier</div>
-        <div className="text-xs text-[var(--text-secondary)] mb-3">
-          Limited to Quran + 2 translations, Sahih al-Bukhari & Sahih Muslim, and basic features
-        </div>
-        <button className="text-sm px-4 py-2 rounded-lg border border-[var(--accent-primary)] text-[var(--accent-primary)] hover:bg-[var(--accent-primary)]/5 transition-colors">
-          Upgrade Plan
-        </button>
+      <div>
+        <a
+          href="#"
+          onClick={(e) => {
+            e.preventDefault()
+            window.location.hash = '/sync'
+          }}
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-[var(--border-color)] text-[var(--text-primary)] text-sm font-semibold hover:border-[var(--accent-primary)] hover:text-[var(--accent-primary)] transition-colors"
+        >
+          Sync &amp; Backup Settings →
+        </a>
       </div>
     </div>
   )

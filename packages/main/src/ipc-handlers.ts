@@ -1,6 +1,9 @@
 import { ipcMain } from 'electron'
 import type { LibraryService } from './library-service.js'
 import type { UserService } from './user-service.js'
+import type { AccountService } from './account-service.js'
+import type { SyncService } from './sync-service.js'
+import type { ResourceManagerService } from './resource-manager.js'
 
 // ─── Input validation helpers ─────────────────────────────────────────────────
 
@@ -36,7 +39,10 @@ function isStringArray(value: unknown): value is string[] {
 
 export function registerIpcHandlers(
   libraryService: LibraryService,
-  userService: UserService
+  userService: UserService,
+  accountService?: AccountService,
+  syncService?: SyncService,
+  resourceManager?: ResourceManagerService
 ): void {
   // ── library:get-surahs ──────────────────────────────────────────────────────
   ipcMain.handle('library:get-surahs', () => {
@@ -485,5 +491,124 @@ export function registerIpcHandlers(
     const { entryId } = args as { entryId: number }
     if (typeof entryId !== 'number' || entryId < 1) return []
     return libraryService.getFactbookAyahRefs(entryId)
+  })
+
+  // ── account:sign-up ─────────────────────────────────────────────────────────
+  ipcMain.handle(
+    'account:sign-up',
+    (_e, email: unknown, password: unknown, displayName: unknown) => {
+      if (!accountService) throw new Error('Account service not available.')
+      const em = assertString(email, 'email')
+      const pw = assertString(password, 'password')
+      if (pw.length < 8) throw new Error('Password must be at least 8 characters.')
+      const dn = displayName != null && typeof displayName === 'string' ? displayName : undefined
+      return accountService.signUp(em, pw, dn)
+    }
+  )
+
+  // ── account:sign-in ─────────────────────────────────────────────────────────
+  ipcMain.handle('account:sign-in', (_e, email: unknown, password: unknown) => {
+    if (!accountService) throw new Error('Account service not available.')
+    const em = assertString(email, 'email')
+    const pw = assertString(password, 'password')
+    return accountService.signIn(em, pw)
+  })
+
+  // ── account:sign-out ────────────────────────────────────────────────────────
+  ipcMain.handle('account:sign-out', (_e, token: unknown) => {
+    if (!accountService) throw new Error('Account service not available.')
+    const t = assertString(token, 'token')
+    accountService.signOut(t)
+    return true
+  })
+
+  // ── account:get-profile ─────────────────────────────────────────────────────
+  ipcMain.handle('account:get-profile', (_e, token: unknown) => {
+    if (!accountService) throw new Error('Account service not available.')
+    const t = assertString(token, 'token')
+    return accountService.getProfileByToken(t) ?? null
+  })
+
+  // ── account:update-display-name ─────────────────────────────────────────────
+  ipcMain.handle('account:update-display-name', (_e, token: unknown, name: unknown) => {
+    if (!accountService) throw new Error('Account service not available.')
+    const t = assertString(token, 'token')
+    const n = assertString(name, 'name')
+    return accountService.updateDisplayName(t, n) ?? null
+  })
+
+  // ── sync:get-status ─────────────────────────────────────────────────────────
+  ipcMain.handle('sync:get-status', () => {
+    if (!syncService)
+      return { status: 'offline', lastSyncAt: null, errorMessage: null, pendingChanges: 0 }
+    return syncService.getStatus()
+  })
+
+  // ── sync:export-bundle ──────────────────────────────────────────────────────
+  ipcMain.handle('sync:export-bundle', (_e, outputPath: unknown) => {
+    if (!syncService) throw new Error('Sync service not available.')
+    const op = assertString(outputPath, 'outputPath')
+    return syncService.exportBundle(op)
+  })
+
+  // ── sync:import-bundle ──────────────────────────────────────────────────────
+  ipcMain.handle('sync:import-bundle', (_e, bundlePath: unknown) => {
+    if (!syncService) throw new Error('Sync service not available.')
+    const bp = assertString(bundlePath, 'bundlePath')
+    return syncService.importBundle(bp)
+  })
+
+  // ── sync:trigger ────────────────────────────────────────────────────────────
+  ipcMain.handle('sync:trigger', async () => {
+    if (!syncService)
+      return { status: 'offline', lastSyncAt: null, errorMessage: null, pendingChanges: 0 }
+    return syncService.triggerCloudSync()
+  })
+
+  // ── resource:get-installed ──────────────────────────────────────────────────
+  ipcMain.handle('resource:get-installed', () => {
+    if (!resourceManager) return []
+    return resourceManager.getInstalledResources()
+  })
+
+  // ── resource:get-available ──────────────────────────────────────────────────
+  ipcMain.handle('resource:get-available', () => {
+    if (!resourceManager) return []
+    return resourceManager.getAvailableResources()
+  })
+
+  // ── resource:install ────────────────────────────────────────────────────────
+  ipcMain.handle('resource:install', (_e, resourceKey: unknown) => {
+    if (!resourceManager) throw new Error('Resource manager not available.')
+    const rk = assertString(resourceKey, 'resourceKey')
+    return resourceManager.installResource(rk)
+  })
+
+  // ── resource:uninstall ──────────────────────────────────────────────────────
+  ipcMain.handle('resource:uninstall', (_e, resourceKey: unknown) => {
+    if (!resourceManager) throw new Error('Resource manager not available.')
+    const rk = assertString(resourceKey, 'resourceKey')
+    return resourceManager.uninstallResource(rk)
+  })
+
+  // ── resource:import-mkt ─────────────────────────────────────────────────────
+  ipcMain.handle('resource:import-mkt', (_e, filePath: unknown) => {
+    if (!resourceManager) throw new Error('Resource manager not available.')
+    const fp = assertString(filePath, 'filePath')
+    return resourceManager.importMktResource(fp)
+  })
+
+  // ── resource:import-epub ────────────────────────────────────────────────────
+  ipcMain.handle('resource:import-epub', (_e, filePath: unknown) => {
+    if (!resourceManager) throw new Error('Resource manager not available.')
+    const fp = assertString(filePath, 'filePath')
+    return resourceManager.importEpub(fp)
+  })
+
+  // ── resource:import-pdf ─────────────────────────────────────────────────────
+  ipcMain.handle('resource:import-pdf', (_e, filePath: unknown) => {
+    if (!resourceManager) throw new Error('Resource manager not available.')
+    const fp = assertString(filePath, 'filePath')
+    return resourceManager.importPdf(fp)
   })
 }

@@ -5,6 +5,9 @@ import { TrayManager, sendNotification } from './tray-manager.js'
 import { WindowManager } from './window-manager.js'
 import { LibraryService } from './library-service.js'
 import { UserService } from './user-service.js'
+import { AccountService } from './account-service.js'
+import { SyncService } from './sync-service.js'
+import { ResourceManagerService } from './resource-manager.js'
 import { registerIpcHandlers } from './ipc-handlers.js'
 
 // ─── Services ──────────────────────────────────────────────────────────────────
@@ -15,6 +18,9 @@ const userDbPath: string = path.join(userData, 'user.db')
 
 let libraryService: LibraryService
 let userService: UserService
+let accountService: AccountService
+let syncService: SyncService
+let resourceManager: ResourceManagerService
 const windowManager = new WindowManager()
 let trayManager: TrayManager
 
@@ -74,9 +80,12 @@ void app.whenReady().then(() => {
   // Initialise services
   libraryService = new LibraryService(libraryDbPath)
   userService = new UserService(userDbPath)
+  accountService = new AccountService(userDbPath)
+  syncService = new SyncService(userService)
+  resourceManager = new ResourceManagerService(libraryService, userData)
 
   // Register IPC handlers
-  registerIpcHandlers(libraryService, userService)
+  registerIpcHandlers(libraryService, userService, accountService, syncService, resourceManager)
 
   // Create main window
   windowManager.createMainWindow()
