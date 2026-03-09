@@ -87,11 +87,15 @@ function ResizeHandle(): React.ReactElement {
 /**
  * The main workspace: renders 1, 2, or 3 resizable panels based on layout.
  */
-export default function PanelWorkspace(): React.ReactElement {
+export default function PanelWorkspace({
+  mainContentId,
+}: {
+  mainContentId?: string
+}): React.ReactElement {
   const panels = useAppStore((s) => s.panels)
 
   return (
-    <Group orientation="horizontal" className="flex-1 h-full">
+    <Group orientation="horizontal" className="flex-1 h-full" id={mainContentId}>
       {panels.map((panel, index) => (
         <React.Fragment key={panel.id}>
           {index > 0 && <ResizeHandle />}

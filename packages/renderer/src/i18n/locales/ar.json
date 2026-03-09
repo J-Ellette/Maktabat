@@ -1,0 +1,103 @@
+{
+  "app": {
+    "name": "مكتبة",
+    "tagline": "مكتبتك الإسلامية الرقمية"
+  },
+  "nav": {
+    "dashboard": "لوحة التحكم",
+    "quran": "القرآن الكريم",
+    "hadith": "الحديث الشريف",
+    "tafsir": "التفسير",
+    "search": "البحث",
+    "library": "المكتبة",
+    "notes": "الملاحظات",
+    "bookmarks": "الإشارات المرجعية",
+    "readingPlans": "خطط القراءة",
+    "factbook": "الموسوعة",
+    "atlas": "الأطلس الإسلامي",
+    "khutbah": "منشئ الخطبة",
+    "settings": "الإعدادات",
+    "account": "الحساب"
+  },
+  "quran": {
+    "surah": "سورة",
+    "ayah": "آية",
+    "juz": "جزء",
+    "meccan": "مكية",
+    "medinan": "مدنية",
+    "verses": "آيات",
+    "bismillah": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
+    "prevSurah": "السورة السابقة",
+    "nextSurah": "السورة التالية",
+    "openWordStudy": "فتح دراسة الكلمة",
+    "viewTafsir": "عرض التفسير",
+    "addNote": "إضافة ملاحظة",
+    "highlight": "تظليل",
+    "copyArabic": "نسخ العربية",
+    "copyTranslation": "نسخ الترجمة",
+    "copyBoth": "نسخ العربية والترجمة",
+    "addToKhutbah": "إضافة إلى الخطبة"
+  },
+  "hadith": {
+    "grade": "الدرجة",
+    "sahih": "صحيح",
+    "hasan": "حسن",
+    "daif": "ضعيف",
+    "mawdu": "موضوع",
+    "narrator": "الراوي",
+    "isnad": "سلسلة الإسناد",
+    "collection": "المجموعة",
+    "book": "الكتاب",
+    "chapter": "الباب"
+  },
+  "search": {
+    "placeholder": "ابحث في المكتبة...",
+    "searching": "جارٍ البحث...",
+    "results": "{{count}} نتيجة",
+    "noResults": "لا توجد نتائج",
+    "filters": "الفلاتر",
+    "allTypes": "جميع الأنواع"
+  },
+  "settings": {
+    "title": "الإعدادات",
+    "appearance": "المظهر",
+    "language": "اللغة",
+    "library": "المكتبة",
+    "account": "الحساب",
+    "shortcuts": "اختصارات لوحة المفاتيح",
+    "accessibility": "إمكانية الوصول",
+    "notifications": "الإشعارات",
+    "theme": {
+      "light": "فاتح",
+      "dark": "داكن",
+      "sepia": "بني فاتح"
+    }
+  },
+  "common": {
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "close": "إغلاق",
+    "back": "رجوع",
+    "forward": "تقدم",
+    "loading": "جارٍ التحميل...",
+    "error": "حدث خطأ",
+    "retry": "إعادة المحاولة",
+    "export": "تصدير",
+    "import": "استيراد",
+    "download": "تنزيل",
+    "upgrade": "الترقية إلى Premium",
+    "premium": "Premium"
+  },
+  "readingPlans": {
+    "title": "خطط القراءة",
+    "startPlan": "ابدأ خطة",
+    "continuePlan": "متابعة الخطة",
+    "streak": "أيام متتالية",
+    "complete": "تحديد كمكتمل",
+    "certificate": "تصدير الشهادة",
+    "customPlan": "خطة مخصصة",
+    "daysLeft": "أيام متبقية"
+  }
+}

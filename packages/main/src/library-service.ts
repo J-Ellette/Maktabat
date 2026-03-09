@@ -621,6 +621,23 @@ export class LibraryService {
     this.db.close()
   }
 
+  /**
+   * Run a no-op FTS5 query to warm up the search index on app start.
+   * Called via setImmediate so it doesn't block the main process startup.
+   * The query term doesn't need to match data — touching the FTS5 virtual
+   * table is sufficient to initialize its internal data structures.
+   */
+  warmUpSearchIndex(): void {
+    try {
+      // COUNT(*) on FTS5 tables loads the index into the page cache without
+      // requiring a specific match term, making it a reliable warm-up query.
+      this.db.prepare(`SELECT count(*) FROM translations_fts`).get()
+      this.db.prepare(`SELECT count(*) FROM hadiths_fts`).get()
+    } catch {
+      // FTS tables may not be populated yet — warm-up is best-effort
+    }
+  }
+
   searchFactbook(query: string, limit = 20): FactbookEntryRow[] {
     const like = `%${query}%`
     return this.stmts.searchFactbook.all(like, like, like, limit) as FactbookEntryRow[]

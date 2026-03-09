@@ -70,11 +70,39 @@ function detectWazan(stripped: string, withDiacritics: string): { form: number; 
   return { form: 1, wazan: 'فَعَلَ' }
 }
 
+// ─── LRU cache for analyzeWord ─────────────────────────────────────────────────
+
+const MORPHOLOGY_CACHE_MAX = 2000
+// Map preserves insertion order; entries at the front are least-recently-used.
+// Cache hits re-insert the entry at the end to maintain LRU order.
+const morphologyCache = new Map<string, MorphologyResult>()
+
+export function clearMorphologyCache(): void {
+  morphologyCache.clear()
+}
+
+function evictOldestIfNeeded(): void {
+  if (morphologyCache.size >= MORPHOLOGY_CACHE_MAX) {
+    // The first key in a Map is always the least-recently-used entry
+    // because cache hits move their entry to the end via delete + set.
+    const firstKey = morphologyCache.keys().next().value
+    if (firstKey !== undefined) morphologyCache.delete(firstKey)
+  }
+}
+
 /**
  * Analyzes an Arabic word and returns its morphological breakdown.
  * Uses pattern matching for wazan detection; full WASM engine in a later phase.
+ * Results are cached (max 2000 entries, LRU eviction) for repeated lookups.
  */
 export function analyzeWord(word: string): MorphologyResult {
+  const cached = morphologyCache.get(word)
+  if (cached !== undefined) {
+    // Move to end (most-recently-used) by re-inserting
+    morphologyCache.delete(word)
+    morphologyCache.set(word, cached)
+    return cached
+  }
   const stripped = stripDiacritics(word)
   const { form, wazan } = detectWazan(stripped, word)
 
@@ -86,7 +114,7 @@ export function analyzeWord(word: string): MorphologyResult {
     if (stripped.length >= 4) pos = 'V' // mudari' prefix patterns
   }
 
-  return {
+  const result: MorphologyResult = {
     word,
     root: stripped,
     pattern: wazan,
@@ -94,6 +122,10 @@ export function analyzeWord(word: string): MorphologyResult {
     wazanForm: pos === 'V' ? form : null,
     partOfSpeech: pos,
   }
+
+  evictOldestIfNeeded()
+  morphologyCache.set(word, result)
+  return result
 }
 
 /** Strip Arabic diacritics (tashkeel) from a string for normalization. */

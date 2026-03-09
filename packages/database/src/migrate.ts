@@ -51,7 +51,14 @@ export function runMigrations(options: MigrationOptions): void {
     }
 
     console.log(`Applying migration ${version}...`)
-    const sql = fs.readFileSync(path.join(migrationsDir, file), 'utf-8')
+    const rawSql = fs.readFileSync(path.join(migrationsDir, file), 'utf-8')
+    // Migration files may include their own BEGIN TRANSACTION / COMMIT wrapper.
+    // Strip only full-line occurrences of these markers (not ones inside
+    // comments or string literals) so we can manage the transaction ourselves
+    // and atomically record the migration version alongside the SQL changes.
+    const sql = rawSql
+      .replace(/^\s*BEGIN\s+TRANSACTION\s*;\s*$/gim, '')
+      .replace(/^\s*COMMIT\s*;\s*$/gim, '')
 
     db.transaction(() => {
       db.exec(sql)

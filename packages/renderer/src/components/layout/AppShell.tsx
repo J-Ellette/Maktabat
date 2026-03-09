@@ -5,6 +5,7 @@ import { useAppStore, type PanelLayout } from '../../store/app-store'
 import { useSettingsStore } from '../../store/settings-store'
 import { useDirection } from '../../hooks/useDirection'
 import { useCommandPalette } from '../../hooks/useCommandPalette'
+import { useI18nSync } from '../../hooks/useI18n'
 import Sidebar from './Sidebar'
 import PanelWorkspace from './PanelWorkspace'
 import CommandPalette from '../navigation/CommandPalette'
@@ -24,8 +25,13 @@ function ThemeSynchronizer() {
     const root = document.documentElement
     root.classList.remove('light', 'dark', 'sepia')
     root.classList.add(theme)
-    if (accessibility.highContrast) root.classList.add('high-contrast')
-    else root.classList.remove('high-contrast')
+    if (accessibility.highContrast) {
+      root.classList.add('high-contrast')
+      root.setAttribute('data-theme', 'high-contrast')
+    } else {
+      root.classList.remove('high-contrast')
+      root.removeAttribute('data-theme')
+    }
     if (accessibility.reducedMotion) root.style.setProperty('--transition-speed', '0ms')
     else root.style.removeProperty('--transition-speed')
   }, [theme, accessibility])
@@ -282,6 +288,7 @@ export default function AppShell(): React.ReactElement {
   const sidebarOpen = useAppStore((s) => s.sidebarOpen)
   const setLayout = useAppStore((s) => s.setLayout)
   useDirection()
+  useI18nSync()
 
   function handleLayoutChange(layout: PanelLayout) {
     setLayout(layout)
@@ -289,6 +296,12 @@ export default function AppShell(): React.ReactElement {
 
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-[var(--bg-primary)] text-[var(--text-primary)]">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[9999] focus:px-4 focus:py-2 focus:bg-[var(--accent-primary)] focus:text-black focus:rounded focus:font-semibold"
+      >
+        Skip to main content
+      </a>
       <ThemeSynchronizer />
       <IpcMenuListener onLayoutChange={handleLayoutChange} />
       <GlobalKeyListener />
@@ -310,7 +323,7 @@ export default function AppShell(): React.ReactElement {
             </>
           )}
           <Panel id="workspace">
-            <PanelWorkspace />
+            <PanelWorkspace mainContentId="main-content" />
           </Panel>
         </Group>
       </div>

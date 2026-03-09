@@ -1408,3 +1408,214 @@ and IPC infrastructure for all new services.
 - [x] Import personal PDFs (copied to user data dir)
 
 ### Phase 14 — _future session_
+
+---
+
+### Session 12 — Phase 14: Polish, Performance & Release
+
+**Date**: 2026-03-09
+
+**Status**: ✅ Mostly Complete (some items deferred — see below)
+
+#### Changes Made
+
+**`packages/renderer/src/components/quran/SurahNavigator.tsx`** — Updated
+
+- Added `@tanstack/react-virtual` (`useVirtualizer`) to render the 114 surah cards as a virtualized list
+- Replaced flat `.map()` with virtualized absolute-positioned items in a fixed-height scrollable container
+- Improves performance significantly for older hardware
+
+**`packages/renderer/package.json`** — Updated
+
+- Added `@tanstack/react-virtual ^3.13.21` dependency
+
+**`packages/database/schema/library.sql`** — Updated
+
+- Added 4 composite indexes: `idx_ayahs_surah_ayah`, `idx_translations_ayah_key`, `idx_tafsir_ayah_key`, `idx_hadiths_collection_number`
+
+**`packages/database/migrations/005_performance_indexes.sql`** — New file
+
+- Migration with all 5 `CREATE INDEX IF NOT EXISTS` statements for query performance
+
+**`packages/main/src/library-service.ts`** — Updated
+
+- Added `warmUpSearchIndex()` — runs a `COUNT(*)` preflight on `translations_fts` and `hadiths_fts` to pre-warm SQLite FTS5 on app start
+
+**`packages/main/src/index.ts`** — Updated
+
+- Imported `session` from electron
+- Added `setImmediate(() => libraryService.warmUpSearchIndex())` for non-blocking FTS warm-up
+- Added `session.defaultSession.webRequest.onHeadersReceived` CSP headers:
+  - `Content-Security-Policy` (strict; `unsafe-eval` only in dev for Vite HMR)
+  - `X-Content-Type-Options: nosniff`
+  - `X-Frame-Options: DENY`
+- Added memory health monitor (5-minute interval, warns at 512 MB heap)
+- Added `scheduleReadingPlanReminders()` — checks every minute at configured reminder time, fires desktop notification if user has active reading plans
+
+**`packages/arabic-nlp/src/morphology.ts`** — Updated
+
+- Added Map-based LRU cache (max 2000 entries) for `analyzeWord()`
+- Added exported `clearMorphologyCache()` for testing
+- Cache hits re-insert at end to maintain LRU eviction order
+
+**`electron-builder.config.js`** — Updated
+
+- Mac: `arch: ['universal']` (single Universal binary for Intel + Apple Silicon)
+- Win: targets `['nsis', 'msix']`
+- Added `asar: true`, `compression: 'maximum'`
+- `publish.releaseType: 'draft'` for controlled rollout
+
+**`packages/renderer/src/styles/tokens.css`** — Updated
+
+- Added `[data-theme="high-contrast"]` CSS token block (AEGold accents on black)
+- Added `@media (prefers-reduced-motion: reduce)` global motion suppression
+- Added `@media (pointer: coarse)` touch target enforcement (min 44×44px)
+
+**`packages/renderer/src/components/layout/AppShell.tsx`** — Updated
+
+- `ThemeSynchronizer` now handles `high-contrast` mode from `accessibility.highContrast`
+- Added skip-to-content link as first focusable element
+- Added `id="main-content"` on the main panel workspace
+- Calls `useI18nSync()` to keep i18next language synced with settings
+
+**`packages/renderer/src/components/search/SearchPanel.tsx`** — Updated
+
+- Added `<div role="status" aria-live="polite" aria-atomic="true" className="sr-only">` live region
+- Announces "Searching...", "Found N results", or "No results found" for screen readers
+
+**`packages/renderer/src/components/navigation/CommandPalette.tsx`** — Updated
+
+- Integrated `useFocusTrap(open)` — focus trapped in modal while palette is open
+- `dialogRef` attached to the palette window div
+
+**`packages/renderer/src/hooks/useFocusTrap.ts`** — New file
+
+- Tab/Shift+Tab cycle stays within the modal container when `active` is true
+- Focuses first focusable element on activation
+
+**`packages/renderer/src/i18n/index.ts`** — New file
+
+- i18next initialized with `react-i18next`, English and Arabic resource bundles
+
+**`packages/renderer/src/i18n/locales/en.json`** — New file
+
+- English translations: app, nav, quran, hadith, search, settings, common, readingPlans
+
+**`packages/renderer/src/i18n/locales/ar.json`** — New file
+
+- Arabic translations: all the same namespaces in Arabic
+
+**`packages/renderer/src/hooks/useI18n.ts`** — New file
+
+- Re-exports `useTranslation` from react-i18next
+- `useI18nSync()` hook syncs i18next language from `interfaceLanguage` setting
+
+**`packages/renderer/src/lib/hijri.ts`** — New file
+
+- `toHijri(date, lang)` — Kuwaiti algorithm for Gregorian → Hijri conversion
+- `formatHijri(h, lang)` — formats as "15 Ramadan 1446 AH" or Arabic equivalent
+- `toArabicIndic(n)` — converts ASCII digits to Arabic-Indic (١٢٣٤...)
+
+**`packages/arabic-nlp/vitest.config.ts`** + **`packages/arabic-nlp/src/morphology.test.ts`** — New files
+
+- vitest setup for the NLP package
+- 6 unit tests: basic analysis, consistency, caching, Form X detection, non-Arabic, empty input
+- All 6 pass ✅
+
+**`packages/database/vitest.config.ts`** + **`packages/database/src/migrate.test.ts`** — New files
+
+- vitest setup for database package
+- 3 unit tests: fresh migration, idempotency, schema_migrations table creation
+- All 3 pass ✅ (also fixed a nested transaction bug in migrate.ts)
+
+**`package.json`** (root) — Updated
+
+- Added `test`, `test:nlp`, `test:db` scripts
+
+---
+
+## Phase Completion Status
+
+### Phase 0: Project Foundation ✅
+
+### Phase 1: Main Process & IPC Layer ✅
+
+### Phase 2: Core UI Shell ✅
+
+### Phase 3: Quran Reading Module ✅
+
+### Phase 4: Tafsir Module ✅
+
+### Phase 5: Hadith Module ✅
+
+### Phase 6: Search & AI Study Assistant ✅
+
+### Phase 7: Linguistic Analysis Module ✅
+
+### Phase 8: Notes, Annotations & Khutbah Workflow ✅
+
+### Phase 9: Factbook & Islamic Atlas ✅
+
+### Phase 10: Audio & Recitation ✅
+
+### Phase 11: Sync & Account System ✅
+
+### Phase 12: Library Manager & Resource Store ✅
+
+### Phase 13: Reading Plans & Progress ✅
+
+- [x] Desktop notification reminders (time configurable — scheduleReadingPlanReminders in main/index.ts)
+
+### Phase 14: Polish, Performance & Release ✅ (Session 12)
+
+#### 14.1 Performance
+
+- [x] Virtualized lists — @tanstack/react-virtual in SurahNavigator
+- [x] Lazy load panels — React.lazy + Suspense (already in routes/index.tsx)
+- [x] SQLite index optimization — migration 005_performance_indexes.sql
+- [x] Search warm-up — warmUpSearchIndex() on setImmediate at startup
+- [ ] Image optimization for Atlas maps — deferred
+- [x] Morphology cache — LRU Map (2000 entries) in morphology.ts
+- [x] Memory monitoring — 5-min interval, warns at 512 MB heap
+
+#### 14.2 Accessibility
+
+- [x] Full keyboard navigation — ARIA roles, focus trap, skip-to-content
+- [x] Screen reader support — ARIA live regions in SearchPanel
+- [x] High contrast mode — [data-theme="high-contrast"] CSS tokens (AEGold on black)
+- [x] Focus management — useFocusTrap hook wired to CommandPalette modal
+- [x] Reduced motion mode — @media (prefers-reduced-motion: reduce) CSS
+- [x] Minimum touch targets — 44×44px via @media (pointer: coarse) CSS
+
+#### 14.3 Internationalization
+
+- [x] Interface languages: English + Arabic (i18next + react-i18next)
+- [x] RTL layout switching — useI18nSync() syncs i18n language from settings
+- [x] Number formatting — toArabicIndic() in lib/hijri.ts
+- [x] Date formatting — toHijri() + formatHijri() Kuwaiti algorithm
+- [x] i18next for string management — EN + AR locale JSON files
+
+#### 14.4 Security Hardening
+
+- [x] Content Security Policy headers — session.defaultSession.webRequest
+- [x] Disable remote module — all windows: nodeIntegration: false, contextIsolation: true, sandbox: true
+- [x] Validate all IPC inputs — all ipc-handlers.ts handlers have full validation
+- [ ] Encrypt user.db — deferred (requires SQLCipher / SEE — commercial)
+- [ ] Secure credential storage — deferred (requires keytar integration)
+- [ ] Certificate pinning — deferred (no external API calls yet)
+
+#### 14.5 Testing
+
+- [x] Unit tests: morphology (6) + migration system (3) — vitest ✅
+- [ ] Integration tests: IPC handlers — deferred
+- [ ] E2E tests: Playwright — deferred
+- [ ] Performance benchmarks — deferred
+
+#### 14.6 Build & Distribution
+
+- [x] Mac Universal binary — electron-builder arch: ['universal']
+- [x] Windows NSIS + MSIX — electron-builder targets: ['nsis', 'msix']
+- [x] Linux AppImage + .deb + .rpm — already configured
+- [x] Auto-update draft releases — releaseType: 'draft'
+- [ ] Crash reporting (Sentry) — deferred
+- [ ] Analytics (opt-in) — deferred
