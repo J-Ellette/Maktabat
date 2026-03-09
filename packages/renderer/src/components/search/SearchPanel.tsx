@@ -357,6 +357,17 @@ function FullTextSearch({ initialQuery }: { initialQuery: string }): React.React
           </button>
         </form>
 
+        {/* ARIA live region for search status announcements */}
+        <div role="status" aria-live="polite" aria-atomic="true" className="sr-only">
+          {loading
+            ? 'Searching...'
+            : searched && !hasResults
+              ? 'No results found'
+              : hasResults
+                ? `Found ${results.length} result${results.length !== 1 ? 's' : ''}`
+                : ''}
+        </div>
+
         {/* Loading */}
         {loading && (
           <div className="flex items-center justify-center py-16">

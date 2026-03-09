@@ -1,0 +1,103 @@
+{
+  "app": {
+    "name": "Maktabat",
+    "tagline": "Your Islamic Digital Library"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "quran": "Quran",
+    "hadith": "Hadith",
+    "tafsir": "Tafsir",
+    "search": "Search",
+    "library": "Library",
+    "notes": "Notes",
+    "bookmarks": "Bookmarks",
+    "readingPlans": "Reading Plans",
+    "factbook": "Factbook",
+    "atlas": "Atlas",
+    "khutbah": "Khutbah Builder",
+    "settings": "Settings",
+    "account": "Account"
+  },
+  "quran": {
+    "surah": "Surah",
+    "ayah": "Ayah",
+    "juz": "Juz'",
+    "meccan": "Meccan",
+    "medinan": "Medinan",
+    "verses": "verses",
+    "bismillah": "In the name of Allah, the Most Gracious, the Most Merciful",
+    "prevSurah": "Previous Surah",
+    "nextSurah": "Next Surah",
+    "openWordStudy": "Open Word Study",
+    "viewTafsir": "View Tafsir",
+    "addNote": "Add Note",
+    "highlight": "Highlight",
+    "copyArabic": "Copy Arabic",
+    "copyTranslation": "Copy Translation",
+    "copyBoth": "Copy Arabic + Translation",
+    "addToKhutbah": "Add to Khutbah"
+  },
+  "hadith": {
+    "grade": "Grade",
+    "sahih": "Sahih",
+    "hasan": "Hasan",
+    "daif": "Da'if",
+    "mawdu": "Mawdu'",
+    "narrator": "Narrator",
+    "isnad": "Chain of Narration",
+    "collection": "Collection",
+    "book": "Book",
+    "chapter": "Chapter"
+  },
+  "search": {
+    "placeholder": "Search the library...",
+    "searching": "Searching...",
+    "results": "{{count}} results",
+    "noResults": "No results found",
+    "filters": "Filters",
+    "allTypes": "All Types"
+  },
+  "settings": {
+    "title": "Settings",
+    "appearance": "Appearance",
+    "language": "Language",
+    "library": "Library",
+    "account": "Account",
+    "shortcuts": "Keyboard Shortcuts",
+    "accessibility": "Accessibility",
+    "notifications": "Notifications",
+    "theme": {
+      "light": "Light",
+      "dark": "Dark",
+      "sepia": "Sepia"
+    }
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "back": "Back",
+    "forward": "Forward",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "retry": "Retry",
+    "export": "Export",
+    "import": "Import",
+    "download": "Download",
+    "upgrade": "Upgrade to Premium",
+    "premium": "Premium"
+  },
+  "readingPlans": {
+    "title": "Reading Plans",
+    "startPlan": "Start a Plan",
+    "continuePlan": "Continue Plan",
+    "streak": "Day Streak",
+    "complete": "Mark Complete",
+    "certificate": "Export Certificate",
+    "customPlan": "Custom Plan",
+    "daysLeft": "days left"
+  }
+}
