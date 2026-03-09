@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { useIpc } from '../../hooks/useIpc'
+import { formatDate, parseTags } from '../../lib/utils'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -26,25 +27,6 @@ const NOTE_TYPE_META: Record<NoteType, { label: string; icon: string; color: str
   application: { label: 'Application', icon: '✅', color: 'var(--ae-green-600, #16a34a)' },
 }
 
-function parseTags(tagsJson: string): string[] {
-  try {
-    return JSON.parse(tagsJson) as string[]
-  } catch {
-    return []
-  }
-}
-
-function formatDate(dateStr: string): string {
-  try {
-    return new Date(dateStr).toLocaleDateString(undefined, {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    })
-  } catch {
-    return dateStr
-  }
-}
 
 function exportNotesAsMarkdown(notes: NoteRow[]): void {
   const lines = notes.map((n) => {

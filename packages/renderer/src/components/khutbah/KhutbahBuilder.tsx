@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useIpc } from '../../hooks/useIpc'
+import { formatDate } from '../../lib/utils'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -65,18 +66,6 @@ const TEMPLATE_META: Record<KhutbahTemplateKey, { label: string; icon: string; s
   },
 }
 
-function formatDate(dateStr: string | null): string {
-  if (!dateStr) return 'No date'
-  try {
-    return new Date(dateStr).toLocaleDateString(undefined, {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    })
-  } catch {
-    return dateStr
-  }
-}
 
 // ─── Premium gate ─────────────────────────────────────────────────────────────
 
