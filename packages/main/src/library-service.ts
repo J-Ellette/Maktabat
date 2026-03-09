@@ -137,6 +137,25 @@ export interface SurahRow {
   verse_count: number
 }
 
+export interface FactbookEntryRow {
+  id: number
+  slug: string
+  title_arabic: string | null
+  title_english: string
+  type: 'person' | 'place' | 'event' | 'concept' | 'surah' | 'collection'
+  summary: string | null
+  body: string | null
+}
+
+export interface FactbookAyahRef {
+  id: number
+  entry_id: number
+  ayah_id: number
+  surah_number: number
+  ayah_number: number
+  arabic_text: string
+}
+
 // ─── Statement cache ──────────────────────────────────────────────────────────
 
 type CachedStatements = {
@@ -162,6 +181,9 @@ type CachedStatements = {
   ftsTranslation: Statement
   ftsHadith: Statement
   ftsHadithNarrator: Statement
+  searchFactbook: Statement
+  getFactbookEntry: Statement
+  getFactbookAyahRefs: Statement
 }
 
 export class LibraryService {
@@ -359,6 +381,27 @@ export class LibraryService {
         WHERE hn.name_english LIKE ?
         LIMIT ?
         OFFSET ?
+      `),
+
+      searchFactbook: this.db.prepare(`
+        SELECT id, slug, title_arabic, title_english, type, summary
+        FROM factbook_entries
+        WHERE title_english LIKE ? OR title_arabic LIKE ? OR summary LIKE ?
+        ORDER BY title_english
+        LIMIT ?
+      `),
+
+      getFactbookEntry: this.db.prepare(`
+        SELECT * FROM factbook_entries WHERE slug = ?
+      `),
+
+      getFactbookAyahRefs: this.db.prepare(`
+        SELECT far.id, far.entry_id, far.ayah_id,
+               s.number AS surah_number, a.ayah_number, a.arabic_text
+        FROM factbook_ayah_refs far
+        JOIN ayahs a ON a.id = far.ayah_id
+        JOIN surahs s ON s.id = a.surah_id
+        WHERE far.entry_id = ?
       `),
     }
   }
@@ -576,6 +619,19 @@ export class LibraryService {
 
   close(): void {
     this.db.close()
+  }
+
+  searchFactbook(query: string, limit = 20): FactbookEntryRow[] {
+    const like = `%${query}%`
+    return this.stmts.searchFactbook.all(like, like, like, limit) as FactbookEntryRow[]
+  }
+
+  getFactbookEntry(slug: string): FactbookEntryRow | null {
+    return (this.stmts.getFactbookEntry.get(slug) as FactbookEntryRow) ?? null
+  }
+
+  getFactbookAyahRefs(entryId: number): FactbookAyahRef[] {
+    return this.stmts.getFactbookAyahRefs.all(entryId) as FactbookAyahRef[]
   }
 }
 

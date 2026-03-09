@@ -11,6 +11,7 @@ import CommandPalette from '../navigation/CommandPalette'
 import NavigationControls from '../navigation/NavigationControls'
 import AddressBar from '../navigation/AddressBar'
 import HighlightToolbar from '../annotations/HighlightToolbar'
+import AudioPlayer from '../audio/AudioPlayer'
 
 // ────────────────────────────────────────────────────────────────
 // Theme provider: applies CSS class + sync with settings store
@@ -297,6 +298,9 @@ export default function AppShell(): React.ReactElement {
 
       {/* Global floating highlight toolbar (appears on text selection) */}
       <HighlightToolbar />
+
+      {/* Global audio player (floating, bottom-right) */}
+      <AudioPlayer />
     </div>
   )
 }

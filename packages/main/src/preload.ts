@@ -35,6 +35,9 @@ const validChannels = [
   'audio:pause',
   'settings:get',
   'settings:set',
+  'library:search-factbook',
+  'library:get-factbook-entry',
+  'library:get-factbook-ayah-refs',
 ] as const
 
 /** Channels that the main process can push to the renderer. */
