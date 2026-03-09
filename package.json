@@ -8,7 +8,10 @@
     "lint": "eslint packages/*/src --ext .ts,.tsx",
     "typecheck": "pnpm -r typecheck",
     "format": "prettier --write \"**/*.{ts,tsx,js,json,md,yaml,yml}\"",
-    "prepare": "husky"
+    "prepare": "husky",
+    "test": "pnpm --filter './packages/*' run --if-present test",
+    "test:nlp": "pnpm --filter @maktabat/arabic-nlp run test",
+    "test:db": "pnpm --filter @maktabat/database run test"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^7.0.0",

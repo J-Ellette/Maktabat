@@ -77,6 +77,10 @@ const MORPHOLOGY_CACHE_MAX = 2000
 // Cache hits re-insert the entry at the end to maintain LRU order.
 const morphologyCache = new Map<string, MorphologyResult>()
 
+export function clearMorphologyCache(): void {
+  morphologyCache.clear()
+}
+
 function evictOldestIfNeeded(): void {
   if (morphologyCache.size >= MORPHOLOGY_CACHE_MAX) {
     // The first key in a Map is always the least-recently-used entry
