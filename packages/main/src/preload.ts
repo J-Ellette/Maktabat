@@ -35,6 +35,7 @@ const validChannels = [
   'user:add-khutbah-material',
   'user:get-khutbah-materials',
   'user:remove-khutbah-material',
+  'user:get-khutbahs-for-verse',
   'audio:play',
   'audio:pause',
   'settings:get',

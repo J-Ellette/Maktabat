@@ -87,6 +87,7 @@ type CachedStatements = {
   insertKhutbahMaterial: Statement
   getKhutbahMaterials: Statement
   deleteKhutbahMaterial: Statement
+  getKhutbahsForVerse: Statement
 }
 
 export class UserService {
@@ -226,6 +227,14 @@ export class UserService {
       `),
 
       deleteKhutbahMaterial: this.db.prepare(`DELETE FROM khutbah_materials WHERE id = ?`),
+
+      getKhutbahsForVerse: this.db.prepare(`
+        SELECT k.id, k.title, k.date
+        FROM khutbahs k
+        JOIN khutbah_materials km ON km.khutbah_id = k.id
+        WHERE km.content_ref = ?
+        ORDER BY k.date DESC
+      `),
     }
   }
 
@@ -390,6 +399,14 @@ export class UserService {
 
   removeKhutbahMaterial(id: number): void {
     this.stmts.deleteKhutbahMaterial.run(id)
+  }
+
+  getKhutbahsForVerse(contentRef: string): Array<{ id: number; title: string; date: string }> {
+    return this.stmts.getKhutbahsForVerse.all(contentRef) as Array<{
+      id: number
+      title: string
+      date: string
+    }>
   }
 
   close(): void {

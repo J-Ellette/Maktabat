@@ -404,6 +404,12 @@ export function registerIpcHandlers(
     return true
   })
 
+  // ── user:get-khutbahs-for-verse ─────────────────────────────────────────────
+  ipcMain.handle('user:get-khutbahs-for-verse', (_e, contentRef: unknown) => {
+    if (typeof contentRef !== 'string') return []
+    return userService.getKhutbahsForVerse(contentRef)
+  })
+
   // ── user:get-reading-plan ───────────────────────────────────────────────────
   ipcMain.handle('user:get-reading-plan', (_event, planKey: unknown) => {
     const pk = assertString(planKey, 'planKey')
