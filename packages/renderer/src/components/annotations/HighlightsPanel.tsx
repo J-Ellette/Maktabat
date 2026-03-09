@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useIpc } from '../../hooks/useIpc'
+import { formatDate, resourceLabel } from '../../lib/utils'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -27,21 +28,6 @@ const COLOR_META: Record<HighlightColor, { label: string; cssVar: string; bgVar:
   slate: { label: 'Slate', cssVar: 'var(--ae-black-300, #cbd5e1)', bgVar: 'rgba(148,163,184,0.25)' },
 }
 
-function resourceLabel(resourceKey: string): string {
-  if (resourceKey.startsWith('quran:')) return `Quran — Surah ${resourceKey.replace('quran:', '')}`
-  if (resourceKey.startsWith('hadith:')) return `Hadith — ${resourceKey.replace('hadith:', '')}`
-  if (resourceKey.startsWith('tafsir:')) return `Tafsir — ${resourceKey.replace('tafsir:', '')}`
-  if (resourceKey.startsWith('text:')) return resourceKey.replace('text:', '') || 'General'
-  return resourceKey
-}
-
-function formatDate(dateStr: string): string {
-  try {
-    return new Date(dateStr).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
-  } catch {
-    return dateStr
-  }
-}
 
 function exportHighlightsAsText(highlights: HighlightRow[]): void {
   const lines = highlights.map((h) => {

@@ -35,6 +35,12 @@ function isStringArray(value: unknown): value is string[] {
   return Array.isArray(value) && (value as unknown[]).every((v) => typeof v === 'string')
 }
 
+// ─── Validation constants ──────────────────────────────────────────────────────
+
+const VALID_NOTE_TYPES = ['study', 'question', 'reflection', 'khutbah', 'application'] as const
+const VALID_HIGHLIGHT_COLORS = ['gold', 'green', 'red', 'blue', 'yellow', 'orange', 'fuchsia', 'slate'] as const
+const VALID_KHUTBAH_TEMPLATES = ['jumuah', 'eid-al-fitr', 'eid-al-adha', 'janazah', 'nikah', 'custom'] as const
+
 // ─── Registration ──────────────────────────────────────────────────────────────
 
 export function registerIpcHandlers(
@@ -253,9 +259,8 @@ export function registerIpcHandlers(
       const b = assertString(body, 'body')
       const tg = tags !== undefined && isStringArray(tags) ? assertStringArray(tags, 'tags') : []
 
-      const VALID_TYPES = ['study', 'question', 'reflection', 'khutbah', 'application']
-      if (!VALID_TYPES.includes(t)) {
-        throw new Error(`Invalid note type. Must be one of: ${VALID_TYPES.join(', ')}`)
+      if (!VALID_NOTE_TYPES.includes(t as (typeof VALID_NOTE_TYPES)[number])) {
+        throw new Error(`Invalid note type. Must be one of: ${VALID_NOTE_TYPES.join(', ')}`)
       }
 
       return userService.saveNote(rk, cr, t, b, tg)
@@ -279,9 +284,8 @@ export function registerIpcHandlers(
       const cr = assertString(contentRef, 'contentRef')
       const c = assertString(color, 'color')
 
-      const VALID_COLORS = ['gold', 'green', 'red', 'blue', 'yellow', 'orange', 'fuchsia', 'slate']
-      if (!VALID_COLORS.includes(c)) {
-        throw new Error(`Invalid color. Must be one of: ${VALID_COLORS.join(', ')}`)
+      if (!VALID_HIGHLIGHT_COLORS.includes(c as (typeof VALID_HIGHLIGHT_COLORS)[number])) {
+        throw new Error(`Invalid color. Must be one of: ${VALID_HIGHLIGHT_COLORS.join(', ')}`)
       }
 
       return userService.saveHighlight(rk, cr, c)
@@ -339,9 +343,8 @@ export function registerIpcHandlers(
       const tk = assertString(templateKey, 'templateKey')
       const b = typeof body === 'string' ? body : ''
 
-      const VALID_TEMPLATES = ['jumuah', 'eid-al-fitr', 'eid-al-adha', 'janazah', 'nikah', 'custom']
-      if (!VALID_TEMPLATES.includes(tk)) {
-        throw new Error(`Invalid templateKey. Must be one of: ${VALID_TEMPLATES.join(', ')}`)
+      if (!VALID_KHUTBAH_TEMPLATES.includes(tk as (typeof VALID_KHUTBAH_TEMPLATES)[number])) {
+        throw new Error(`Invalid templateKey. Must be one of: ${VALID_KHUTBAH_TEMPLATES.join(', ')}`)
       }
 
       return userService.saveKhutbah(t, d, tk, b)
