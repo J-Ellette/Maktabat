@@ -1,4 +1,4 @@
-import { app, BrowserWindow, protocol, shell } from 'electron'
+import { app, BrowserWindow, protocol, shell, session } from 'electron'
 import path from 'path'
 import { buildMenu } from './menu-builder.js'
 import { TrayManager, sendNotification } from './tray-manager.js'
@@ -86,6 +86,32 @@ void app.whenReady().then(() => {
 
   // Register IPC handlers
   registerIpcHandlers(libraryService, userService, accountService, syncService, resourceManager)
+
+  // Warm up the FTS5 search index after startup (non-blocking)
+  setImmediate(() => libraryService.warmUpSearchIndex())
+
+  // ─── Content Security Policy ─────────────────────────────────────────────────
+  const scriptSrc = app.isPackaged ? "'self'" : "'self' 'unsafe-eval'"
+  const csp = [
+    "default-src 'self'",
+    `script-src ${scriptSrc}`,
+    "style-src 'self' 'unsafe-inline'",
+    "font-src 'self' data:",
+    "img-src 'self' data:",
+    "connect-src 'self'",
+    "media-src 'self' blob:",
+  ].join('; ')
+
+  session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+    callback({
+      responseHeaders: {
+        ...details.responseHeaders,
+        'Content-Security-Policy': [csp],
+        'X-Content-Type-Options': ['nosniff'],
+        'X-Frame-Options': ['DENY'],
+      },
+    })
+  })
 
   // Create main window
   windowManager.createMainWindow()

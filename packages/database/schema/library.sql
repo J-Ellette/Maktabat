@@ -221,9 +221,13 @@ CREATE VIRTUAL TABLE IF NOT EXISTS hadiths_fts USING fts5(
 
 -- Indexes for performance
 CREATE INDEX IF NOT EXISTS idx_ayahs_surah ON ayahs(surah_id);
+CREATE INDEX IF NOT EXISTS idx_ayahs_surah_ayah ON ayahs(surah_id, ayah_number);
 CREATE INDEX IF NOT EXISTS idx_translations_ayah ON translations(ayah_id);
+CREATE INDEX IF NOT EXISTS idx_translations_ayah_key ON translations(ayah_id, translation_key);
 CREATE INDEX IF NOT EXISTS idx_tafsir_ayah ON tafsir_entries(ayah_id);
+CREATE INDEX IF NOT EXISTS idx_tafsir_ayah_key ON tafsir_entries(ayah_id, tafsir_key);
 CREATE INDEX IF NOT EXISTS idx_hadiths_collection ON hadiths(collection_id);
+CREATE INDEX IF NOT EXISTS idx_hadiths_collection_number ON hadiths(collection_id, hadith_number);
 CREATE INDEX IF NOT EXISTS idx_hadith_grades_hadith ON hadith_grades(hadith_id);
 CREATE INDEX IF NOT EXISTS idx_word_morphology_ayah ON word_morphology(ayah_id);
 CREATE INDEX IF NOT EXISTS idx_word_morphology_root ON word_morphology(root_id);

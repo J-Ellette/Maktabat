@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useVirtualizer } from '@tanstack/react-virtual'
 import { useIpc } from '../../hooks/useIpc'
 
 export interface SurahInfo {
@@ -137,6 +138,9 @@ export default function SurahNavigator({
   const [filter, setFilter] = useState<FilterType>('all')
   const [navTab, setNavTab] = useState<NavTab>('surahs')
 
+  // Ref for the scrollable content container (needed by useVirtualizer)
+  const scrollParentRef = useRef<HTMLDivElement>(null)
+
   useEffect(() => {
     async function loadSurahs() {
       setLoading(true)
@@ -177,6 +181,13 @@ export default function SurahNavigator({
       return matchesFilter && matchesSearch
     })
   }, [surahs, filter, search])
+
+  const surahVirtualizer = useVirtualizer({
+    count: filteredSurahs.length,
+    getScrollElement: () => scrollParentRef.current,
+    estimateSize: () => 72, // estimated height per SurahCard (px)
+    overscan: 5,
+  })
 
   function handleSelectSurah(surahNumber: number) {
     if (onSelectSurah) {
@@ -266,7 +277,7 @@ export default function SurahNavigator({
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto" ref={scrollParentRef}>
         {loading ? (
           <div className="flex items-center justify-center h-32">
             <div className="w-6 h-6 border-2 border-[var(--accent-primary)] border-t-transparent rounded-full animate-spin" />
@@ -274,25 +285,38 @@ export default function SurahNavigator({
         ) : error ? (
           <div className="p-4 text-sm text-[var(--ae-red-500)]">{error}</div>
         ) : navTab === 'surahs' ? (
-          /* Surah list */
-          <div className="p-2 space-y-1">
-            {filteredSurahs.length === 0 ? (
-              <p className="p-4 text-sm text-[var(--text-secondary)] text-center">
-                No surahs match your search.
-              </p>
-            ) : (
-              filteredSurahs.map((surah) => (
-                <SurahCard
-                  key={surah.id}
-                  surah={surah}
-                  isActive={activeSurahNumber === surah.number}
-                  onClick={() => handleSelectSurah(surah.number)}
-                />
-              ))
-            )}
-          </div>
+          /* Virtualized surah list */
+          filteredSurahs.length === 0 ? (
+            <p className="p-4 text-sm text-[var(--text-secondary)] text-center">
+              No surahs match your search.
+            </p>
+          ) : (
+            <div
+              className="p-2 relative"
+              style={{ height: `${surahVirtualizer.getTotalSize()}px` }}
+            >
+              {surahVirtualizer.getVirtualItems().map((virtualItem) => {
+                const surah = filteredSurahs[virtualItem.index]
+                return (
+                  <div
+                    key={virtualItem.key}
+                    data-index={virtualItem.index}
+                    ref={surahVirtualizer.measureElement}
+                    className="absolute top-0 left-0 w-full py-0.5"
+                    style={{ transform: `translateY(${virtualItem.start}px)` }}
+                  >
+                    <SurahCard
+                      surah={surah}
+                      isActive={activeSurahNumber === surah.number}
+                      onClick={() => handleSelectSurah(surah.number)}
+                    />
+                  </div>
+                )
+              })}
+            </div>
+          )
         ) : (
-          /* Juz' list */
+          /* Juz' list (30 items — no virtualization needed) */
           <div className="p-2 space-y-1">
             {JUZ_DATA.map((juz) => (
               <button
