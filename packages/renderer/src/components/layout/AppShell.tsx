@@ -10,6 +10,7 @@ import PanelWorkspace from './PanelWorkspace'
 import CommandPalette from '../navigation/CommandPalette'
 import NavigationControls from '../navigation/NavigationControls'
 import AddressBar from '../navigation/AddressBar'
+import HighlightToolbar from '../annotations/HighlightToolbar'
 
 // ────────────────────────────────────────────────────────────────
 // Theme provider: applies CSS class + sync with settings store
@@ -293,6 +294,9 @@ export default function AppShell(): React.ReactElement {
 
       {/* Command Palette (portal-like, rendered at end) */}
       <CommandPalette onLayoutChange={handleLayoutChange} />
+
+      {/* Global floating highlight toolbar (appears on text selection) */}
+      <HighlightToolbar />
     </div>
   )
 }

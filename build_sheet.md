@@ -961,39 +961,39 @@ Everything in Premium, plus:
 
 #### Step 8.1 — Highlights System
 
-- [ ] Select text in any panel → highlight toolbar appears
-- [ ] 8 highlight colors mapped to AE palette
-- [ ] Highlights persist across sessions (stored in user.db)
-- [ ] All highlights visible in Highlights panel
-- [ ] Export highlights for any resource
+- [x] Select text in any panel → highlight toolbar appears
+- [x] 8 highlight colors mapped to AE palette
+- [x] Highlights persist across sessions (stored in user.db)
+- [x] All highlights visible in Highlights panel
+- [x] Export highlights for any resource
 
 #### Step 8.2 — Notes System
 
-- [ ] Margin notes: anchored to specific verse/hadith/passage
-- [ ] Free-form notes: not anchored, just tagged
-- [ ] Rich text editor (Markdown-based with Arabic support)
-- [ ] Note types: Study, Question, Insight, Khutbah, Application
-- [ ] Tagging system (user-defined tags)
-- [ ] Note search (full-text across all notes)
-- [ ] Note export: PDF, DOCX, Markdown, plain text
+- [x] Margin notes: anchored to specific verse/hadith/passage
+- [x] Free-form notes: not anchored, just tagged
+- [x] Rich text editor (Markdown-based with Arabic support)
+- [x] Note types: Study, Question, Insight, Khutbah, Application
+- [x] Tagging system (user-defined tags)
+- [x] Note search (full-text across all notes)
+- [x] Note export: PDF, DOCX, Markdown, plain text
 
 #### Step 8.3 — Khutbah Builder (Premium)
 
-- [ ] Mark any passage as "Khutbah material" from context menu
-- [ ] Khutbah Builder panel:
+- [x] Mark any passage as "Khutbah material" from context menu
+- [x] Khutbah Builder panel:
   - Title and date
   - Template selector (Jumu'ah, Eid al-Fitr, Eid al-Adha, Janazah, Nikah, Custom)
   - Sections: Opening (Hamd/Salawat), Main points, Conclusion, Du'a
   - Drag collected passages into sections
   - Add personal notes between passages
-- [ ] Live preview: see formatted khutbah as you build
-- [ ] Export as bilingual PDF (Arabic + English, print-ready)
-- [ ] Khutbah archive: record which verses/hadiths used in past khutbahs
-- [ ] Khutbah marker: reading a verse shows past khutbahs that used it
+- [x] Live preview: see formatted khutbah as you build
+- [x] Export as bilingual PDF (Arabic + English, print-ready)
+- [x] Khutbah archive: record which verses/hadiths used in past khutbahs
+- [ ] Khutbah marker: reading a verse shows past khutbahs that used it (requires cross-reference query — deferred)
 
 #### Step 8.4 — Study Templates (Premium)
 
-- [ ] Template library:
+- [x] Template library:
   - Verse Deep-Dive (Arabic → Translation → Tafsir → Hadith → Fiqh → Application)
   - Topical Study
   - Character Study (Prophet or Companion)
@@ -1001,8 +1001,8 @@ Everything in Premium, plus:
   - Comparative Madhab
   - Historical Event
   - Custom (build your own)
-- [ ] Template runner: fill in anchor verse/topic → template auto-populates linked resources
-- [ ] Save and share completed studies
+- [x] Template runner: fill in anchor verse/topic → template auto-populates linked resources
+- [ ] Save and share completed studies (requires account system — deferred to Phase 11)
 
 ---
 

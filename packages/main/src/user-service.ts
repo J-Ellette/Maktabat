@@ -39,6 +39,22 @@ export interface ReadingPlanRow {
   progress_data: string
 }
 
+export interface KhutbahRow {
+  id: number
+  title: string
+  date: string | null
+  template_key: string
+  status: string
+  body: string
+}
+
+export interface KhutbahMaterialRow {
+  id: number
+  khutbah_id: number
+  content_ref: string
+  order_index: number
+}
+
 // ─── Statement cache ──────────────────────────────────────────────────────────
 
 type CachedStatements = {
@@ -47,8 +63,10 @@ type CachedStatements = {
   getAllNotes: Statement
   updateNote: Statement
   deleteNote: Statement
+  searchNotes: Statement
   insertHighlight: Statement
   getHighlightsByResource: Statement
+  getAllHighlights: Statement
   deleteHighlight: Statement
   upsertBookmark: Statement
   getBookmarksByResource: Statement
@@ -57,6 +75,14 @@ type CachedStatements = {
   upsertReadingPlan: Statement
   getSetting: Statement
   upsertSetting: Statement
+  insertKhutbah: Statement
+  getKhutbahs: Statement
+  getKhutbah: Statement
+  updateKhutbah: Statement
+  deleteKhutbah: Statement
+  insertKhutbahMaterial: Statement
+  getKhutbahMaterials: Statement
+  deleteKhutbahMaterial: Statement
 }
 
 export class UserService {
@@ -108,12 +134,24 @@ export class UserService {
 
       deleteNote: this.db.prepare(`DELETE FROM notes WHERE id = ?`),
 
+      searchNotes: this.db.prepare(`
+        SELECT notes.* FROM notes
+        JOIN notes_fts ON notes.id = notes_fts.rowid
+        WHERE notes_fts MATCH ?
+        ORDER BY rank
+        LIMIT ?
+      `),
+
       insertHighlight: this.db.prepare(`
         INSERT INTO highlights (resource_key, content_ref, color) VALUES (?, ?, ?)
       `),
 
       getHighlightsByResource: this.db.prepare(`
         SELECT * FROM highlights WHERE resource_key = ? ORDER BY created_at DESC
+      `),
+
+      getAllHighlights: this.db.prepare(`
+        SELECT * FROM highlights ORDER BY created_at DESC
       `),
 
       deleteHighlight: this.db.prepare(`DELETE FROM highlights WHERE id = ?`),
@@ -148,6 +186,32 @@ export class UserService {
         INSERT INTO settings (key, value) VALUES (?, ?)
         ON CONFLICT(key) DO UPDATE SET value = excluded.value
       `),
+
+      insertKhutbah: this.db.prepare(`
+        INSERT INTO khutbahs (title, date, template_key, body) VALUES (?, ?, ?, ?)
+      `),
+
+      getKhutbahs: this.db.prepare(`
+        SELECT * FROM khutbahs ORDER BY date DESC, id DESC
+      `),
+
+      getKhutbah: this.db.prepare(`SELECT * FROM khutbahs WHERE id = ? LIMIT 1`),
+
+      updateKhutbah: this.db.prepare(`
+        UPDATE khutbahs SET title = ?, date = ?, body = ?, status = ? WHERE id = ?
+      `),
+
+      deleteKhutbah: this.db.prepare(`DELETE FROM khutbahs WHERE id = ?`),
+
+      insertKhutbahMaterial: this.db.prepare(`
+        INSERT INTO khutbah_materials (khutbah_id, content_ref, order_index) VALUES (?, ?, ?)
+      `),
+
+      getKhutbahMaterials: this.db.prepare(`
+        SELECT * FROM khutbah_materials WHERE khutbah_id = ? ORDER BY order_index ASC
+      `),
+
+      deleteKhutbahMaterial: this.db.prepare(`DELETE FROM khutbah_materials WHERE id = ?`),
     }
   }
 
@@ -186,6 +250,16 @@ export class UserService {
     this.stmts.deleteNote.run(id)
   }
 
+  searchNotes(query: string, limit = 50): NoteRow[] {
+    // Sanitize for FTS5: wrap in quotes for phrase search, append * for prefix
+    const ftsQuery = `"${query.replace(/"/g, '""')}"`
+    try {
+      return this.stmts.searchNotes.all(ftsQuery, limit) as NoteRow[]
+    } catch {
+      return []
+    }
+  }
+
   // ─── Highlights ────────────────────────────────────────────────────────────
 
   saveHighlight(resourceKey: string, contentRef: string, color: string): number {
@@ -195,6 +269,10 @@ export class UserService {
 
   getHighlightsByResource(resourceKey: string): HighlightRow[] {
     return this.stmts.getHighlightsByResource.all(resourceKey) as HighlightRow[]
+  }
+
+  getAllHighlights(): HighlightRow[] {
+    return this.stmts.getAllHighlights.all() as HighlightRow[]
   }
 
   deleteHighlight(id: number): void {
@@ -244,6 +322,42 @@ export class UserService {
 
   setSetting<T>(key: string, value: T): void {
     this.stmts.upsertSetting.run(key, JSON.stringify(value))
+  }
+
+  // ─── Khutbah Builder ───────────────────────────────────────────────────────
+
+  saveKhutbah(title: string, date: string | null, templateKey: string, body: string): number {
+    const result = this.stmts.insertKhutbah.run(title, date ?? null, templateKey, body)
+    return result.lastInsertRowid as number
+  }
+
+  getKhutbahs(): KhutbahRow[] {
+    return this.stmts.getKhutbahs.all() as KhutbahRow[]
+  }
+
+  getKhutbah(id: number): KhutbahRow | undefined {
+    return this.stmts.getKhutbah.get(id) as KhutbahRow | undefined
+  }
+
+  updateKhutbah(id: number, title: string, date: string | null, body: string, status: string): void {
+    this.stmts.updateKhutbah.run(title, date ?? null, body, status, id)
+  }
+
+  deleteKhutbah(id: number): void {
+    this.stmts.deleteKhutbah.run(id)
+  }
+
+  addKhutbahMaterial(khutbahId: number, contentRef: string, orderIndex: number): number {
+    const result = this.stmts.insertKhutbahMaterial.run(khutbahId, contentRef, orderIndex)
+    return result.lastInsertRowid as number
+  }
+
+  getKhutbahMaterials(khutbahId: number): KhutbahMaterialRow[] {
+    return this.stmts.getKhutbahMaterials.all(khutbahId) as KhutbahMaterialRow[]
+  }
+
+  removeKhutbahMaterial(id: number): void {
+    this.stmts.deleteKhutbahMaterial.run(id)
   }
 
   close(): void {

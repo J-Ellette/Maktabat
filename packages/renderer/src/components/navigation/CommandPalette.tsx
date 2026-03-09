@@ -224,6 +224,17 @@ export default function CommandPalette({
         closePalette()
       },
     },
+    {
+      id: 'nav-study-templates',
+      label: 'Open Study Templates',
+      category: 'navigate',
+      icon: '📋',
+      keywords: 'study templates verse deep dive topical character word madhab',
+      action: () => {
+        void navigate('/study-templates')
+        closePalette()
+      },
+    },
   ]
 
   const filteredCommands = query

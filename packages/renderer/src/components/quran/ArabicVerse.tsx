@@ -244,7 +244,27 @@ export default function ArabicVerse({
           onHighlight={(color) => void handleHighlight(color)}
           onAddNote={() => onAddNote?.(surahNumber, ayahNumber)}
           onAddToKhutbah={() => {
-            // TODO: integrate with Khutbah Builder
+            // Save verse as Khutbah material to the most recent khutbah
+            // (or create a default one). Uses a "default" khutbah bucket.
+            void (async () => {
+              if (!ipc) return
+              const contentRef = `Quran ${surahNumber}:${ayahNumber}`
+              // Try to find an existing draft khutbah, or save to a generic bucket
+              try {
+                const khutbahs = await ipc.invoke('user:get-khutbahs')
+                const list = khutbahs as { id: number; status: string }[]
+                const draft = list.find((k) => k.status === 'draft')
+                if (draft) {
+                  await ipc.invoke('user:add-khutbah-material', draft.id, contentRef, 0)
+                } else {
+                  // Create a quick khutbah if none exists
+                  const id = await ipc.invoke('user:save-khutbah', 'My Khutbah', null, 'jumuah', '')
+                  await ipc.invoke('user:add-khutbah-material', id as number, contentRef, 0)
+                }
+              } catch {
+                // Silently fail — user can add manually
+              }
+            })()
           }}
           onViewTafsir={() => onViewTafsir?.(surahNumber, ayahNumber)}
           onViewHadith={() => onViewHadith?.(surahNumber, ayahNumber)}
