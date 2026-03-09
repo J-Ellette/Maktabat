@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
+import AudioDownloadManager from './AudioDownloadManager'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -87,6 +88,10 @@ export interface AudioState {
   minimized: boolean
   currentTime: number
   duration: number
+  pauseBetweenVerses: boolean
+  autoAdvance: boolean
+  translationAudio: boolean
+  showDownloadManager: boolean
 }
 
 const DEFAULT_STATE: AudioState = {
@@ -101,6 +106,10 @@ const DEFAULT_STATE: AudioState = {
   minimized: false,
   currentTime: 0,
   duration: 0,
+  pauseBetweenVerses: false,
+  autoAdvance: true,
+  translationAudio: false,
+  showDownloadManager: false,
 }
 
 // ─── Global play trigger ──────────────────────────────────────────────────────
@@ -111,6 +120,19 @@ export function playAyah(surah: number, ayah: number): void {
   if (globalPlayTrigger) globalPlayTrigger(surah, ayah)
 }
 
+// ─── Audio state pub/sub ──────────────────────────────────────────────────────
+
+let audioStateListeners: Array<(surah: number, ayah: number, isPlaying: boolean) => void> = []
+
+export function subscribeToAudioState(
+  cb: (surah: number, ayah: number, isPlaying: boolean) => void
+): () => void {
+  audioStateListeners.push(cb)
+  return () => {
+    audioStateListeners = audioStateListeners.filter((l) => l !== cb)
+  }
+}
+
 // ─── AudioPlayer component ────────────────────────────────────────────────────
 
 export default function AudioPlayer(): React.ReactElement | null {
@@ -119,12 +141,23 @@ export default function AudioPlayer(): React.ReactElement | null {
   const [showReciterMenu, setShowReciterMenu] = useState(false)
   const [showSpeedMenu, setShowSpeedMenu] = useState(false)
   const audioRef = useRef<HTMLAudioElement | null>(null)
+  const audioEnRef = useRef<HTMLAudioElement | null>(null)
   const sleepTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  // Ref to hold the current onended parameters so we can update it without reloading audio
-  const onEndedParamsRef = useRef({ repeatMode: state.repeatMode, ayah: state.ayah, totalAyahs })
+  const pauseTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const reciter = RECITERS.find((r) => r.id === state.reciterId) ?? RECITERS[0]
   const totalAyahs = AYAH_COUNTS[state.surah - 1] ?? 7
+
+  // Ref to hold the current onended parameters so we can update it without reloading audio
+  const onEndedParamsRef = useRef({
+    repeatMode: state.repeatMode,
+    ayah: state.ayah,
+    surah: state.surah,
+    totalAyahs,
+    pauseBetweenVerses: state.pauseBetweenVerses,
+    autoAdvance: state.autoAdvance,
+    translationAudio: state.translationAudio,
+  })
 
   // Register global trigger
   useEffect(() => {
@@ -138,8 +171,24 @@ export default function AudioPlayer(): React.ReactElement | null {
 
   // Keep onEndedParams ref up to date without reloading audio
   useEffect(() => {
-    onEndedParamsRef.current = { repeatMode: state.repeatMode, ayah: state.ayah, totalAyahs }
-  }, [state.repeatMode, state.ayah, totalAyahs])
+    onEndedParamsRef.current = {
+      repeatMode: state.repeatMode,
+      ayah: state.ayah,
+      surah: state.surah,
+      totalAyahs,
+      pauseBetweenVerses: state.pauseBetweenVerses,
+      autoAdvance: state.autoAdvance,
+      translationAudio: state.translationAudio,
+    }
+  }, [
+    state.repeatMode,
+    state.ayah,
+    state.surah,
+    totalAyahs,
+    state.pauseBetweenVerses,
+    state.autoAdvance,
+    state.translationAudio,
+  ])
 
   // Load audio when track identity changes (surah/ayah/reciter/visible)
   useEffect(() => {
@@ -156,26 +205,52 @@ export default function AudioPlayer(): React.ReactElement | null {
     }
     audio.ontimeupdate = () =>
       setState((s) => ({ ...s, currentTime: audio.currentTime, duration: audio.duration || 0 }))
-    // onended reads from the ref so it always has current repeatMode/ayah/totalAyahs
-    // without needing to reload the audio track when those values change.
+    // onended reads from the ref so it always has current values without reloading the audio track.
     audio.onended = () => {
-      const { repeatMode, ayah, totalAyahs: total } = onEndedParamsRef.current
+      const {
+        repeatMode,
+        ayah,
+        surah,
+        totalAyahs: total,
+        pauseBetweenVerses,
+        autoAdvance,
+        translationAudio,
+      } = onEndedParamsRef.current
+
       if (repeatMode === 'verse') {
         void audio.play()
-      } else {
-        let nextAyah: number | null
-        if (ayah < total) {
-          nextAyah = ayah + 1
-        } else if (repeatMode === 'surah') {
-          nextAyah = 1
-        } else {
-          nextAyah = null
-        }
-        if (nextAyah !== null) {
+        return
+      }
+
+      const nextAyah = ayah < total ? ayah + 1 : repeatMode === 'surah' ? 1 : null
+
+      const advance = () => {
+        if (nextAyah !== null && autoAdvance) {
           setState((s) => ({ ...s, ayah: nextAyah }))
         } else {
           setState((s) => ({ ...s, isPlaying: false }))
         }
+      }
+
+      const delayedAdvance = () => {
+        if (pauseBetweenVerses) {
+          if (pauseTimeoutRef.current) clearTimeout(pauseTimeoutRef.current)
+          pauseTimeoutRef.current = setTimeout(advance, 2000)
+        } else {
+          advance()
+        }
+      }
+
+      if (translationAudio) {
+        const verse = getVerseNumber(surah, ayah)
+        const enUrl = `https://cdn.islamic.network/quran/audio/128/en.walk/${verse}.mp3`
+        if (!audioEnRef.current) audioEnRef.current = new Audio()
+        const audioEn = audioEnRef.current
+        audioEn.src = enUrl
+        audioEn.onended = delayedAdvance
+        void audioEn.play().catch(delayedAdvance)
+      } else {
+        delayedAdvance()
       }
     }
   }, [state.surah, state.ayah, state.reciterId, state.visible])
@@ -208,6 +283,11 @@ export default function AudioPlayer(): React.ReactElement | null {
       if (sleepTimerRef.current) clearTimeout(sleepTimerRef.current)
     }
   }, [state.sleepMinutes])
+
+  // Notify audio state subscribers (e.g. QuranReader highlight sync)
+  useEffect(() => {
+    audioStateListeners.forEach((cb) => cb(state.surah, state.ayah, state.isPlaying))
+  }, [state.surah, state.ayah, state.isPlaying])
 
   const toggle = useCallback(() => setState((s) => ({ ...s, isPlaying: !s.isPlaying })), [])
 
@@ -271,188 +351,237 @@ export default function AudioPlayer(): React.ReactElement | null {
   }
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 w-80 bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-2xl shadow-2xl overflow-hidden">
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 py-2.5 bg-[var(--bg-panel)] border-b border-[var(--border-subtle)]">
-        <div className="flex items-center gap-2">
-          <span className="text-lg">🎙️</span>
-          <div>
-            <div className="text-xs font-semibold text-[var(--text-primary)]">Quran Recitation</div>
+    <>
+      <div className="fixed bottom-4 right-4 z-50 w-80 bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-2xl shadow-2xl overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between px-4 py-2.5 bg-[var(--bg-panel)] border-b border-[var(--border-subtle)]">
+          <div className="flex items-center gap-2">
+            <span className="text-lg">🎙️</span>
+            <div>
+              <div className="text-xs font-semibold text-[var(--text-primary)]">
+                Quran Recitation
+              </div>
+              <button
+                onClick={() => setShowReciterMenu((s) => !s)}
+                className="text-[10px] text-[var(--accent-primary)] hover:underline"
+              >
+                {reciter.name}
+              </button>
+            </div>
+          </div>
+          <div className="flex items-center gap-1">
             <button
-              onClick={() => setShowReciterMenu((s) => !s)}
-              className="text-[10px] text-[var(--accent-primary)] hover:underline"
+              onClick={() => setState((s) => ({ ...s, showDownloadManager: true }))}
+              title="Download for Offline"
+              className="text-[var(--text-muted)] hover:text-[var(--text-primary)] p-1 text-sm"
             >
-              {reciter.name}
+              ⬇️
+            </button>
+            <button
+              onClick={() => setState((s) => ({ ...s, minimized: true }))}
+              className="text-[var(--text-muted)] hover:text-[var(--text-primary)] p-1 text-sm"
+            >
+              ⬇
+            </button>
+            <button
+              onClick={() => {
+                setState((s) => ({ ...s, visible: false, isPlaying: false }))
+                audioRef.current?.pause()
+              }}
+              className="text-[var(--text-muted)] hover:text-[var(--text-primary)] p-1"
+            >
+              ✕
             </button>
           </div>
         </div>
-        <div className="flex items-center gap-1">
+
+        {/* Reciter picker */}
+        {showReciterMenu && (
+          <div className="px-3 py-2 bg-[var(--bg-panel)] border-b border-[var(--border-subtle)] space-y-1">
+            {RECITERS.map((r) => (
+              <button
+                key={r.id}
+                onClick={() => {
+                  setState((s) => ({ ...s, reciterId: r.id }))
+                  setShowReciterMenu(false)
+                }}
+                className={`w-full text-left px-2 py-1 rounded text-xs transition-colors ${
+                  r.id === state.reciterId
+                    ? 'bg-[var(--accent-primary)] text-white'
+                    : 'text-[var(--text-secondary)] hover:bg-[var(--bg-hover)]'
+                }`}
+              >
+                <span className="font-medium">{r.name}</span>
+                <span className="ml-1 opacity-70">· {r.style}</span>
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Now playing */}
+        <div className="px-4 py-3 text-center">
           <button
-            onClick={() => setState((s) => ({ ...s, minimized: true }))}
-            className="text-[var(--text-muted)] hover:text-[var(--text-primary)] p-1 text-sm"
+            onClick={() => void navigate(`/quran/${state.surah}/${state.ayah}`)}
+            className="text-sm font-medium text-[var(--accent-primary)] hover:underline"
           >
-            ⬇
+            Surah {state.surah} — Verse {state.ayah}
           </button>
-          <button
-            onClick={() => {
-              setState((s) => ({ ...s, visible: false, isPlaying: false }))
-              audioRef.current?.pause()
-            }}
-            className="text-[var(--text-muted)] hover:text-[var(--text-primary)] p-1"
-          >
-            ✕
-          </button>
+          <div className="text-xs text-[var(--text-muted)]">of {totalAyahs} verses</div>
         </div>
-      </div>
 
-      {/* Reciter picker */}
-      {showReciterMenu && (
-        <div className="px-3 py-2 bg-[var(--bg-panel)] border-b border-[var(--border-subtle)] space-y-1">
-          {RECITERS.map((r) => (
-            <button
-              key={r.id}
-              onClick={() => {
-                setState((s) => ({ ...s, reciterId: r.id }))
-                setShowReciterMenu(false)
-              }}
-              className={`w-full text-left px-2 py-1 rounded text-xs transition-colors ${
-                r.id === state.reciterId
-                  ? 'bg-[var(--accent-primary)] text-white'
-                  : 'text-[var(--text-secondary)] hover:bg-[var(--bg-hover)]'
-              }`}
-            >
-              <span className="font-medium">{r.name}</span>
-              <span className="ml-1 opacity-70">· {r.style}</span>
-            </button>
-          ))}
-        </div>
-      )}
-
-      {/* Now playing */}
-      <div className="px-4 py-3 text-center">
-        <button
-          onClick={() => void navigate(`/quran/${state.surah}/${state.ayah}`)}
-          className="text-sm font-medium text-[var(--accent-primary)] hover:underline"
-        >
-          Surah {state.surah} — Verse {state.ayah}
-        </button>
-        <div className="text-xs text-[var(--text-muted)]">of {totalAyahs} verses</div>
-      </div>
-
-      {/* Progress bar */}
-      <div className="px-4 pb-1">
-        <div
-          className="w-full h-1.5 bg-[var(--bg-hover)] rounded-full cursor-pointer"
-          onClick={(e) => {
-            const rect = e.currentTarget.getBoundingClientRect()
-            seek((e.clientX - rect.left) / rect.width)
-          }}
-        >
+        {/* Progress bar */}
+        <div className="px-4 pb-1">
           <div
-            className="h-full bg-[var(--accent-primary)] rounded-full transition-all"
-            style={{ width: `${progress * 100}%` }}
-          />
-        </div>
-        <div className="flex justify-between text-[10px] text-[var(--text-muted)] mt-0.5">
-          <span>
-            {Math.floor(state.currentTime / 60)}:
-            {String(Math.floor(state.currentTime % 60)).padStart(2, '0')}
-          </span>
-          <span>
-            {Math.floor(state.duration / 60)}:
-            {String(Math.floor(state.duration % 60)).padStart(2, '0')}
-          </span>
-        </div>
-      </div>
-
-      {/* Controls */}
-      <div className="flex items-center justify-center gap-3 px-4 py-2">
-        <button
-          onClick={prevVerse}
-          className="text-[var(--text-muted)] hover:text-[var(--text-primary)] text-xl"
-          title="Previous verse"
-        >
-          ⏮
-        </button>
-        <button
-          onClick={toggle}
-          className="w-10 h-10 rounded-full bg-[var(--accent-primary)] text-white flex items-center justify-center text-lg hover:opacity-90 transition-opacity"
-        >
-          {state.isPlaying ? '⏸' : '▶'}
-        </button>
-        <button
-          onClick={nextVerse}
-          className="text-[var(--text-muted)] hover:text-[var(--text-primary)] text-xl"
-          title="Next verse"
-        >
-          ⏭
-        </button>
-      </div>
-
-      {/* Extra controls */}
-      <div className="flex items-center justify-between px-4 pb-3">
-        {/* Repeat */}
-        <button
-          onClick={cycleRepeat}
-          title={`Repeat: ${state.repeatMode}`}
-          className={`text-sm px-2 py-0.5 rounded ${state.repeatMode !== 'none' ? 'text-[var(--accent-primary)]' : 'text-[var(--text-muted)]'}`}
-        >
-          {repeatIcon}
-        </button>
-
-        {/* Speed */}
-        <div className="relative">
-          <button
-            onClick={() => setShowSpeedMenu((s) => !s)}
-            className="text-xs px-2 py-0.5 rounded border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:bg-[var(--bg-hover)]"
+            className="w-full h-1.5 bg-[var(--bg-hover)] rounded-full cursor-pointer"
+            onClick={(e) => {
+              const rect = e.currentTarget.getBoundingClientRect()
+              seek((e.clientX - rect.left) / rect.width)
+            }}
           >
-            {state.speed}×
-          </button>
-          {showSpeedMenu && (
-            <div className="absolute bottom-8 right-0 bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-lg shadow-xl overflow-hidden">
-              {SPEEDS.map((s) => (
-                <button
-                  key={s}
-                  onClick={() => {
-                    setState((prev) => ({ ...prev, speed: s }))
-                    setShowSpeedMenu(false)
-                  }}
-                  className={`block w-full px-4 py-1.5 text-xs text-left hover:bg-[var(--bg-hover)] ${s === state.speed ? 'text-[var(--accent-primary)] font-medium' : 'text-[var(--text-secondary)]'}`}
-                >
-                  {s}×
-                </button>
-              ))}
-            </div>
-          )}
+            <div
+              className="h-full bg-[var(--accent-primary)] rounded-full transition-all"
+              style={{ width: `${progress * 100}%` }}
+            />
+          </div>
+          <div className="flex justify-between text-[10px] text-[var(--text-muted)] mt-0.5">
+            <span>
+              {Math.floor(state.currentTime / 60)}:
+              {String(Math.floor(state.currentTime % 60)).padStart(2, '0')}
+            </span>
+            <span>
+              {Math.floor(state.duration / 60)}:
+              {String(Math.floor(state.duration % 60)).padStart(2, '0')}
+            </span>
+          </div>
         </div>
 
-        {/* Sleep timer */}
-        <div className="flex items-center gap-1">
-          <span className="text-sm">🌙</span>
-          {state.sleepMinutes ? (
+        {/* Controls */}
+        <div className="flex items-center justify-center gap-3 px-4 py-2">
+          <button
+            onClick={prevVerse}
+            className="text-[var(--text-muted)] hover:text-[var(--text-primary)] text-xl"
+            title="Previous verse"
+          >
+            ⏮
+          </button>
+          <button
+            onClick={toggle}
+            className="w-10 h-10 rounded-full bg-[var(--accent-primary)] text-white flex items-center justify-center text-lg hover:opacity-90 transition-opacity"
+          >
+            {state.isPlaying ? '⏸' : '▶'}
+          </button>
+          <button
+            onClick={nextVerse}
+            className="text-[var(--text-muted)] hover:text-[var(--text-primary)] text-xl"
+            title="Next verse"
+          >
+            ⏭
+          </button>
+        </div>
+
+        {/* Extra controls */}
+        <div className="flex items-center justify-between px-4 pb-3">
+          {/* Repeat */}
+          <button
+            onClick={cycleRepeat}
+            title={`Repeat: ${state.repeatMode}`}
+            className={`text-sm px-2 py-0.5 rounded ${state.repeatMode !== 'none' ? 'text-[var(--accent-primary)]' : 'text-[var(--text-muted)]'}`}
+          >
+            {repeatIcon}
+          </button>
+
+          {/* Auto-advance toggle */}
+          <button
+            onClick={() => setState((s) => ({ ...s, autoAdvance: !s.autoAdvance }))}
+            title={`Auto-advance: ${state.autoAdvance ? 'on' : 'off'}`}
+            className={`text-sm px-2 py-0.5 rounded ${state.autoAdvance ? 'text-[var(--accent-primary)]' : 'text-[var(--text-muted)]'}`}
+          >
+            ⏩
+          </button>
+
+          {/* Pause-between-verses toggle */}
+          <button
+            onClick={() => setState((s) => ({ ...s, pauseBetweenVerses: !s.pauseBetweenVerses }))}
+            title={`Pause between verses: ${state.pauseBetweenVerses ? 'on' : 'off'}`}
+            className={`text-sm px-2 py-0.5 rounded ${state.pauseBetweenVerses ? 'text-[var(--accent-primary)]' : 'text-[var(--text-muted)]'}`}
+          >
+            ⏸
+          </button>
+
+          {/* Translation audio toggle */}
+          <button
+            onClick={() => setState((s) => ({ ...s, translationAudio: !s.translationAudio }))}
+            title={`EN translation audio: ${state.translationAudio ? 'on' : 'off'}`}
+            className={`text-xs px-2 py-0.5 rounded border transition-colors ${
+              state.translationAudio
+                ? 'border-[var(--accent-primary)] text-[var(--accent-primary)]'
+                : 'border-[var(--border-subtle)] text-[var(--text-muted)]'
+            }`}
+          >
+            🌍 EN
+          </button>
+
+          {/* Speed */}
+          <div className="relative">
             <button
-              onClick={() => setState((s) => ({ ...s, sleepMinutes: null }))}
-              className="text-xs text-[var(--accent-primary)]"
+              onClick={() => setShowSpeedMenu((s) => !s)}
+              className="text-xs px-2 py-0.5 rounded border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:bg-[var(--bg-hover)]"
             >
-              {state.sleepMinutes}m ✕
+              {state.speed}×
             </button>
-          ) : (
-            <select
-              onChange={(e) =>
-                setState((s) => ({ ...s, sleepMinutes: Number(e.target.value) || null }))
-              }
-              className="text-[10px] bg-transparent text-[var(--text-muted)] border-none outline-none cursor-pointer"
-              defaultValue=""
-            >
-              <option value="">Sleep</option>
-              <option value="15">15 min</option>
-              <option value="30">30 min</option>
-              <option value="45">45 min</option>
-              <option value="60">60 min</option>
-            </select>
-          )}
+            {showSpeedMenu && (
+              <div className="absolute bottom-8 right-0 bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-lg shadow-xl overflow-hidden">
+                {SPEEDS.map((s) => (
+                  <button
+                    key={s}
+                    onClick={() => {
+                      setState((prev) => ({ ...prev, speed: s }))
+                      setShowSpeedMenu(false)
+                    }}
+                    className={`block w-full px-4 py-1.5 text-xs text-left hover:bg-[var(--bg-hover)] ${s === state.speed ? 'text-[var(--accent-primary)] font-medium' : 'text-[var(--text-secondary)]'}`}
+                  >
+                    {s}×
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Sleep timer */}
+          <div className="flex items-center gap-1">
+            <span className="text-sm">🌙</span>
+            {state.sleepMinutes ? (
+              <button
+                onClick={() => setState((s) => ({ ...s, sleepMinutes: null }))}
+                className="text-xs text-[var(--accent-primary)]"
+              >
+                {state.sleepMinutes}m ✕
+              </button>
+            ) : (
+              <select
+                onChange={(e) =>
+                  setState((s) => ({ ...s, sleepMinutes: Number(e.target.value) || null }))
+                }
+                className="text-[10px] bg-transparent text-[var(--text-muted)] border-none outline-none cursor-pointer"
+                defaultValue=""
+              >
+                <option value="">Sleep</option>
+                <option value="15">15 min</option>
+                <option value="30">30 min</option>
+                <option value="45">45 min</option>
+                <option value="60">60 min</option>
+              </select>
+            )}
+          </div>
         </div>
       </div>
-    </div>
+      {/* Offline download manager modal */}
+      {state.showDownloadManager && (
+        <AudioDownloadManager
+          reciters={RECITERS}
+          onClose={() => setState((s) => ({ ...s, showDownloadManager: false }))}
+        />
+      )}
+    </>
   )
 }

@@ -11,6 +11,7 @@ import TranslationView, {
 import SurahNavigator from './SurahNavigator'
 import { TAJWEED_RULES, TAJWEED_RULE_NAMES, TAJWEED_COLORS } from './TajweedColors'
 import type { WordMorphology } from './WordPopover'
+import { subscribeToAudioState } from '../audio/AudioPlayer'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -448,6 +449,13 @@ export default function QuranReader(): React.ReactElement {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  // Audio playback highlight state
+  const [playingAyah, setPlayingAyah] = useState<{
+    surah: number
+    ayah: number
+    isPlaying: boolean
+  } | null>(null)
+
   // UI state
   const [viewMode, setViewMode] = useState<ViewMode>('verse-by-verse')
   const [showTranslation, setShowTranslation] = useState(true)
@@ -457,6 +465,14 @@ export default function QuranReader(): React.ReactElement {
   const [selectedTranslationKeys, setSelectedTranslationKeys] = useState<string[]>([])
 
   const contentRef = useRef<HTMLDivElement>(null)
+
+  // Subscribe to audio player state for verse highlight sync
+  useEffect(() => {
+    const unsub = subscribeToAudioState((surah, ayah, isPlaying) => {
+      setPlayingAyah({ surah, ayah, isPlaying })
+    })
+    return unsub
+  }, [])
 
   // ── Load surah data ────────────────────────────────────────────────────────
   useEffect(() => {
@@ -756,9 +772,43 @@ export default function QuranReader(): React.ReactElement {
                       <div
                         key={ayah.id}
                         id={`ayah-${ayah.ayah_number}`}
-                        className="rounded-xl border border-[var(--border-color)] bg-[var(--bg-primary)] p-5 shadow-sm hover:shadow-md transition-shadow"
+                        className="rounded-xl border bg-[var(--bg-primary)] p-5 shadow-sm hover:shadow-md transition-shadow"
+                        style={{
+                          borderLeftWidth:
+                            playingAyah?.surah === surahNumber &&
+                            playingAyah?.ayah === ayah.ayah_number &&
+                            playingAyah?.isPlaying
+                              ? '4px'
+                              : undefined,
+                          borderLeftColor:
+                            playingAyah?.surah === surahNumber &&
+                            playingAyah?.ayah === ayah.ayah_number &&
+                            playingAyah?.isPlaying
+                              ? 'var(--ae-gold-500, #f59e0b)'
+                              : undefined,
+                          backgroundColor:
+                            playingAyah?.surah === surahNumber &&
+                            playingAyah?.ayah === ayah.ayah_number &&
+                            playingAyah?.isPlaying
+                              ? 'color-mix(in srgb, var(--ae-gold-500, #f59e0b) 6%, var(--bg-primary))'
+                              : undefined,
+                          borderColor:
+                            playingAyah?.surah === surahNumber &&
+                            playingAyah?.ayah === ayah.ayah_number &&
+                            playingAyah?.isPlaying
+                              ? 'var(--ae-gold-300, #fcd34d)'
+                              : undefined,
+                        }}
                       >
                         {/* Arabic verse */}
+                        {playingAyah?.surah === surahNumber &&
+                          playingAyah?.ayah === ayah.ayah_number &&
+                          playingAyah?.isPlaying && (
+                            <div className="flex items-center gap-1.5 mb-2 text-[var(--ae-gold-500,#f59e0b)]">
+                              <span className="text-base animate-pulse">🔊</span>
+                              <span className="text-xs font-medium">Now playing</span>
+                            </div>
+                          )}
                         <ArabicVerse
                           surahNumber={surahNumber}
                           ayahNumber={ayah.ayah_number}
