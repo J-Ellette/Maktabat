@@ -6,6 +6,7 @@ const SettingsPanel = lazy(() => import('../components/settings/SettingsPanel'))
 const QuranReader = lazy(() => import('../components/quran/QuranReader'))
 const TafsirViewer = lazy(() => import('../components/tafsir/TafsirViewer'))
 const HadithBrowser = lazy(() => import('../components/hadith/HadithBrowser'))
+const SearchPanel = lazy(() => import('../components/search/SearchPanel'))
 const PlaceholderRoute = lazy(() => import('./PlaceholderRoute'))
 
 function RouteSpinner() {
@@ -34,7 +35,8 @@ export default function AppRoutes(): React.ReactElement {
         <Route path="/hadith/:collection/:number" element={<HadithBrowser />} />
         {/* Tafsir module — Phase 4 */}
         <Route path="/tafsir/:surah/:ayah" element={<TafsirViewer />} />
-        <Route path="/search" element={<PlaceholderRoute title="Search" />} />
+        {/* Search module — Phase 6 */}
+        <Route path="/search" element={<SearchPanel />} />
         <Route path="/library" element={<PlaceholderRoute title="Library Manager" />} />
         <Route path="/reading-plans" element={<PlaceholderRoute title="Reading Plans" />} />
         <Route path="/bookmarks" element={<PlaceholderRoute title="Bookmarks" />} />
