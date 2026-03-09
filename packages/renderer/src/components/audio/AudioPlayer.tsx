@@ -149,12 +149,22 @@ export default function AudioPlayer(): React.ReactElement | null {
     }
     audio.ontimeupdate = () =>
       setState((s) => ({ ...s, currentTime: audio.currentTime, duration: audio.duration || 0 }))
+    // Capture current values in closure to avoid stale references in onended
+    const currentRepeatMode = state.repeatMode
+    const currentAyah = state.ayah
+    const currentTotalAyahs = totalAyahs
     audio.onended = () => {
-      if (state.repeatMode === 'verse') {
+      if (currentRepeatMode === 'verse') {
         void audio.play()
       } else {
-        const nextAyah =
-          state.ayah < totalAyahs ? state.ayah + 1 : state.repeatMode === 'surah' ? 1 : null
+        let nextAyah: number | null
+        if (currentAyah < currentTotalAyahs) {
+          nextAyah = currentAyah + 1
+        } else if (currentRepeatMode === 'surah') {
+          nextAyah = 1
+        } else {
+          nextAyah = null
+        }
         if (nextAyah !== null) {
           setState((s) => ({ ...s, ayah: nextAyah }))
         } else {
@@ -162,9 +172,9 @@ export default function AudioPlayer(): React.ReactElement | null {
         }
       }
     }
-    // Load only when track identity changes; intentionally omits state.isPlaying and state.speed
-    // to avoid reloading audio on every play/pause or speed toggle.
-  }, [state.surah, state.ayah, state.reciterId, state.visible])
+    // This effect intentionally depends only on track identity (surah/ayah/reciter/visible).
+    // play/pause and speed are handled by their own dedicated effects below.
+  }, [state.surah, state.ayah, state.reciterId, state.visible, state.repeatMode, totalAyahs])
 
   // Speed change
   useEffect(() => {

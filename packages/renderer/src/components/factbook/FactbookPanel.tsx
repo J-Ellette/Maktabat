@@ -263,6 +263,15 @@ function EntryDetail({
 
 // ─── FactbookPanel ─────────────────────────────────────────────────────────────
 
+function filterDemoEntries(q: string): FactbookEntry[] {
+  const lower = q.toLowerCase()
+  return DEMO_ENTRIES.filter(
+    (e) =>
+      e.title_english.toLowerCase().includes(lower) ||
+      (e.summary ?? '').toLowerCase().includes(lower)
+  )
+}
+
 export default function FactbookPanel(): React.ReactElement {
   const { slug } = useParams<{ slug?: string }>()
   const navigate = useNavigate()
@@ -296,32 +305,12 @@ export default function FactbookPanel(): React.ReactElement {
             query: query.trim(),
             limit: 30,
           })) as FactbookEntry[]
-          setResults(
-            rows.length > 0
-              ? rows
-              : DEMO_ENTRIES.filter(
-                  (e) =>
-                    e.title_english.toLowerCase().includes(query.toLowerCase()) ||
-                    (e.summary ?? '').toLowerCase().includes(query.toLowerCase())
-                )
-          )
+          setResults(rows.length > 0 ? rows : filterDemoEntries(query))
         } else {
-          setResults(
-            DEMO_ENTRIES.filter(
-              (e) =>
-                e.title_english.toLowerCase().includes(query.toLowerCase()) ||
-                (e.summary ?? '').toLowerCase().includes(query.toLowerCase())
-            )
-          )
+          setResults(filterDemoEntries(query))
         }
       } catch {
-        setResults(
-          DEMO_ENTRIES.filter(
-            (e) =>
-              e.title_english.toLowerCase().includes(query.toLowerCase()) ||
-              (e.summary ?? '').toLowerCase().includes(query.toLowerCase())
-          )
-        )
+        setResults(filterDemoEntries(query))
       } finally {
         setLoading(false)
       }

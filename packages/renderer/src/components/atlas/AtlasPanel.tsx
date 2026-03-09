@@ -17,7 +17,7 @@ interface HistoricalSite {
   lat: number // normalized 0-100 for SVG
   lng: number // normalized 0-100 for SVG
   type: 'city' | 'battle' | 'route' | 'pilgrimage'
-  era: number // CE year
+  era: number // CE year; negative values represent BCE (e.g. -1200 = 1200 BCE)
   description: string
   surahRefs?: Array<{ surah: number; ayah: number; label: string }>
 }
