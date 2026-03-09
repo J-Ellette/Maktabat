@@ -94,7 +94,7 @@ export function analyzeIrab(
   precedingPos?: string | null
 ): IrabAnalysis {
   const grammaticalCase = getCaseFromMarker(caseMarker)
-  const caseInfo = CASE_LABELS[grammaticalCase] ?? CASE_LABELS['nom']!
+  const caseInfo = CASE_LABELS[grammaticalCase] ?? CASE_LABELS['nom'] ?? { en: 'Nominative', ar: 'مرفوع' }
 
   let role: GrammaticalRole = 'other'
 
@@ -158,7 +158,7 @@ export function analyzeIrab(
       role = 'other'
   }
 
-  const info = ROLE_LABELS[role]!
+  const info = ROLE_LABELS[role] ?? ROLE_LABELS['other']
 
   return {
     role,

@@ -635,7 +635,11 @@ export function conjugateVerb(root: string, formNumber = 1): ConjugationTable {
   ]
 
   const idx = Math.max(0, Math.min(9, formNumber - 1))
-  const spec = FORMS[idx]!
+  const spec = FORMS[idx]
+
+  if (!spec) {
+    return { root, form: formNumber, formName: 'Unknown', formPattern: '', formPatternPresent: '', tenses: [] }
+  }
 
   const tenses: ConjugationTense[] = [
     {

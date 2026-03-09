@@ -203,7 +203,7 @@ export default function IrabViewer(): React.ReactElement {
       pos: m.pos,
       caseMarker: m.caseMarker,
       wordPosition: m.wordPosition,
-      irab: irabResults[i]!,
+      irab: irabResults[i] ?? irabResults[0],
     }))
   }, [bundle])
 

@@ -133,8 +133,8 @@ export default function WordStudyPanel(): React.ReactElement {
     void fetchHadith()
   }, [fetchOccurrences, fetchHadith])
 
-  const dictData = MOCK_DICTIONARY[root] ?? MOCK_DICTIONARY['default']!
-  const semanticData = MOCK_SEMANTIC_FIELD[root] ?? MOCK_SEMANTIC_FIELD['default']!
+  const dictData = MOCK_DICTIONARY[root] ?? MOCK_DICTIONARY['default']
+  const semanticData = MOCK_SEMANTIC_FIELD[root] ?? MOCK_SEMANTIC_FIELD['default']
 
   if (!word) {
     return (
