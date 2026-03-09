@@ -37,10 +37,10 @@ function exportHighlightsAsText(highlights: HighlightRow[]): void {
   })
   const blob = new Blob([lines.join('\n')], { type: 'text/plain' })
   const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = 'maktabat-highlights.txt'
-  a.click()
+  const downloadLink = document.createElement('a')
+  downloadLink.href = url
+  downloadLink.download = 'maktabat-highlights.txt'
+  downloadLink.click()
   URL.revokeObjectURL(url)
 }
 

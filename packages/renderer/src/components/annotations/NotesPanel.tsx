@@ -41,10 +41,10 @@ ${tagsLine}${n.body}
   })
   const blob = new Blob([`# Maktabat Notes Export\n\n${lines.join('\n')}`], { type: 'text/markdown' })
   const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = 'maktabat-notes.md'
-  a.click()
+  const downloadLink = document.createElement('a')
+  downloadLink.href = url
+  downloadLink.download = 'maktabat-notes.md'
+  downloadLink.click()
   URL.revokeObjectURL(url)
 }
 
@@ -137,8 +137,8 @@ function NoteEditor({ note, onSave, onDelete, onNew }: NoteEditorProps): React.R
     setIsDirty(false)
   }, [note])
 
-  function handleBodyChange(v: string) {
-    setBody(v)
+  function handleBodyChange(newBodyText: string) {
+    setBody(newBodyText)
     setIsDirty(true)
   }
 

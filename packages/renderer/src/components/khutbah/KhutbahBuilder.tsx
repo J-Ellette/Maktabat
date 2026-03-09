@@ -522,10 +522,10 @@ ${khutbah.body}
 `
   const blob = new Blob([text], { type: 'text/plain' })
   const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = `${khutbah.title.replace(/[^a-z0-9]/gi, '_')}.txt`
-  a.click()
+  const downloadLink = document.createElement('a')
+  downloadLink.href = url
+  downloadLink.download = `${khutbah.title.replace(/[^a-z0-9]/gi, '_')}.txt`
+  downloadLink.click()
   URL.revokeObjectURL(url)
 }
 

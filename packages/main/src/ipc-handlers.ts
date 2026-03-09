@@ -17,11 +17,11 @@ function assertString(value: unknown, name: string): string {
 }
 
 function assertNumber(value: unknown, name: string): number {
-  const n = Number(value)
-  if (!Number.isFinite(n) || n < 0) {
+  const parsedNumber = Number(value)
+  if (!Number.isFinite(parsedNumber) || parsedNumber < 0) {
     throw new Error(`Invalid input: '${name}' must be a non-negative number`)
   }
-  return n
+  return parsedNumber
 }
 
 function assertStringArray(value: unknown, name: string): string[] {
@@ -57,10 +57,10 @@ export function registerIpcHandlers(
 
   // ── library:get-ayahs-by-surah ──────────────────────────────────────────────
   ipcMain.handle('library:get-ayahs-by-surah', (_event, surahNumber: unknown) => {
-    const sn = assertNumber(surahNumber, 'surahNumber')
-    if (sn < 1 || sn > 114) throw new Error('surahNumber must be between 1 and 114')
+    const surahNum = assertNumber(surahNumber, 'surahNumber')
+    if (surahNum < 1 || surahNum > 114) throw new Error('surahNumber must be between 1 and 114')
 
-    const ayahs = libraryService.getAyahsBySurah(sn)
+    const ayahs = libraryService.getAyahsBySurah(surahNum)
     // For each ayah also get translations
     return ayahs.map((ayah) => ({
       ayah,
@@ -71,18 +71,18 @@ export function registerIpcHandlers(
 
   // ── library:get-translations ────────────────────────────────────────────────
   ipcMain.handle('library:get-translations', (_event, ayahId: unknown) => {
-    const id = assertNumber(ayahId, 'ayahId')
-    return libraryService.getTranslations(id)
+    const validatedAyahId = assertNumber(ayahId, 'ayahId')
+    return libraryService.getTranslations(validatedAyahId)
   })
 
   // ── library:get-ayah ────────────────────────────────────────────────────────
   ipcMain.handle('library:get-ayah', (_event, surahNumber: unknown, ayahNumber: unknown) => {
-    const sn = assertNumber(surahNumber, 'surahNumber')
-    const an = assertNumber(ayahNumber, 'ayahNumber')
-    if (sn < 1 || sn > 114) throw new Error('surahNumber must be between 1 and 114')
-    if (an < 1 || an > 286) throw new Error('ayahNumber must be between 1 and 286')
+    const surahNum = assertNumber(surahNumber, 'surahNumber')
+    const ayahNum = assertNumber(ayahNumber, 'ayahNumber')
+    if (surahNum < 1 || surahNum > 114) throw new Error('surahNumber must be between 1 and 114')
+    if (ayahNum < 1 || ayahNum > 286) throw new Error('ayahNumber must be between 1 and 286')
 
-    const ayah = libraryService.getAyah(sn, an)
+    const ayah = libraryService.getAyah(surahNum, ayahNum)
     if (!ayah) return null
 
     const translations = libraryService.getTranslations(ayah.id)
@@ -91,25 +91,25 @@ export function registerIpcHandlers(
 
   // ── library:get-tafsir ──────────────────────────────────────────────────────
   ipcMain.handle('library:get-tafsir', (_event, ayahId: unknown, tafsirKey: unknown) => {
-    const id = assertNumber(ayahId, 'ayahId')
-    const key = assertString(tafsirKey, 'tafsirKey')
-    return libraryService.getTafsir(id, key) ?? null
+    const validatedAyahId = assertNumber(ayahId, 'ayahId')
+    const validatedTafsirKey = assertString(tafsirKey, 'tafsirKey')
+    return libraryService.getTafsir(validatedAyahId, validatedTafsirKey) ?? null
   })
 
   // ── library:get-tafsirs-for-ayah ────────────────────────────────────────────
   ipcMain.handle('library:get-tafsirs-for-ayah', (_event, ayahId: unknown) => {
-    const id = assertNumber(ayahId, 'ayahId')
-    return libraryService.getTafsirsForAyah(id)
+    const validatedAyahId = assertNumber(ayahId, 'ayahId')
+    return libraryService.getTafsirsForAyah(validatedAyahId)
   })
 
   // ── library:get-tafsirs-by-surah ────────────────────────────────────────────
   ipcMain.handle(
     'library:get-tafsirs-by-surah',
     (_event, surahNumber: unknown, tafsirKey: unknown) => {
-      const sn = assertNumber(surahNumber, 'surahNumber')
-      const key = assertString(tafsirKey, 'tafsirKey')
-      if (sn < 1 || sn > 114) throw new Error('surahNumber must be between 1 and 114')
-      return libraryService.getTafsirsBySurah(sn, key)
+      const surahNum = assertNumber(surahNumber, 'surahNumber')
+      const validatedTafsirKey = assertString(tafsirKey, 'tafsirKey')
+      if (surahNum < 1 || surahNum > 114) throw new Error('surahNumber must be between 1 and 114')
+      return libraryService.getTafsirsBySurah(surahNum, validatedTafsirKey)
     }
   )
 
@@ -120,10 +120,10 @@ export function registerIpcHandlers(
 
   // ── library:get-hadith ──────────────────────────────────────────────────────
   ipcMain.handle('library:get-hadith', (_event, collectionKey: unknown, hadithNumber: unknown) => {
-    const ck = assertString(collectionKey, 'collectionKey')
-    const hn = assertString(hadithNumber, 'hadithNumber')
+    const validatedCollectionKey = assertString(collectionKey, 'collectionKey')
+    const validatedHadithNumber = assertString(hadithNumber, 'hadithNumber')
 
-    const hadith = libraryService.getHadith(ck, hn)
+    const hadith = libraryService.getHadith(validatedCollectionKey, validatedHadithNumber)
     if (!hadith) return null
 
     const grades = libraryService.getHadithGrades(hadith.id)
@@ -137,33 +137,33 @@ export function registerIpcHandlers(
 
   // ── library:get-hadith-books ────────────────────────────────────────────────
   ipcMain.handle('library:get-hadith-books', (_event, collectionKey: unknown) => {
-    const ck = assertString(collectionKey, 'collectionKey')
-    return libraryService.getHadithBooks(ck)
+    const validatedCollectionKey = assertString(collectionKey, 'collectionKey')
+    return libraryService.getHadithBooks(validatedCollectionKey)
   })
 
   // ── library:get-hadith-chapters ─────────────────────────────────────────────
   ipcMain.handle('library:get-hadith-chapters', (_event, bookId: unknown) => {
-    const id = assertNumber(bookId, 'bookId')
-    return libraryService.getHadithChapters(id)
+    const validatedBookId = assertNumber(bookId, 'bookId')
+    return libraryService.getHadithChapters(validatedBookId)
   })
 
   // ── library:get-hadiths-by-book ──────────────────────────────────────────────
   ipcMain.handle('library:get-hadiths-by-book', (_event, bookId: unknown) => {
-    const id = assertNumber(bookId, 'bookId')
-    return libraryService.getHadithsByBook(id)
+    const validatedBookId = assertNumber(bookId, 'bookId')
+    return libraryService.getHadithsByBook(validatedBookId)
   })
 
   // ── library:get-hadiths-by-chapter ──────────────────────────────────────────
   ipcMain.handle('library:get-hadiths-by-chapter', (_event, chapterId: unknown) => {
-    const id = assertNumber(chapterId, 'chapterId')
-    return libraryService.getHadithsByChapter(id)
+    const validatedChapterId = assertNumber(chapterId, 'chapterId')
+    return libraryService.getHadithsByChapter(validatedChapterId)
   })
 
   // ── library:get-hadith-by-id ─────────────────────────────────────────────────
   ipcMain.handle('library:get-hadith-by-id', (_event, hadithId: unknown) => {
-    const id = assertNumber(hadithId, 'hadithId')
+    const validatedHadithId = assertNumber(hadithId, 'hadithId')
 
-    const hadith = libraryService.getHadithById(id)
+    const hadith = libraryService.getHadithById(validatedHadithId)
     if (!hadith) return null
 
     const grades = libraryService.getHadithGrades(hadith.id)
@@ -173,8 +173,8 @@ export function registerIpcHandlers(
 
   // ── library:get-isnad ────────────────────────────────────────────────────────
   ipcMain.handle('library:get-isnad', (_event, hadithId: unknown) => {
-    const id = assertNumber(hadithId, 'hadithId')
-    return libraryService.getIsnad(id)
+    const validatedHadithId = assertNumber(hadithId, 'hadithId')
+    return libraryService.getIsnad(validatedHadithId)
   })
 
   // ── library:search-hadiths ───────────────────────────────────────────────────
@@ -188,32 +188,32 @@ export function registerIpcHandlers(
       limit: unknown,
       offset: unknown
     ) => {
-      const q = assertString(query, 'query')
-      if (q.length > 500) throw new Error('Query too long (max 500 characters)')
+      const searchQuery = assertString(query, 'query')
+      if (searchQuery.length > 500) throw new Error('Query too long (max 500 characters)')
 
-      const ck =
+      const collectionFilter =
         collectionKey !== undefined && collectionKey !== null
           ? assertString(collectionKey, 'collectionKey')
           : undefined
-      const gr = grade !== undefined && grade !== null ? assertString(grade, 'grade') : undefined
-      const lim = limit !== undefined ? Math.min(assertNumber(limit, 'limit'), 100) : 20
-      const off = offset !== undefined ? assertNumber(offset, 'offset') : 0
+      const gradeFilter = grade !== undefined && grade !== null ? assertString(grade, 'grade') : undefined
+      const resultLimit = limit !== undefined ? Math.min(assertNumber(limit, 'limit'), 100) : 20
+      const resultOffset = offset !== undefined ? assertNumber(offset, 'offset') : 0
 
-      return libraryService.searchHadiths(q, ck, gr, lim, off)
+      return libraryService.searchHadiths(searchQuery, collectionFilter, gradeFilter, resultLimit, resultOffset)
     }
   )
 
   // ── library:get-morphology ──────────────────────────────────────────────────
   ipcMain.handle('library:get-morphology', (_event, ayahId: unknown) => {
-    const id = assertNumber(ayahId, 'ayahId')
-    return libraryService.getMorphologyForAyah(id)
+    const validatedAyahId = assertNumber(ayahId, 'ayahId')
+    return libraryService.getMorphologyForAyah(validatedAyahId)
   })
 
   // ── library:get-word-occurrences ────────────────────────────────────────────
   ipcMain.handle('library:get-word-occurrences', (_event, root: unknown) => {
-    const r = assertString(root, 'root')
-    if (r.length > 10) throw new Error('root exceeds maximum length of 10 characters')
-    return libraryService.getWordOccurrences(r)
+    const rootWord = assertString(root, 'root')
+    if (rootWord.length > 10) throw new Error('root exceeds maximum length of 10 characters')
+    return libraryService.getWordOccurrences(rootWord)
   })
 
   // ── library:search ──────────────────────────────────────────────────────────
@@ -227,18 +227,18 @@ export function registerIpcHandlers(
       resourceTypes: unknown,
       expandMorphology: unknown
     ) => {
-      const q = assertString(query, 'query')
-      if (q.length > 500) throw new Error('Query too long (max 500 characters)')
+      const searchQuery = assertString(query, 'query')
+      if (searchQuery.length > 500) throw new Error('Query too long (max 500 characters)')
 
-      const lim = limit !== undefined ? Math.min(assertNumber(limit, 'limit'), 100) : 20
-      const off = offset !== undefined ? assertNumber(offset, 'offset') : 0
+      const resultLimit = limit !== undefined ? Math.min(assertNumber(limit, 'limit'), 100) : 20
+      const resultOffset = offset !== undefined ? assertNumber(offset, 'offset') : 0
       const types =
         resourceTypes !== undefined && isStringArray(resourceTypes)
           ? assertStringArray(resourceTypes, 'resourceTypes')
           : undefined
       const expand = typeof expandMorphology === 'boolean' ? expandMorphology : false
 
-      return libraryService.search(q, lim, off, types, expand)
+      return libraryService.search(searchQuery, resultLimit, resultOffset, types, expand)
     }
   )
 
@@ -253,17 +253,17 @@ export function registerIpcHandlers(
       body: unknown,
       tags: unknown
     ) => {
-      const rk = assertString(resourceKey, 'resourceKey')
-      const cr = assertString(contentRef, 'contentRef')
-      const t = assertString(type, 'type')
-      const b = assertString(body, 'body')
-      const tg = tags !== undefined && isStringArray(tags) ? assertStringArray(tags, 'tags') : []
+      const validatedResourceKey = assertString(resourceKey, 'resourceKey')
+      const validatedContentRef = assertString(contentRef, 'contentRef')
+      const noteType = assertString(type, 'type')
+      const noteBody = assertString(body, 'body')
+      const noteTags = tags !== undefined && isStringArray(tags) ? assertStringArray(tags, 'tags') : []
 
-      if (!VALID_NOTE_TYPES.includes(t as (typeof VALID_NOTE_TYPES)[number])) {
+      if (!VALID_NOTE_TYPES.includes(noteType as (typeof VALID_NOTE_TYPES)[number])) {
         throw new Error(`Invalid note type. Must be one of: ${VALID_NOTE_TYPES.join(', ')}`)
       }
 
-      return userService.saveNote(rk, cr, t, b, tg)
+      return userService.saveNote(validatedResourceKey, validatedContentRef, noteType, noteBody, noteTags)
     }
   )
 
@@ -272,30 +272,30 @@ export function registerIpcHandlers(
     if (resourceKey === undefined || resourceKey === null) {
       return userService.getAllNotes()
     }
-    const rk = assertString(resourceKey, 'resourceKey')
-    return userService.getNotesByResource(rk)
+    const validatedResourceKey = assertString(resourceKey, 'resourceKey')
+    return userService.getNotesByResource(validatedResourceKey)
   })
 
   // ── user:save-highlight ─────────────────────────────────────────────────────
   ipcMain.handle(
     'user:save-highlight',
     (_event, resourceKey: unknown, contentRef: unknown, color: unknown) => {
-      const rk = assertString(resourceKey, 'resourceKey')
-      const cr = assertString(contentRef, 'contentRef')
-      const c = assertString(color, 'color')
+      const validatedResourceKey = assertString(resourceKey, 'resourceKey')
+      const validatedContentRef = assertString(contentRef, 'contentRef')
+      const highlightColor = assertString(color, 'color')
 
-      if (!VALID_HIGHLIGHT_COLORS.includes(c as (typeof VALID_HIGHLIGHT_COLORS)[number])) {
+      if (!VALID_HIGHLIGHT_COLORS.includes(highlightColor as (typeof VALID_HIGHLIGHT_COLORS)[number])) {
         throw new Error(`Invalid color. Must be one of: ${VALID_HIGHLIGHT_COLORS.join(', ')}`)
       }
 
-      return userService.saveHighlight(rk, cr, c)
+      return userService.saveHighlight(validatedResourceKey, validatedContentRef, highlightColor)
     }
   )
 
   // ── user:get-highlights ─────────────────────────────────────────────────────
   ipcMain.handle('user:get-highlights', (_event, resourceKey: unknown) => {
-    const rk = assertString(resourceKey, 'resourceKey')
-    return userService.getHighlightsByResource(rk)
+    const validatedResourceKey = assertString(resourceKey, 'resourceKey')
+    return userService.getHighlightsByResource(validatedResourceKey)
   })
 
   // ── user:get-all-highlights ─────────────────────────────────────────────────
@@ -313,9 +313,9 @@ export function registerIpcHandlers(
   // ── user:update-note ────────────────────────────────────────────────────────
   ipcMain.handle('user:update-note', (_event, id: unknown, body: unknown, tags: unknown) => {
     const noteId = assertNumber(id, 'id')
-    const b = assertString(body, 'body')
-    const tg = tags !== undefined && isStringArray(tags) ? assertStringArray(tags, 'tags') : []
-    userService.updateNote(noteId, b, tg)
+    const noteBody = assertString(body, 'body')
+    const noteTags = tags !== undefined && isStringArray(tags) ? assertStringArray(tags, 'tags') : []
+    userService.updateNote(noteId, noteBody, noteTags)
     return true
   })
 
@@ -328,26 +328,26 @@ export function registerIpcHandlers(
 
   // ── user:search-notes ───────────────────────────────────────────────────────
   ipcMain.handle('user:search-notes', (_event, query: unknown, limit: unknown) => {
-    const q = assertString(query, 'query')
-    if (q.length > 500) throw new Error('Query too long (max 500 characters)')
-    const lim = limit !== undefined ? Math.min(assertNumber(limit, 'limit'), 200) : 50
-    return userService.searchNotes(q, lim)
+    const searchQuery = assertString(query, 'query')
+    if (searchQuery.length > 500) throw new Error('Query too long (max 500 characters)')
+    const resultLimit = limit !== undefined ? Math.min(assertNumber(limit, 'limit'), 200) : 50
+    return userService.searchNotes(searchQuery, resultLimit)
   })
 
   // ── user:save-khutbah ───────────────────────────────────────────────────────
   ipcMain.handle(
     'user:save-khutbah',
     (_event, title: unknown, date: unknown, templateKey: unknown, body: unknown) => {
-      const t = assertString(title, 'title')
-      const d = date != null ? assertString(date, 'date') : null
-      const tk = assertString(templateKey, 'templateKey')
-      const b = typeof body === 'string' ? body : ''
+      const titleValue = assertString(title, 'title')
+      const dateValue = date != null ? assertString(date, 'date') : null
+      const validatedTemplateKey = assertString(templateKey, 'templateKey')
+      const bodyContent = typeof body === 'string' ? body : ''
 
-      if (!VALID_KHUTBAH_TEMPLATES.includes(tk as (typeof VALID_KHUTBAH_TEMPLATES)[number])) {
+      if (!VALID_KHUTBAH_TEMPLATES.includes(validatedTemplateKey as (typeof VALID_KHUTBAH_TEMPLATES)[number])) {
         throw new Error(`Invalid templateKey. Must be one of: ${VALID_KHUTBAH_TEMPLATES.join(', ')}`)
       }
 
-      return userService.saveKhutbah(t, d, tk, b)
+      return userService.saveKhutbah(titleValue, dateValue, validatedTemplateKey, bodyContent)
     }
   )
 
@@ -367,11 +367,11 @@ export function registerIpcHandlers(
     'user:update-khutbah',
     (_event, id: unknown, title: unknown, date: unknown, body: unknown, status: unknown) => {
       const khutbahId = assertNumber(id, 'id')
-      const t = assertString(title, 'title')
-      const d = date != null ? assertString(date, 'date') : null
-      const b = typeof body === 'string' ? body : ''
-      const s = typeof status === 'string' && ['draft', 'final'].includes(status) ? status : 'draft'
-      userService.updateKhutbah(khutbahId, t, d, b, s)
+      const titleValue = assertString(title, 'title')
+      const dateValue = date != null ? assertString(date, 'date') : null
+      const bodyContent = typeof body === 'string' ? body : ''
+      const statusValue = typeof status === 'string' && ['draft', 'final'].includes(status) ? status : 'draft'
+      userService.updateKhutbah(khutbahId, titleValue, dateValue, bodyContent, statusValue)
       return true
     }
   )
@@ -387,17 +387,17 @@ export function registerIpcHandlers(
   ipcMain.handle(
     'user:add-khutbah-material',
     (_event, khutbahId: unknown, contentRef: unknown, orderIndex: unknown) => {
-      const kid = assertNumber(khutbahId, 'khutbahId')
-      const cr = assertString(contentRef, 'contentRef')
-      const oi = orderIndex !== undefined ? assertNumber(orderIndex, 'orderIndex') : 0
-      return userService.addKhutbahMaterial(kid, cr, oi)
+      const parsedKhutbahId = assertNumber(khutbahId, 'khutbahId')
+      const validatedContentRef = assertString(contentRef, 'contentRef')
+      const parsedOrderIndex = orderIndex !== undefined ? assertNumber(orderIndex, 'orderIndex') : 0
+      return userService.addKhutbahMaterial(parsedKhutbahId, validatedContentRef, parsedOrderIndex)
     }
   )
 
   // ── user:get-khutbah-materials ──────────────────────────────────────────────
   ipcMain.handle('user:get-khutbah-materials', (_event, khutbahId: unknown) => {
-    const kid = assertNumber(khutbahId, 'khutbahId')
-    return userService.getKhutbahMaterials(kid)
+    const parsedKhutbahId = assertNumber(khutbahId, 'khutbahId')
+    return userService.getKhutbahMaterials(parsedKhutbahId)
   })
 
   // ── user:remove-khutbah-material ────────────────────────────────────────────
@@ -415,8 +415,8 @@ export function registerIpcHandlers(
 
   // ── user:get-reading-plan ───────────────────────────────────────────────────
   ipcMain.handle('user:get-reading-plan', (_event, planKey: unknown) => {
-    const pk = assertString(planKey, 'planKey')
-    return userService.getReadingPlan(pk) ?? null
+    const validatedPlanKey = assertString(planKey, 'planKey')
+    return userService.getReadingPlan(validatedPlanKey) ?? null
   })
 
   // ── user:get-all-reading-plans ──────────────────────────────────────────────
@@ -428,13 +428,13 @@ export function registerIpcHandlers(
   ipcMain.handle(
     'user:save-reading-plan',
     (_event, planKey: unknown, startDate: unknown, targetDate: unknown, progressData: unknown) => {
-      const pk = assertString(planKey, 'planKey')
-      const sd = assertString(startDate, 'startDate')
-      const td = assertString(targetDate, 'targetDate')
+      const validatedPlanKey = assertString(planKey, 'planKey')
+      const validatedStartDate = assertString(startDate, 'startDate')
+      const validatedTargetDate = assertString(targetDate, 'targetDate')
       if (!progressData || typeof progressData !== 'object' || Array.isArray(progressData)) {
         throw new Error('user:save-reading-plan: progressData must be an object')
       }
-      userService.saveReadingPlan(pk, sd, td, progressData as Record<string, unknown>)
+      userService.saveReadingPlan(validatedPlanKey, validatedStartDate, validatedTargetDate, progressData as Record<string, unknown>)
       return true
     }
   )
@@ -443,33 +443,33 @@ export function registerIpcHandlers(
   ipcMain.handle(
     'user:update-reading-plan-progress',
     (_event, planKey: unknown, progressData: unknown) => {
-      const pk = assertString(planKey, 'planKey')
+      const validatedPlanKey = assertString(planKey, 'planKey')
       if (!progressData || typeof progressData !== 'object' || Array.isArray(progressData)) {
         throw new Error('user:update-reading-plan-progress: progressData must be an object')
       }
-      userService.updateReadingPlanProgress(pk, progressData as Record<string, unknown>)
+      userService.updateReadingPlanProgress(validatedPlanKey, progressData as Record<string, unknown>)
       return true
     }
   )
 
   // ── user:delete-reading-plan ────────────────────────────────────────────────
   ipcMain.handle('user:delete-reading-plan', (_event, planKey: unknown) => {
-    const pk = assertString(planKey, 'planKey')
-    userService.deleteReadingPlan(pk)
+    const validatedPlanKey = assertString(planKey, 'planKey')
+    userService.deleteReadingPlan(validatedPlanKey)
     return true
   })
 
   // ── settings:get ────────────────────────────────────────────────────────────
   ipcMain.handle('settings:get', (_event, key: unknown, defaultValue: unknown) => {
-    const k = assertString(key, 'key')
-    return userService.getSetting(k, defaultValue ?? null)
+    const settingKey = assertString(key, 'key')
+    return userService.getSetting(settingKey, defaultValue ?? null)
   })
 
   // ── settings:set ────────────────────────────────────────────────────────────
   ipcMain.handle('settings:set', (_event, key: unknown, value: unknown) => {
-    const k = assertString(key, 'key')
+    const settingKey = assertString(key, 'key')
     if (value === undefined) throw new Error("settings:set requires a 'value' argument")
-    userService.setSetting(k, value)
+    userService.setSetting(settingKey, value)
     return true
   })
 
@@ -515,43 +515,43 @@ export function registerIpcHandlers(
     'account:sign-up',
     (_e, email: unknown, password: unknown, displayName: unknown) => {
       if (!accountService) throw new Error('Account service not available.')
-      const em = assertString(email, 'email')
-      const pw = assertString(password, 'password')
-      if (pw.length < 8) throw new Error('Password must be at least 8 characters.')
-      const dn = displayName != null && typeof displayName === 'string' ? displayName : undefined
-      return accountService.signUp(em, pw, dn)
+      const emailAddress = assertString(email, 'email')
+      const passwordValue = assertString(password, 'password')
+      if (passwordValue.length < 8) throw new Error('Password must be at least 8 characters.')
+      const displayNameValue = displayName != null && typeof displayName === 'string' ? displayName : undefined
+      return accountService.signUp(emailAddress, passwordValue, displayNameValue)
     }
   )
 
   // ── account:sign-in ─────────────────────────────────────────────────────────
   ipcMain.handle('account:sign-in', (_e, email: unknown, password: unknown) => {
     if (!accountService) throw new Error('Account service not available.')
-    const em = assertString(email, 'email')
-    const pw = assertString(password, 'password')
-    return accountService.signIn(em, pw)
+    const emailAddress = assertString(email, 'email')
+    const passwordValue = assertString(password, 'password')
+    return accountService.signIn(emailAddress, passwordValue)
   })
 
   // ── account:sign-out ────────────────────────────────────────────────────────
   ipcMain.handle('account:sign-out', (_e, token: unknown) => {
     if (!accountService) throw new Error('Account service not available.')
-    const t = assertString(token, 'token')
-    accountService.signOut(t)
+    const sessionToken = assertString(token, 'token')
+    accountService.signOut(sessionToken)
     return true
   })
 
   // ── account:get-profile ─────────────────────────────────────────────────────
   ipcMain.handle('account:get-profile', (_e, token: unknown) => {
     if (!accountService) throw new Error('Account service not available.')
-    const t = assertString(token, 'token')
-    return accountService.getProfileByToken(t) ?? null
+    const sessionToken = assertString(token, 'token')
+    return accountService.getProfileByToken(sessionToken) ?? null
   })
 
   // ── account:update-display-name ─────────────────────────────────────────────
   ipcMain.handle('account:update-display-name', (_e, token: unknown, name: unknown) => {
     if (!accountService) throw new Error('Account service not available.')
-    const t = assertString(token, 'token')
-    const n = assertString(name, 'name')
-    return accountService.updateDisplayName(t, n) ?? null
+    const sessionToken = assertString(token, 'token')
+    const newDisplayName = assertString(name, 'name')
+    return accountService.updateDisplayName(sessionToken, newDisplayName) ?? null
   })
 
   // ── sync:get-status ─────────────────────────────────────────────────────────
@@ -564,15 +564,15 @@ export function registerIpcHandlers(
   // ── sync:export-bundle ──────────────────────────────────────────────────────
   ipcMain.handle('sync:export-bundle', (_e, outputPath: unknown) => {
     if (!syncService) throw new Error('Sync service not available.')
-    const op = assertString(outputPath, 'outputPath')
-    return syncService.exportBundle(op)
+    const validatedOutputPath = assertString(outputPath, 'outputPath')
+    return syncService.exportBundle(validatedOutputPath)
   })
 
   // ── sync:import-bundle ──────────────────────────────────────────────────────
   ipcMain.handle('sync:import-bundle', (_e, bundlePath: unknown) => {
     if (!syncService) throw new Error('Sync service not available.')
-    const bp = assertString(bundlePath, 'bundlePath')
-    return syncService.importBundle(bp)
+    const validatedBundlePath = assertString(bundlePath, 'bundlePath')
+    return syncService.importBundle(validatedBundlePath)
   })
 
   // ── sync:trigger ────────────────────────────────────────────────────────────
@@ -597,42 +597,42 @@ export function registerIpcHandlers(
   // ── resource:install ────────────────────────────────────────────────────────
   ipcMain.handle('resource:install', (_e, resourceKey: unknown) => {
     if (!resourceManager) throw new Error('Resource manager not available.')
-    const rk = assertString(resourceKey, 'resourceKey')
-    return resourceManager.installResource(rk)
+    const validatedResourceKey = assertString(resourceKey, 'resourceKey')
+    return resourceManager.installResource(validatedResourceKey)
   })
 
   // ── resource:uninstall ──────────────────────────────────────────────────────
   ipcMain.handle('resource:uninstall', (_e, resourceKey: unknown) => {
     if (!resourceManager) throw new Error('Resource manager not available.')
-    const rk = assertString(resourceKey, 'resourceKey')
-    return resourceManager.uninstallResource(rk)
+    const validatedResourceKey = assertString(resourceKey, 'resourceKey')
+    return resourceManager.uninstallResource(validatedResourceKey)
   })
 
   // ── resource:import-mkt ─────────────────────────────────────────────────────
   ipcMain.handle('resource:import-mkt', (_e, filePath: unknown) => {
     if (!resourceManager) throw new Error('Resource manager not available.')
-    const fp = assertString(filePath, 'filePath')
-    return resourceManager.importMktResource(fp)
+    const validatedFilePath = assertString(filePath, 'filePath')
+    return resourceManager.importMktResource(validatedFilePath)
   })
 
   // ── resource:import-epub ────────────────────────────────────────────────────
   ipcMain.handle('resource:import-epub', (_e, filePath: unknown) => {
     if (!resourceManager) throw new Error('Resource manager not available.')
-    const fp = assertString(filePath, 'filePath')
-    return resourceManager.importEpub(fp)
+    const validatedFilePath = assertString(filePath, 'filePath')
+    return resourceManager.importEpub(validatedFilePath)
   })
 
   // ── resource:import-pdf ─────────────────────────────────────────────────────
   ipcMain.handle('resource:import-pdf', (_e, filePath: unknown) => {
     if (!resourceManager) throw new Error('Resource manager not available.')
-    const fp = assertString(filePath, 'filePath')
-    return resourceManager.importPdf(fp)
+    const validatedFilePath = assertString(filePath, 'filePath')
+    return resourceManager.importPdf(validatedFilePath)
   })
 
   // ── library:get-tafsir-annotations ──────────────────────────────────────────
   ipcMain.handle('library:get-tafsir-annotations', (_e, ayahId: unknown, tafsirKey: unknown) => {
-    const id = assertNumber(ayahId, 'ayahId')
-    const tk = assertString(tafsirKey, 'tafsirKey')
-    return libraryService.getTafsirAnnotations(id, tk)
+    const validatedAyahId = assertNumber(ayahId, 'ayahId')
+    const validatedTafsirKey = assertString(tafsirKey, 'tafsirKey')
+    return libraryService.getTafsirAnnotations(validatedAyahId, validatedTafsirKey)
   })
 }

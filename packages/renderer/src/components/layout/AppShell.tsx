@@ -60,8 +60,8 @@ function IpcMenuListener({ onLayoutChange }: { onLayoutChange: (layout: PanelLay
     maktabat.on('menu:layout-two', () => onLayoutChange('two-column'))
     maktabat.on('menu:layout-three', () => onLayoutChange('three-column'))
     maktabat.on('menu:theme', (data) => {
-      const t = data as { theme: 'light' | 'dark' | 'sepia' }
-      if (t?.theme) setTheme(t.theme)
+      const themePayload = data as { theme: 'light' | 'dark' | 'sepia' }
+      if (themePayload?.theme) setTheme(themePayload.theme)
     })
     maktabat.on('menu:reading-plans', () => void navigate('/reading-plans'))
     maktabat.on('menu:khutbah-builder', () => void navigate('/khutbah'))

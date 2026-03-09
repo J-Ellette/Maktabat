@@ -60,11 +60,11 @@ export default function HighlightToolbar(): React.ReactElement | null {
 
       // Position toolbar above the selection, centered
       const toolbarWidth = 220
-      const x = Math.max(8, Math.min(rect.left + rect.width / 2 - toolbarWidth / 2, window.innerWidth - toolbarWidth - 8))
-      const y = rect.top - 48
+      const toolbarLeft = Math.max(8, Math.min(rect.left + rect.width / 2 - toolbarWidth / 2, window.innerWidth - toolbarWidth - 8))
+      const toolbarTop = rect.top - 48
 
       setSelectedText(text)
-      setPosition({ x, y: Math.max(8, y) })
+      setPosition({ x: toolbarLeft, y: Math.max(8, toolbarTop) })
     }
 
     document.addEventListener('selectionchange', handleSelectionChange)
