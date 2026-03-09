@@ -53,13 +53,6 @@ const RECENT_NOTES = [
   },
 ]
 
-const READING_PLAN = {
-  name: '30-Day Quran Completion',
-  progress: 12,
-  total: 30,
-  todaySurahs: ['Al-Kahf (18)', 'Maryam (19)'],
-}
-
 // ────────────────────────────────────────────────────────────────
 // Subcomponents
 // ────────────────────────────────────────────────────────────────
@@ -190,15 +183,66 @@ function DhikrCard() {
 
 function ReadingPlanCard() {
   const navigate = useNavigate()
-  const pct = Math.round((READING_PLAN.progress / READING_PLAN.total) * 100)
+  const ipc = useIpc()
+  const [planRows, setPlanRows] = useState<
+    { plan_key: string; start_date: string; target_date: string; progress_data: string }[]
+  >([])
+
+  useEffect(() => {
+    if (!ipc) return
+    ipc
+      .invoke('user:get-all-reading-plans')
+      .then((rows) => {
+        if (Array.isArray(rows)) {
+          setPlanRows(rows as typeof planRows)
+        }
+      })
+      .catch(() => {})
+  }, [ipc])
+
+  // Pick the first active plan to display
+  const firstRow = planRows[0]
+
+  if (!firstRow) {
+    return (
+      <Card title="📅 Reading Plans">
+        <p className="text-sm text-[var(--text-secondary)]">No active reading plan.</p>
+        <button
+          onClick={() => void navigate('/reading-plans')}
+          className="w-full text-xs py-1.5 rounded-lg bg-[var(--accent-primary)] text-white hover:opacity-90 transition-opacity"
+        >
+          Start a Plan
+        </button>
+      </Card>
+    )
+  }
+
+  let progress: { completedDays: Record<string, boolean> } = { completedDays: {} }
+  try {
+    progress = JSON.parse(firstRow.progress_data) as typeof progress
+  } catch {
+    /* ignore */
+  }
+
+  const daysBetween = (a: string, b: string) =>
+    Math.max(0, Math.round((new Date(b).getTime() - new Date(a).getTime()) / 86_400_000))
+  const totalDays = daysBetween(firstRow.start_date, firstRow.target_date) + 1
+  const completed = Object.values(progress.completedDays).filter(Boolean).length
+  const pct = Math.round((completed / Math.max(1, totalDays)) * 100)
+  const planName = (progress as Record<string, unknown>).planName as string | undefined
+  const displayName = planName ?? firstRow.plan_key.replace(/-/g, ' ')
+  const dayNum = Math.max(
+    1,
+    daysBetween(firstRow.start_date, new Date().toISOString().split('T')[0] ?? '') + 1
+  )
 
   return (
     <Card title="📅 Reading Plan">
       <div>
         <div className="flex justify-between text-sm mb-1.5">
-          <span className="font-medium text-[var(--text-primary)]">{READING_PLAN.name}</span>
+          <span className="font-medium text-[var(--text-primary)] capitalize">{displayName}</span>
           <span className="text-[var(--text-secondary)]">
-            Day {READING_PLAN.progress} / {READING_PLAN.total}
+            Day {dayNum} / {totalDays}
           </span>
         </div>
         <div className="h-2 bg-[var(--bg-primary)] rounded-full overflow-hidden border border-[var(--border-color)]">
@@ -208,19 +252,6 @@ function ReadingPlanCard() {
           />
         </div>
         <p className="text-xs text-[var(--text-secondary)] mt-1">{pct}% complete</p>
-      </div>
-      <div>
-        <p className="text-xs text-[var(--text-secondary)] mb-1.5">Today's reading:</p>
-        <div className="flex flex-wrap gap-1.5">
-          {READING_PLAN.todaySurahs.map((s) => (
-            <span
-              key={s}
-              className="text-xs px-2 py-0.5 rounded-full bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] font-medium"
-            >
-              {s}
-            </span>
-          ))}
-        </div>
       </div>
       <button
         onClick={() => void navigate('/reading-plans')}
@@ -256,14 +287,22 @@ function RecentResourcesCard() {
 function RecentNotesCard() {
   const ipc = useIpc()
   const navigate = useNavigate()
-  const [notes, setNotes] = useState<{ id: number; resource_key: string; content_ref: string; type: string; body: string }[]>([])
+  const [notes, setNotes] = useState<
+    { id: number; resource_key: string; content_ref: string; type: string; body: string }[]
+  >([])
 
   useEffect(() => {
     if (!ipc) return
     void (async () => {
       try {
         const data = await ipc.invoke('user:get-notes')
-        const all = data as { id: number; resource_key: string; content_ref: string; type: string; body: string }[]
+        const all = data as {
+          id: number
+          resource_key: string
+          content_ref: string
+          type: string
+          body: string
+        }[]
         setNotes(all.slice(0, 3))
       } catch {
         setNotes([])
@@ -271,9 +310,16 @@ function RecentNotesCard() {
     })()
   }, [ipc])
 
-  const displayNotes = notes.length > 0
-    ? notes
-    : RECENT_NOTES.map((n, i) => ({ id: i, resource_key: n.ref, content_ref: n.ref, type: n.type, body: n.body }))
+  const displayNotes =
+    notes.length > 0
+      ? notes
+      : RECENT_NOTES.map((n, i) => ({
+          id: i,
+          resource_key: n.ref,
+          content_ref: n.ref,
+          type: n.type,
+          body: n.body,
+        }))
 
   return (
     <Card title="📝 Recent Notes">

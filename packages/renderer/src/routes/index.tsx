@@ -16,6 +16,7 @@ const KhutbahBuilder = lazy(() => import('../components/khutbah/KhutbahBuilder')
 const StudyTemplates = lazy(() => import('../components/study-templates/StudyTemplates'))
 const FactbookPanel = lazy(() => import('../components/factbook/FactbookPanel'))
 const AtlasPanel = lazy(() => import('../components/atlas/AtlasPanel'))
+const ReadingPlansPanel = lazy(() => import('../components/reading-plans/ReadingPlansPanel'))
 const PlaceholderRoute = lazy(() => import('./PlaceholderRoute'))
 
 function RouteSpinner() {
@@ -56,7 +57,7 @@ export default function AppRoutes(): React.ReactElement {
         <Route path="/khutbah" element={<KhutbahBuilder />} />
         <Route path="/study-templates" element={<StudyTemplates />} />
         <Route path="/library" element={<PlaceholderRoute title="Library Manager" />} />
-        <Route path="/reading-plans" element={<PlaceholderRoute title="Reading Plans" />} />
+        <Route path="/reading-plans" element={<ReadingPlansPanel />} />
         <Route path="/factbook" element={<FactbookPanel />} />
         <Route path="/factbook/:slug" element={<FactbookPanel />} />
         <Route path="/atlas" element={<AtlasPanel />} />

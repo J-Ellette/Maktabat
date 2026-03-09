@@ -396,6 +396,46 @@ export function registerIpcHandlers(
     return userService.getReadingPlan(pk) ?? null
   })
 
+  // ── user:get-all-reading-plans ──────────────────────────────────────────────
+  ipcMain.handle('user:get-all-reading-plans', () => {
+    return userService.getAllReadingPlans()
+  })
+
+  // ── user:save-reading-plan ──────────────────────────────────────────────────
+  ipcMain.handle(
+    'user:save-reading-plan',
+    (_event, planKey: unknown, startDate: unknown, targetDate: unknown, progressData: unknown) => {
+      const pk = assertString(planKey, 'planKey')
+      const sd = assertString(startDate, 'startDate')
+      const td = assertString(targetDate, 'targetDate')
+      if (!progressData || typeof progressData !== 'object' || Array.isArray(progressData)) {
+        throw new Error('user:save-reading-plan: progressData must be an object')
+      }
+      userService.saveReadingPlan(pk, sd, td, progressData as Record<string, unknown>)
+      return true
+    }
+  )
+
+  // ── user:update-reading-plan-progress ──────────────────────────────────────
+  ipcMain.handle(
+    'user:update-reading-plan-progress',
+    (_event, planKey: unknown, progressData: unknown) => {
+      const pk = assertString(planKey, 'planKey')
+      if (!progressData || typeof progressData !== 'object' || Array.isArray(progressData)) {
+        throw new Error('user:update-reading-plan-progress: progressData must be an object')
+      }
+      userService.updateReadingPlanProgress(pk, progressData as Record<string, unknown>)
+      return true
+    }
+  )
+
+  // ── user:delete-reading-plan ────────────────────────────────────────────────
+  ipcMain.handle('user:delete-reading-plan', (_event, planKey: unknown) => {
+    const pk = assertString(planKey, 'planKey')
+    userService.deleteReadingPlan(pk)
+    return true
+  })
+
   // ── settings:get ────────────────────────────────────────────────────────────
   ipcMain.handle('settings:get', (_event, key: unknown, defaultValue: unknown) => {
     const k = assertString(key, 'key')

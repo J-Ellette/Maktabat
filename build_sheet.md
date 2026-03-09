@@ -1099,17 +1099,17 @@ Everything in Premium, plus:
 
 ### PHASE 13: Reading Plans & Progress
 
-- [ ] Built-in plans:
+- [x] Built-in plans:
   - Quran in 30 days
   - Quran in 60 days
   - Quran in 1 year
   - 40 Hadith (Al-Nawawi) in 40 days
   - Riyadh al-Salihin (1 year)
   - Custom plan builder
-- [ ] Daily reading assigned and shown on dashboard
-- [ ] Progress ring (per plan, per day)
-- [ ] Streak tracking
-- [ ] Completion certificates (PDF export)
+- [x] Daily reading assigned and shown on dashboard
+- [x] Progress ring (per plan, per day)
+- [x] Streak tracking
+- [x] Completion certificates (PDF export)
 - [ ] Desktop notification reminders (time configurable)
 
 ---
